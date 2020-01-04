@@ -13,13 +13,13 @@ class TravailEditor extends CommonElementEditor {
   *** --------------------------------------------------------------------- */
   static get properties(){
     return {
-        id:         {hname: 'ID',     type: 'number', hidden: true}
-      , tache:      {hname: 'Tâche',  type: 'string'}
-      , heure:      {hname: 'Heure',  type: 'float'}
-      , duree:      {hname: 'Durée',  type: 'float'}
-      , projetId:   {hname: 'Projet', type: 'Projet' /* donc un identifiant */}
-      , categorieId:{hname: 'Catégorie', type: 'Category', /*idem*/}
-      , domaineId:  {hname: 'Domaine', type: 'Domaine', /*idem*/}
+        id:           {hname: 'ID',         type: 'number', hidden: true}
+      , tache:        {hname: 'Tâche',      type: 'string'}
+      , njour:        {hname: 'Jour',       type: 'number'}
+      , heure:        {hname: 'Heure',      type: 'float'}
+      , duree:        {hname: 'Durée',      type: 'float'}
+      , projetId:     {hname: 'Projet',     type: 'Projet'}
+      , categorieId:  {hname: 'Catégorie',  type: 'Categorie'}
     }
   }
 
@@ -33,11 +33,14 @@ class TravailEditor extends CommonElementEditor {
   innerForm(){
     return [
         DCreate('INPUT',{type:'text',   id:this.idFor('tache'), placeholder:"Tâche à exécuter"})
-      , DCreate('INPUT',{type:'text', id:this.idFor('heure'), placeholder: 'Heure'})
-      , DCreate('INPUT',{type:'text', id:this.idFor('duree'), placeholder: 'Durée (en heure)'})
+      , this.rowFormForJour('Jour', 'njour')
+      , this.rowFormForHour('Heure', 'heure')
+      , this.rowFormForDuree('Durée', 'duree')
       , this.rowFormForType('Projet')
+      , this.rowFormForType('Categorie')
       ]
   }
+
 
   /**
     Observation du formulaire

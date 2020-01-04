@@ -23,18 +23,8 @@ class AssociateColorEditor extends CommonElementEditor {
   innerForm(){
     return [
         DCreate('INPUT',{type:'text', id:this.idFor('name'), inner:this.name})
-      , this.rowForColor('ftcolor')
-      , this.rowForColor('bgcolor')
+      , this.rowFormForColor('ftcolor')
+      , this.rowFormForColor('bgcolor')
     ]
-  }
-  rowForColor(propColor){
-    return DCreate('DIV',{
-      inner: [
-          DCreate('INPUT',{type:'hidden', id:this.idFor(propColor)})
-        , DCreate('SPAN', {class:'color-demo'})
-        , DCreate('BUTTON', {type:'button', id: 'pick…'})
-
-      ]
-    })
   }
 }

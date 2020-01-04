@@ -132,7 +132,6 @@ class CommonElementEditor {
           // Si la valeur est défini pour le propriétaire, il faut
           // aussi indiquer le nom
           var fieldNameId = this.idFor(`${typeMin}-name`)
-          console.log("Id du champ nom:", fieldNameId)
           if ( DGet(`#${fieldNameId}`) ) {
             DGet(`#${fieldNameId}`).innerHTML = this.owner[typeMin] ? this.owner[typeMin].name : '---'
           }
@@ -152,6 +151,7 @@ class CommonElementEditor {
   getFormValues(){
     var newValues = {}
     for(var prop in this.constructor.properties){
+      console.log("Récupération de la propriété : ", prop)
       let dataProp  = this.constructor.properties[prop]
       var fieldId   = this.idFor(prop)
       var domProp   = 'value'
@@ -172,7 +172,7 @@ class CommonElementEditor {
       // On prend la valeur
       var field = DGet(`#${fieldId}`)
       var value;
-      console.log("field : ", field)
+      // console.log("field : ", field)
       if (undefined != field) {
         value = field[domProp/*p.e. 'value' ou 'checked'*/]
       } else {
@@ -197,7 +197,8 @@ class CommonElementEditor {
             break;
           default:
             /* Un type propre à l'application */
-            // La valeur reste la même
+            // La valeur doit être un entier (ID)
+            value = parseInt(value,10)
             // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
         }
       }
@@ -238,6 +239,17 @@ class CommonElementEditor {
       console.log("PAS NOUVEAU")
     }
   }
+
+  /**
+   * Après une modification on actualise l'intérieur du formulaire,
+   * la rangée qui contient les données propres à l'élément
+   */
+  updateInnerForm(){
+    let body = this.form.querySelector('div.row.body')
+    body.innerHTML = ''
+    this.innerForm().forEach(field => body.append(field))
+  }
+
 
   /**
    * Méthode appelée quand on clique sur un bouton 'Choisir…' concernant
@@ -306,6 +318,81 @@ class CommonElementEditor {
       , DCreate('LABEL', {inner: `${realClass.humanName} : `})
       , DCreate('SPAN', {id:`${this.idFor(classe.toLowerCase())}-name`, inner: '...'})
       , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${classe.toLowerCase()}Id`)}`})
+      ]
+    })
+  }
+
+  /**
+   * Méthode utile pour construire un menu pour les jours
+   * avec le titre +titre+ pour la propriété +prop+
+   */
+  rowFormForJour(titre, prop){
+    var optionsJours = []
+    for(var ijour in DATA_JOURS){
+      optionsJours.push(DCreate('OPTION',{value: ijour, inner: DATA_JOURS[ijour].hname}))
+    }
+    return DCreate('DIV',{
+        class:'row'
+      , inner: [
+          DCreate('SPAN', {inner: titre})
+        , DCreate('SELECT', {id:this.idFor(prop), inner:optionsJours})
+      ]
+    })
+  }
+  /**
+   * Méthode utile pour construire un menu heure de titre
+   * +titre+ pour la propriété +prop+
+   */
+  rowFormForHour(titre, prop){
+    var selectOptions = []
+    for(var i = HEURE_START; i <= HEURE_END; ++i ){
+      var iNum = parseFloat(i,10)
+      var heure = String(i).padStart(2,'0')
+      selectOptions.push(DCreate('OPTION',{value:iNum,      inner: `${heure}:00`}))
+      selectOptions.push(DCreate('OPTION',{value:iNum+0.25, inner: `${heure}:15`}))
+      selectOptions.push(DCreate('OPTION',{value:iNum+0.5,  inner: `${heure}:30`}))
+      selectOptions.push(DCreate('OPTION',{value:iNum+0.75, inner: `${heure}:45`}))
+    }
+    return DCreate('DIV', {
+      class: 'row'
+    , inner: [
+          DCreate('SPAN', {inner:`${titre} : `})
+        , DCreate('SELECT', {id:this.idFor(prop), class:'heure', inner: selectOptions})
+      ]
+    })
+  }
+
+  /**
+   * Méthode utile pour construire un menu durée de titre
+   * +titre+ pour la propriété +prop+
+   */
+  rowFormForDuree(titre, prop){
+    var selectOptions = []
+    for(var i = 0; i < 6 ; ++i){
+      var iNum = parseFloat(i,10)
+      var heure = String(i).padStart(2,'0')
+      i > 0 && selectOptions.push(DCreate('OPTION',{value:iNum, inner:`${heure}:00`}))
+      selectOptions.push(DCreate('OPTION',{value:iNum + 0.25,inner:`${heure}:15`}))
+      selectOptions.push(DCreate('OPTION',{value:iNum + 0.5,inner:`${heure}:30`}))
+      selectOptions.push(DCreate('OPTION',{value:iNum + 0.75,inner:`${heure}:45`}))
+    }
+    return DCreate('DIV', {
+      class: 'row'
+    , inner: [
+          DCreate('SPAN', {inner:`${titre} : `})
+        , DCreate('SELECT', {id:this.idFor(prop), class:'heure', inner: selectOptions})
+      ]
+    })
+  }
+
+  rowFormForColor(propColor){
+    return DCreate('DIV',{
+        class: 'row row-color'
+      , inner: [
+          DCreate('INPUT',{type:'hidden', id:this.idFor(propColor)})
+        , DCreate('SPAN', {class:'color-demo'})
+        , DCreate('BUTTON', {type:'button', inner: 'pick…'})
+
       ]
     })
   }

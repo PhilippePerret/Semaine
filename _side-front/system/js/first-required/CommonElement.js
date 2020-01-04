@@ -173,11 +173,13 @@ class CommonElement {
     console.log("Nouvelles données : ", newData)
     var realNewData = {} // celles qui ont vraiment changé
     var keysNewData = Object.keys(newData)
-    for(var k in this.data){
+    for(var k in this.constructor.editorClass.properties){
       // console.log("k:'%s', value:'%s'", k, newData[k])
       if ( keysNewData.indexOf(k) > -1 ) {
-        if ( this.data[k] != newData[k] /* valeur modifiée */)
-        this.data[k] = this[`_${k}`] = newData[k]
+        console.log("La clé '%s' est connu des données transmises", k)
+        console.log("Valeu dans this.data:'%s' / nouvelle:'%s'", this.data[k], newData[k])
+        if ( this.data[k] != newData[k])
+        this._data[k] = this[`_${k}`] = newData[k]
         Object.assign(realNewData, {[k]: newData[k]})
       }
     }
@@ -196,6 +198,7 @@ class CommonElement {
         this.update()
       }
     }
+    this.edited = false
   }
   /**
     Édition de l'élément, quel que soit son type (sa classe)
@@ -212,6 +215,7 @@ class CommonElement {
       // console.log("zindex = ", zindex)
       this.editor.form.style.zIndex = zindex + 1
     }
+    this.edited = true
   }
 
   /**
@@ -232,8 +236,10 @@ class CommonElement {
     if ( this instanceof Travail ) {
       this.rebuild()
     }
-    // Actualiser en édition (if any) Utiliser un this.edited
-    // TODO
+    if ( this.edited) {
+      // Actualiser en édition (if any) Utiliser un this.edited
+      this.editor.updateInnerForm()
+    }
     // Actualiser dans les listings éventuels
     // TODO
   }

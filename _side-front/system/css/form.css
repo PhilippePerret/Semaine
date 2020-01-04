@@ -53,3 +53,12 @@ form div.row.buttons button, div.form div.row.buttons button
 {
   margin-left: 1em;
 }
+
+form select.short, div.form select.short {
+  width: 40px !important;
+}
+form select.heure,
+div.form select.heure
+{
+  width: 70px !important;
+}

@@ -13,11 +13,6 @@ class Semaine {
       }
     });
 
-    console.log("userDataFolder = ", App.userDataFolder)
-    console.log("Je dois construire la semaine courante.")
-    console.log("Today indice = ", Jour.todayIndice)
-    console.log("Nom du jour courant = ", Jour.todayName)
-
     var semaine = new Semaine()
 
     // Faire tous les jours
@@ -39,6 +34,7 @@ class Semaine {
     // On peut construire le curseur (ce qu'on ne peut pas faire avant
     // d'avoir construit la semaine, ce qui sera à corriger TODO)
     Cursor.current.build()
+
     // On met en route le curseur.
     Cursor.current.startMoving()
 
@@ -63,7 +59,7 @@ class Semaine {
     for(var ijour in JOURS_SEMAINE){
       JOURS_SEMAINE[ijour].build()
     }
-  
+
     // Tracer les lignes d'heures
     for(var h = HEURE_START; h <= HEURE_END; h += .5){
       var contenu = h == parseInt(h,10) ? Horloge.heure2horloge(h) : ''
@@ -82,23 +78,10 @@ class Semaine {
   }
 
   loadData(){
-    if (fs.existsSync(this.dataPath)){
-      return YAML.safeLoad(fs.readFileSync(this.dataPath,'utf8')).map( dtravail => {
-        return new Travail(dtravail)
-      })
-    } else {
-      // ESSAI avec des valeurs
-      return [
-          new Travail({tache: "Faire ça", heure: 8.5, njour:2, duree: 2.50})
-        , new Travail({tache: "Faire cet autre travail", heure: 6.5, njour:1})
-        , new Travail({tache: "Et encore autre chose", heure: 10, njour:1, duree:4})
-        , new Travail({tache:"Je vais faire ça", heure: 12.5, njour:3})
-        , new Travail({tache:"Et ça aussi", heure: 13, njour:3})
-        , new Travail({tache:"Et encore ça", heure: 13.5, njour:3})
-        , new Travail({tache:"Et encore ça", heure: 18.5, duree:1.5, njour:3})
-        , new Travail({tache:"Pour essayer le trigger de 17:5 heures", heure: 17.33, duree:1.5, njour:5})
-      ]
-    }
+    // Pour le moment, on prend tous les travaux
+    // TODO Il faudra ensuite charger par semaine
+    Travail.load()
+    return Object.values(Travail.items)
   }
 
   /**
