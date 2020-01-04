@@ -16,7 +16,7 @@ class AssociateColor extends CommonElement {
   /**
     Retourne le path des données des projets courants
   **/
-  static path(){
+  static get path(){
     return this._path || (this._path = path.join(App.userDataFolder,'associate_colors.json'))
   }
 
@@ -28,8 +28,7 @@ class AssociateColor extends CommonElement {
     *
   *** --------------------------------------------------------------------- */
   constructor(data){
-    this.data = data || {}
-    for(var k in data){this[k] = data[k]}
+    super(data)
   }
 
 

@@ -11,6 +11,5 @@ Object.assign(App,{
     */
     Semaine.build_main_semaine()
 
-    ProjetEditor.chooseFor()
   }
 })

@@ -97,3 +97,10 @@
   background-color:#999999;
   color:white;
 }
+
+.common-listing div.buttons button.button-ok {
+  font-size: 13.4pt;
+  font-family: Arial,Geneva;
+  margin-right:1em;
+  margin-top:8px;
+}

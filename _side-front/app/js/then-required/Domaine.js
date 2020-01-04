@@ -14,7 +14,7 @@ class Domaine extends CommonElement{
   /**
     Retourne le path des données des projets courants
   **/
-  static path(){
+  static get path(){
     return this._path || (this._path = path.join(App.userDataFolder,'domaines.json'))
   }
 

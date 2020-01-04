@@ -134,6 +134,10 @@ class CommonElement {
     return this._editorclass || (this._editorclass = eval(`${this.name}Editor`))
   }
 
+  static get listingClass(){
+    return this._listingclass || (this._listingclass = eval(`${this.name}Listing`))
+  }
+
   /**
     Le nom humain de la classe
     Peut-être redéfini pour chaque classe
@@ -147,13 +151,43 @@ class CommonElement {
   *** --------------------------------------------------------------------- */
   constructor(data){
     this._data = data || {} // par défaut
-    for(var k in data){
-      this[`_${k}`] = data[k]
-    }
+    this.firstDispatch(data)
     if (undefined === this._id) this._id = this.constructor.newId()
     this.constructor.add(this)
   }
 
+  firstDispatch(d){
+    for(var k in d){
+      this[`_${k}`] = d[k]
+    }
+  }
+
+  // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
+  dispatch(newData){
+    var realNewData = {} // celles qui ont vraiment changé
+    var keysNewData = Object.keys(newData)
+    for(var k in this.data){
+      console.log("k:'%s', value:'%s'", k, newData[k])
+      if ( keysNewData.indexOf(k) > -1 ) {
+        if ( this.data[k] != newData[k] /* valeur modifiée */)
+        this.data[k] = this[`_${k}`] = newData[k]
+        Object.assign(realNewData, {[k]: newData[k]})
+      }
+    }
+    // Si des valeurs ont changées, il faut actualiser le
+    // fichier
+    // Noter que ça ne devrait pas arriver au chargement (rappel : la méthode
+    // est appelée à l'instanciation) car newdata et this.data sont identiques.
+    if (Object.keys(realNewData).length){
+      if (this.constructor.path){
+        console.log("Données modifiées, je dois sauver…", realNewData)
+        // Les jours, par exemple, ne sont pas enregistrés
+        this.constructor.save()
+        // Il faut aussi actualiser l'affichage
+        this.updateDisplay()
+      }
+    }
+  }
   /**
     Édition de l'élément, quel que soit son type (sa classe)
 
@@ -166,51 +200,39 @@ class CommonElement {
     this.editor.show(ev)
     if (audessusDe) {
       var zindex = audessusDe.style.zIndex
-      console.log("zindex = ", zindex)
+      // console.log("zindex = ", zindex)
       this.editor.form.style.zIndex = zindex + 1
     }
   }
 
+  update(){
+    console.log("Je dois actualiser l'item, en édition, peut-être pas dans le listing")
+    // Actualisation dans l'affichage des semaines
+    // TODO
+    // Actualiser en édition (if any) Utiliser un this.edited
+    // TODO
+    // Actualiser dans les listings éventuels
+    // TODO
+  }
+  /**
+   * Après une modification, on doit actualiser l'affichage
+   * L'affichage peut être dans un listing ou dans la semaine
+   * en fonction de ce que c'est.
+   */
+  updateDisplay(){
+    console.warn("Il faut voir comment actualiser les listes d'items")
+    // if (this.listingItem) {
+    //   this.listingItem.replaceWith(this.buildListingItem())
+    //   this.__observeListingItem()
+    // }
+  }
+
   get editorClass(){ return this.constructor.editorClass }
 
-  get selected(){return this._selected || false}
-  set selected(v){
-    this._selected = v
-    this.listingItem.classList[v ? 'add' : 'remove']('selected')
-  }
 
   /**
     Méthode d'évènements
   **/
-
-  /**
-   * Méthode appelée quand on clique sur un élément de listing
-   */
-  onClickListingItem(ev){
-    this.constructor.select(this)
-  }
-
-  /**
-    Méthode appelée quand on double-clique sur l'élément de listing
-    En fonction du modifier, ça l'édite ou ça le choisit
-  **/
-  onDoubleClickListingItem(ev){
-    if (ev.metaKey) {
-      this.edit(ev, this.constructor.editorClass.listing)
-    } else {
-      this.choose()
-    }
-  }
-
-  /**
-   * Méthode appelée quand on choisit l'item dans le listing, c'est-à-dire
-   * lorsque l'on double-clique sur l'item
-   * Si le listing était affiché pour un choix, on doit répondre à ce choix
-   * TODO Il faut encore implémenter une méthode pour suivre.
-   */
-  choose(){
-
-  }
 
   /**
     Propriétés fixes (enregistrées)
@@ -219,27 +241,9 @@ class CommonElement {
   get id()    {return this._id}
   get name()  {return this._name}
 
-  /**
-    Propriétés volatiles
-  **/
 
-  /**
-   * Méthode pour observer l'élément dans son listing
-   */
-  __observeListingItem(){
-    const my = this;
-    this.listingItem.addEventListener('click', my.onClickListingItem.bind(my))
-    this.listingItem.addEventListener('dblclick', my.onDoubleClickListingItem.bind(my))
-  }
-
-  get listingItem(){
-    return this._liitem || (this._liitem = DGet(`#${this.listingId}`))
-  }
-  /**
-   * ID pour l'élément dans le listing
-   */
-  get listingId(){
-    return this._listingid || (this._listingid = `${this.constructor.minName}-items-${this.id}`)
+  get ref(){
+    return this._ref || (this._ref = `${this.constructor.minName}-${this.id}`)
   }
 
 }

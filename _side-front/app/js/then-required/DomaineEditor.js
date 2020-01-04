@@ -14,4 +14,18 @@ class DomaineEditor extends CommonElementEditor {
     }
   }
 
+  /** ---------------------------------------------------------------------
+    *   INSTANCE
+    *
+  *** --------------------------------------------------------------------- */
+
+  innerForm(){
+    return [
+        DCreate('INPUT', {type:'text', id:this.idFor('name')})
+      , DCreate('TEXTAREA',{id:this.idFor('description')})
+      , this.rowFormForType(AssociateColor)
+    ]
+  }
+
+
 }

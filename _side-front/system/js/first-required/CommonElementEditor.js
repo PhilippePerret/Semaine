@@ -35,7 +35,7 @@ REQUIS POUR HÉRITAGE
   #rowFormForType(<classe>) avec la classe (i.e. le type) en argument pour
   produire un champ avec le nom courant (if any) et un bouton pour choisir
 
-  #innerForm
+  <Objet>Editor#innerForm
     Méthode d'instance qui construire le formulaire. Appelé par `build`, qui
     doit renvoyer le contenu propre du formulaire (hors champ id, boutons,
     etc.)
@@ -65,103 +65,11 @@ class CommonElementEditor {
   *** --------------------------------------------------------------------- */
 
   /**
-   * Permet de choisir un élément du type voulu
-   +Params+::
-    +asker+::[Any classe]       Le 'demandeur', l'instance qui réclame le
-                                choix de cet élément.
-    +audessusDe+::[DOMElement] Elément au-dessus duquel il faut placer
-                  le listing. Noter que souvent c'est asker.form qui est
-                  envoyé.
-   */
-  static chooseFor(asker, audessusDe){
-    console.log("Il va falloir choisir un ", this.masterClass.name)
-    // this.masterClass.forEach()
-    this.listingBuilt || this.buildListing()
-    this.listing.classList.remove('noDisplay')
-    var zindex;
-    if (audessusDe) {
-      zindex = audessusDe.style.zIndex || 500
-    } else {
-      zindex = 500
-    }
-    this.listing.style.zIndex = zindex + 1
-  }
-
-  /**
-    Peuple la liste
-  **/
-  static peupleListing(){
-    const my = this
-    var items   = this.masterClass.items
-    const ul = this.listing.querySelector('ul.ul-items')
-    ul.innerHTML = ''
-    this.masterClass.forEach(item => {
-      ul.append(DCreate('LI',{id:`${item.listingId}`, inner:item.name}))
-      item.__observeListingItem()
-    })
-  }
-  /**
-   * Construit un listing pour pouvoir choisir un élément ou
-   * en créer un nouveau
-   */
-  static buildListing(){
-    // Titre
-    var row_header = DCreate('DIV',{
-        class: 'header'
-      , inner: [
-          DCreate('SPAN',{class:'title', inner: `Listing des ${this.masterClass.name.toLowerCase()}s`})
-        ]
-    })
-    // Pour les Items
-    var row_items = DCreate('UL', {id: `${this.listingId}-ul`, class: 'ul-items'})
-    // Le bouton pour créer ou supprimer un élément
-    var row_buttons = DCreate('DIV',{
-        class:'buttons'
-      , inner:[
-          DCreate('BUTTON', {class:'btn button-ok fright', inner:'OK'})
-        , DCreate('SPAN',{class:'button button-plus', inner:'+'})
-        , DCreate('SPAN',{class:'button button-moins', inner:'−'})
-        ]
-    })
-    this._listing = DCreate('DIV',{
-        id: this.listingId
-      , class:'common-listing'
-      , inner:[ row_header, row_items, row_buttons ]
-    })
-    document.body.append(this.listing)
-    this.listingBuilt = true
-
-    // On peuple le listing avec les éléments courants
-    this.peupleListing()
-
-    // On observe le listing
-    this.observeListing()
-
-  }
-
-  static observeListing(){
-    const my = this
-    this.listing.querySelector('.button-ok')
-      .addEventListener('click', my.onClickOkListing.bind(my))
-  }
-
-  static onClickOkListing(){
-    this.listing.classList.add('noDisplay')
-  }
-
-  /**
    * Retourne la classe maitresse de cette éditor, qui correspond
    * au nom de la classe sans 'Editor'. Par exemple, la masterClass
    * de 'ProjetEditor' est 'Projet'
    */
   static get masterClass() { return eval(this.name.replace(/Editor$/,'')) }
-
-  static get listing(){
-    return this._listing || (this._listing = DGet(`#${this.listingId}`))
-  }
-  static get listingId(){
-    return this._listingid || (this._listingid = `listing-${this.masterClass.minName}s-items`)
-  }
 
 
   /** ---------------------------------------------------------------------
@@ -262,22 +170,39 @@ class CommonElementEditor {
           // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
       }
       // On prend la valeur
-      value = DGet(`#${fieldId}`)[domProp/*p.e. 'value' ou 'checked'*/]
-      switch (dataProp.type) {
-        case 'string':
-        case 'number':
-          value = parseInt(value,10)
-        case 'float':
-          value = parseFloat(value,10)
-          break;
-        case 'boolean':
-          value = !!value
-          break;
-        default:
-          /* Un type propre à l'application */
-          console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
+      var field = DGet(`#${fieldId}`)
+      var value;
+      console.log("field : ", field)
+      if (undefined != field) {
+        value = field[domProp/*p.e. 'value' ou 'checked'*/]
+      } else {
+        console.warn("Le champ '%s' n'existe pas…", fieldId)
+        continue;
       }
-      Object.assign(newValues, {[prop]: {new: value, old: oldValue}})
+
+      if (value == 'undefined' || value == ''){
+        value = undefined
+      } else {
+        switch (dataProp.type) {
+          case 'string':
+            break;
+          case 'number':
+            value = parseInt(value,10)
+            break;
+          case 'float':
+            value = parseFloat(value,10)
+            break;
+          case 'boolean':
+            value = !!value
+            break;
+          default:
+            /* Un type propre à l'application */
+            // La valeur reste la même
+            // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
+        }
+      }
+
+      Object.assign(newValues, {[prop]: value})
     }
     return newValues
   }
@@ -286,11 +211,34 @@ class CommonElementEditor {
     Méthodes d'évènement
   **/
   onCancel(){
+    if ( this.isNew ) {
+      // Il faut le retirer de la liste des items
+      delete this.constructor.masterClass.items[this.id]
+    }
     this.hide()
   }
+
+  /**
+   * Méthode qui enregistrer les nouvelles données
+   * Peut-être que l'élément doit être créé.
+   */
   onOk(){
-    console.log("OK à traiter")
+    var newData = this.getFormValues()
+    console.log("Nouvelles données : ", newData)
+    this.owner.dispatch(newData)
+    if ( this.isNew ) {
+      this.masterClass.listingClass.forEach(listing => listing.add(this.owner))
+    } else {
+
+    }
     this.hide()
+  }
+
+  // Retourne true si c'est un nouvel élément. Le seul moyen
+  // de le savoir, pour le moment, c'est de voir s'il appartient
+  // au listing NOTE : mais que faire si on ne vient pas du listing ?
+  get isNew(){
+    console.error("Il faut déterminer comment savoir s'il est nouveau => mettre un champ 'isnew' dans le formulaire d'édition (ou dans l'instance)")
   }
 
   /**
@@ -298,7 +246,7 @@ class CommonElementEditor {
    * un type de propriété qui est une classe de l'application.
    */
   onChooseType(classe){
-    eval(`${classe}Editor`).chooseFor(this, this.form)
+    eval(`${classe}Listing`).chooseFor(this, this.form)
   }
 
   /**
@@ -325,7 +273,7 @@ class CommonElementEditor {
       innerBody = this.innerForm()
     } else {
       alert("Une erreur est survenue. Consultez la console.")
-      console.error("Il faut définir la méthode d’instance `innerForm` de %s qui doit retourner le contenu du formulaire d'édition.", this.constructor.masterClass.name)
+      console.error("Il faut définir la méthode d’instance `innerForm` de %s qui doit retourner le contenu du formulaire d'édition.", this.constructor.name)
       innerBody = '--- non défini ---'
     }
     let row_body = DCreate('DIV', {class: 'row body', inner: innerBody})
@@ -401,13 +349,9 @@ class CommonElementEditor {
   /**
     La référence unique à cet éditeur
   **/
-  get ref(){
-    return this._ref || (this._ref = `${this.owner.constructor.minName}-${this.owner.id}`)
-  }
+  get ref(){ return this.owner.ref }
+
   get formId(){
     return this._formid || (this._formid = `${this.ref}-form`)
   }
-
-  // Raccourci
-  get listingItem(){return this.owner.listingItem}
 }
