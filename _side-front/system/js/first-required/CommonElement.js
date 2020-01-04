@@ -45,7 +45,7 @@ class CommonElement {
   **/
   static forEach(method){
     this.items || this.init()
-    console.log("this.items: ", this.items)
+    // console.log("this.items: ", this.items)
     for(var item_id in this.items){
       if ( false === method.call(null, this.items[item_id]) ) {
         break ; // Pour pouvoir interrompren
@@ -79,9 +79,17 @@ class CommonElement {
   static save(){
     this.path || raise(`Il faut définir le fichier ${this.name}.path, chemin d'accès au fichier de données.`)
     fs.existsSync(this.path) && fs.unlinkSync(this.path)
-    var datas = Object.values(this.items).map(item => item.data)
+    var datas = Object.values(this.items).map(item => {
+      if ( item.isNew ){
+        item.isNew = false // pour la clarté
+        console.log("J'ai mis le nouvel item à ancien")
+      }
+      return item.data
+    })
     // console.log("datas:", datas)
     fs.writeFileSync(this.path, JSON.stringify(datas))
+    // Il faut actualiser les listings de cet élément
+    this.listingClass.updateListings()
   }
 
   /**
@@ -157,23 +165,24 @@ class CommonElement {
   }
 
   firstDispatch(d){
-    for(var k in d){
-      this[`_${k}`] = d[k]
-    }
+    for(var k in d){this[`_${k}`] = d[k]}
   }
 
   // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
   dispatch(newData){
+    console.log("Nouvelles données : ", newData)
     var realNewData = {} // celles qui ont vraiment changé
     var keysNewData = Object.keys(newData)
     for(var k in this.data){
-      console.log("k:'%s', value:'%s'", k, newData[k])
+      // console.log("k:'%s', value:'%s'", k, newData[k])
       if ( keysNewData.indexOf(k) > -1 ) {
         if ( this.data[k] != newData[k] /* valeur modifiée */)
         this.data[k] = this[`_${k}`] = newData[k]
         Object.assign(realNewData, {[k]: newData[k]})
       }
     }
+
+    console.log("realNewData après dispatch:", realNewData)
     // Si des valeurs ont changées, il faut actualiser le
     // fichier
     // Noter que ça ne devrait pas arriver au chargement (rappel : la méthode
@@ -184,7 +193,7 @@ class CommonElement {
         // Les jours, par exemple, ne sont pas enregistrés
         this.constructor.save()
         // Il faut aussi actualiser l'affichage
-        this.updateDisplay()
+        this.update()
       }
     }
   }
@@ -205,26 +214,28 @@ class CommonElement {
     }
   }
 
+  /**
+   * Procède à la destruction intelligente de l'élément.
+   * Elle est "intelligente" dans le sens où si l'élément est utilisé
+   * par d'autre élément (peut-être passé), il est gardé et seulement
+   * marqué 'removed'
+   * TODO Pour le moment, on le détruit simplement
+   */
+  smartRemove() {
+    delete this.constructor.items[this.id]
+    this.constructor.save()
+  }
+
   update(){
     console.log("Je dois actualiser l'item, en édition, peut-être pas dans le listing")
     // Actualisation dans l'affichage des semaines
-    // TODO
+    if ( this instanceof Travail ) {
+      this.rebuild()
+    }
     // Actualiser en édition (if any) Utiliser un this.edited
     // TODO
     // Actualiser dans les listings éventuels
     // TODO
-  }
-  /**
-   * Après une modification, on doit actualiser l'affichage
-   * L'affichage peut être dans un listing ou dans la semaine
-   * en fonction de ce que c'est.
-   */
-  updateDisplay(){
-    console.warn("Il faut voir comment actualiser les listes d'items")
-    // if (this.listingItem) {
-    //   this.listingItem.replaceWith(this.buildListingItem())
-    //   this.__observeListingItem()
-    // }
   }
 
   get editorClass(){ return this.constructor.editorClass }
@@ -240,6 +251,8 @@ class CommonElement {
   get data()  {return this._data}
   get id()    {return this._id}
   get name()  {return this._name}
+  get isNew() {return this._isNew === true}
+  set isNew(v){this._isNew = v; delete this._data.isNew /* au cas où */}
 
 
   get ref(){

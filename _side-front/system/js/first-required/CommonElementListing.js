@@ -15,7 +15,7 @@ class CommonElementListing {
     chooser.show()
   }
 
-  static listings(){
+  static get listings(){
     this._listings || (this._listings = [])
     return this._listings
   }
@@ -29,6 +29,10 @@ class CommonElementListing {
     for(var listing of this.listings){
       if (false === method(listing)) { break }
     }
+  }
+
+  static updateListings(){
+    this.forEach(listing => listing.peuple())
   }
 
   /**
@@ -167,7 +171,7 @@ class CommonElementListing {
   // On le crée toujours vraiment, mais sans le mettre dans la liste des
   // items
   createNewItem(ev, audessus){
-    const newItem = new this.masterClass({name: `${this.masterClass.name} sans nom`})
+    const newItem = new this.masterClass({name: `${this.masterClass.name} sans nom`, isNew:true})
     newItem.edit(ev, audessus)
   }
 
@@ -176,14 +180,16 @@ class CommonElementListing {
   **/
 
   // Quand on clique sur le bouton '+' du listing
-  onPlus(){
+  onPlus(ev){
     this.createNewItem(ev, this.obj)
   }
 
   // Quand on clique sur le bouton '-'
-  onMoins(){
-    if (this.masterClass.selected){
-      alert("Vous voulez supprimer l'élément courant de type " + this.masterClass.name)
+  async onMoins(ev){
+    if (this.selected){
+      let question = `Est-vous sûr de vouloir détruire l'élément “${this.selected.name}” ?`
+      var choix = await confirmer(question)
+      choix && this.selected.smartRemove()
     } else {
       console.log("Aucune sélection de type " + this.masterClass.name+ " à supprimer")
     }

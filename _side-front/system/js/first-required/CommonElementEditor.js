@@ -224,13 +224,7 @@ class CommonElementEditor {
    */
   onOk(){
     var newData = this.getFormValues()
-    console.log("Nouvelles données : ", newData)
     this.owner.dispatch(newData)
-    if ( this.isNew ) {
-      this.masterClass.listingClass.forEach(listing => listing.add(this.owner))
-    } else {
-
-    }
     this.hide()
   }
 
@@ -238,7 +232,11 @@ class CommonElementEditor {
   // de le savoir, pour le moment, c'est de voir s'il appartient
   // au listing NOTE : mais que faire si on ne vient pas du listing ?
   get isNew(){
-    console.error("Il faut déterminer comment savoir s'il est nouveau => mettre un champ 'isnew' dans le formulaire d'édition (ou dans l'instance)")
+    if (this.owner.isNew) {
+      console.log("NOUVEL ÉLÉMENT")
+    } else {
+      console.log("PAS NOUVEAU")
+    }
   }
 
   /**

@@ -28,10 +28,15 @@ class Travail extends CommonElement {
     }
     data.tache || (data.tache = Prefs.get('travailTacheDefaut'))
     data.duree || (data.duree = Prefs.get('travailDureeDefaut'))
-    console.log("Données de création :", data)
+    data.isNew = true
+    // console.log("Données de création :", data)
     var new_travail = new Travail(data)
     new_travail.build()
     new_travail.edit(ev)
+  }
+
+  static get path(){
+    return this._path || (this._path = path.join(App.userDataFolder,'travaux.json'))
   }
 
   /** ---------------------------------------------------------------------
@@ -83,11 +88,24 @@ class Travail extends CommonElement {
   }
 
   /**
+   * Reconstruction du travail après modification
+   */
+  rebuild(){
+    this.unobserve()
+    this.obj.remove()
+    this.build()
+  }
+
+  /**
     Observation de l'objet
   **/
   observe(){
     const my = this
     this.obj.addEventListener('dblclick', my.onDblClick.bind(my))
+  }
+  unobserve(){
+    const my = this
+    this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
   }
 
   /**
