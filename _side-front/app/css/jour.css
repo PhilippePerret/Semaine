@@ -1,0 +1,26 @@
+/*
+  Pour l'affichage des jours
+ */
+
+/* La colonne d'un jour */
+div.semaine div.jour {
+  display:inline-block;
+  width:250px;
+  min-width:250px;
+  max-width:250px;
+  min-height:800px;
+  height:800px;
+  background-color:#FFCCCC;
+  margin-left:2px;
+}
+div.semaine div.jour div.titre {
+  /* font-weight: bold; */
+  height: 30px;
+  line-height:30px;
+  background-color:grey;
+  color: white;
+  text-align: center;
+}
+div.semaine div.jour div.travaux {
+  position: relative;
+}

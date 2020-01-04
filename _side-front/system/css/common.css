@@ -1,0 +1,26 @@
+.fleft {float:left;}
+.fright {float:right;}
+.right{
+  text-align:right;
+}
+/*
+  Styles
+ */
+ .small {font-size: 0.85em;}
+.bold { font-weight: bold; }
+.italic { font-style: italic;}
+.warning {color:red;}
+.notice { color: blue; }
+.discret {opacity:0.5;}
+.explication {
+  font-size:0.85em;
+  font-style:italic;
+}
+
+.noDisplay,
+.notDisplayed
+{
+  display:none!important
+}
+.hidden {visibility:hidden!important;}
+.visible {visibility:visible!important;}

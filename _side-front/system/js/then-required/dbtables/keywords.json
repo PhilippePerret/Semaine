@@ -1,0 +1,8 @@
+{
+  "name": "keywords",
+  "description": "Table contenant les mots-clés. Elle est mise en relation avec les lois par la table `lois_keywords`.",
+  "fields":{
+    "id": "Identifiant unique du mot clé",
+    "keyword": "Le mot clé en question (100 caractères maximum)."
+  }
+}

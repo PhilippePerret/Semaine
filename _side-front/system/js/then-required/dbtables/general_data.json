@@ -1,0 +1,16 @@
+{
+  "name": "general_data",
+  "description": "Table contenant les données générales.",
+  "fields":{
+    "name": "Nom de la donnée, par exemple 'last_export' pour la date de dernier export.",
+    "type": "Une lettre indiquant le type de la donnée (cf. ci-dessous).",
+    "value": "La valeur à donner, qui sera transformée selon le type."
+  },
+  "types":{
+    "b": "Booléen ('1'/'true' = true, '0'/'false' = false)",
+    "d": "Date",
+    "f": "Flottant",
+    "i": "Integer",
+    "s": "String (on peut laisser tel quel)"
+  }
+}

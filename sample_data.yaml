@@ -1,0 +1,14 @@
+---
+- id: 1
+  njour: 5
+  tache: Une tâche à exécuter
+  heure: 10.5
+  duree: 2
+  categorie: Roman
+
+- id: 2
+  njour: 5
+  tache: Doit être déclenchée à 17:30.
+  heure: 17.66
+  duree: .5
+  categorie: Programmation

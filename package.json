@@ -1,0 +1,37 @@
+{
+  "name": "Semaine",
+  "productName": "Semaine",
+  "version": "0.0.1",
+  "description": "Pour gérer ses semaines de travail",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron .",
+    "start-update": "UPDATE_MAIN_HTML=true electron .",
+    "update-db": "FORCE_REBUILD_DB=true electron .",
+    "build": "electron-packager . --platform=darwin --icon=icons/app --asar --out=built --overwrite",
+    "build-sans-icone": "electron-packager . --platform=darwin --asar --out=built --overwrite",
+    "dev": "electron . --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PhilippePerret/Semaine.git"
+  },
+  "keywords": [],
+  "author": "_LASTNAME_, FIRSTNAME_",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/PhilippePerret/Semaine/issues"
+  },
+  "homepage": "https://github.com/PhilippePerret/Semaine#readme",
+  "devDependencies": {
+    "electron": "^6.0.0",
+    "electron-packager": "^14.0.4"
+  },
+  "dependencies": {
+    "exec": "^0.2.1",
+    "glob": "^7.1.4",
+    "js-yaml": "^3.13.1",
+    "mysql2": "^1.6.5"
+  }
+}
