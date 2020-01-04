@@ -23,8 +23,9 @@ Object.defineProperties(App,{
   homeDirectory:{get(){
     if (undefined === this._homedirectory){
       this._homedirectory = require('os').homedir();
-    }return this._homedirectory
+    } return this._homedirectory
   }}
+, userDataFolder:{get(){return app.getPath('userData')}}
 , Prefs:{get(){return Prefs}}
 , modulesFolder:{get(){
     return this._modulesfolder || (this._modulesfolder = path.join(app.getAppPath(),'_side-front','app','js','modules'))

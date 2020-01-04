@@ -15,8 +15,7 @@ const Prefs = {
   **/
   get(pref_id) {
     this.loaded || this.load()
-    console.log("this.app_data = ", this.app_data)
-    return this.data[pref_id] || eval(this.app_data[pref_id])
+    return this.data[pref_id] || this.app_data[pref_id] || eval(this.app_data[pref_id])
   }
 
   /**

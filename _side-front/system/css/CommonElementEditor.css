@@ -1,0 +1,99 @@
+.common-editor {
+  position:absolute;
+  width:360px;
+  background-color: white;
+  padding:1em;
+  box-shadow: 10px 10px 10px #777777;
+  top: 100px; /* sera rectifié */
+  left: 200px; /* sera rectifié */
+  z-index: 500; /* au-dessus de presque tout */
+}
+
+.common-editor input[type="text"],
+.common-editor textarea
+{
+  width: 94%
+}
+
+.common-editor div.header {
+  font-size:1.4em;
+  font-variant: all-small-caps;
+  font-weight: bold;
+}
+
+.common-editor div.row.buttons {
+  margin-top: 2em !important;
+}
+
+.common-editor div.row.external-type {
+
+}
+.common-editor div.row.external-type span.name {
+
+}
+.common-editor div.row.external-type span.name:before {
+  content: "Nom : ";
+}
+.common-editor div.row.external-type button.button-choose {
+  font-size: 9pt;
+  float:right
+}
+
+/* ---------------------------------------------------------------------
+
+  POUR LES LISTINGS COMMUNS
+
+ */
+.common-listing {
+  position:absolute;
+  left:100px;
+  top: 100px;
+  background-color:white;
+  box-shadow: 10px 10px 10px #999999;
+  z-index: 750;
+}
+
+.common-listing div.header {
+  font-size: 1.4em;
+  font-weight:bold;
+  padding:0.3em 1em;
+}
+
+.common-listing ul.ul-items {
+  border: 1px solid #CCCCCC;
+  min-height:200px;
+  max-height:500px;
+  overflow:auto;
+  width:500px;
+  padding:0;
+  margin:0;
+}
+.common-listing ul.ul-items li {
+  padding:2px 1em;
+  font-family:Optima;
+}
+.common-listing ul.ul-items li:active {
+  background-color:#CCCCCC;
+  color:white;
+}
+.common-listing ul.ul-items li.selected {
+  background-color:#2979dc !important;
+  color:white !important;
+}
+.common-listing ul.ul-items li:nth-child(odd){
+  background-color:#EFEFEF;
+}
+.common-listing div.buttons {
+  border: 1px solid transparent;
+  padding-bottom:3px;
+}
+.common-listing div.buttons .button {
+  color: #999999;
+  font-size: 26pt;
+  padding: 0px 13px 3px;
+  border:1px solid #CCCCCC;
+}
+.common-listing div.buttons .button:active {
+  background-color:#999999;
+  color:white;
+}

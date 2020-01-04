@@ -1,30 +1,33 @@
 'use strict'
 
-const JOURS = [] ;
+const JOURS_SEMAINE = {} ;
 
 const DATA_JOURS = {
-    0: {index:0, hname: "Lundi", short_name: 'lun'}
-  , 1: {index:1, hname: "Mardi", short_name: 'mar'}
-  , 2: {index:2, hname: "Mercredi", short_name: 'mer'}
-  , 3: {index:3, hname: "Jeudi", short_name: 'jeu'}
-  , 4: {index:4, hname: "Vendredi", short_name: 'ven'}
-  , 5: {index:5, hname: "Samedi", short_name: 'sam'}
-  // , 1: {index:1, hname: "Dimanche", short_name: 'dim'}
+    1: {index:1, hname: 'Lundi',    short_name: 'lun'}
+  , 2: {index:2, hname: 'Mardi',    short_name: 'mar'}
+  , 3: {index:3, hname: 'Mercredi', short_name: 'mer'}
+  , 4: {index:4, hname: 'Jeudi',    short_name: 'jeu'}
+  , 5: {index:5, hname: 'Vendredi', short_name: 'ven'}
+  , 6: {index:6, hname: 'Samedi',   short_name: 'sam'}
+  // , 7: {index:7, hname: "Dimanche", short_name: 'dim'}
 }
 
-class Jour {
+class Jour extends CommonElement {
 
   /** ---------------------------------------------------------------------
     *   CLASSE
     *
   *** --------------------------------------------------------------------- */
 
-  // Indice du jour de la semaine courant, 1-start pou lundi
-  static get today_indice(){
+  // Indice du jour de la semaine courant, 1-start pour lundi
+  static get todayIndice(){
     return this._todayindice || (this._todayindice = new Date().getUTCDay())
   }
-  static get today_name(){
-    return this._todayname || (this._todayname = DATA_JOURS[this.today_indice-1].hname)
+  static get todayData(){
+    return this._todaydata || (this._todaydata = DATA_JOURS[this.todayIndice])
+  }
+  static get todayName(){
+    return this._todayname || (this._todayname = this.todayData.hname)
   }
 
   /** ---------------------------------------------------------------------
@@ -32,11 +35,12 @@ class Jour {
     *
   *** --------------------------------------------------------------------- */
 
-  constructor(semaine, ijour){
-    this.semaine  = semaine
-    this.njour    = ijour // indice a-start dans la fenêtre
+  constructor(data){
+    super(data)
   }
 
+  get semaine(){return this._semaine}
+  get njour(){return this._njour}
 
   /**
    * Construction du jour
@@ -47,10 +51,44 @@ class Jour {
       , DCreate('DIV',{class:'travaux'})
     ]})
     this.semaine.obj.append(this.obj)
+    this.observe()
   }
 
+  /**
+    Observateur du jour
+  **/
+  observe(){
+    this.obj.addEventListener('dblclick', this.onDoubleClick.bind(this))
+  }
+
+
+  /**
+    Méthodes d'évènement
+  **/
+
+  /**
+    Double-click sur le jour => création d'un travail
+  **/
+  onDoubleClick(ev){
+    // console.log("Double-click sur le jour")
+    // console.log("ev = ", ev)
+
+    // On arrondit toujours l'heure cliquée à la demi-heure
+    var realHeure = HEURE_START + ((ev.clientY - TOP_START) / HEURE_HEIGHT)
+    var heure = parseInt(HEURE_START + ((ev.clientY - TOP_START) / HEURE_HEIGHT),10)
+    if ( realHeure > heure + 0.5 ) {
+      heure += .5
+    }
+    // console.log("Heure = ", heure)
+    Travail.createNewInJour({heure:heure, njour:this.njour}, ev)
+    return stopEvent(ev)
+  }
+
+  get absData(){
+    return this._absdata || (this._absdata = DATA_JOURS[this.njour])
+  }
   get jname(){
-    return DATA_JOURS[this.njour].hname
+    return this.absData.hname
   }
 
   get works(){

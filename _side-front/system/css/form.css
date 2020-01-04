@@ -1,43 +1,55 @@
-form {
+/*
+Styles pour les formulaires
+
+NB : on peut aussi utiliser div.form au lieu de form pour ne pas
+répondre au retour chariot et au bouton OK qui sinon soumettent le
+formulaire.
+
+ */
+form, div.form {
   padding:1em;
   border:1px solid #BBBBBB;
   border-radius: 1em;
-  width: 90%;
 }
-form * {
+form *, div.form * {
   font-size:inherit;
 }
-form div.title {
+form div.title, div.form div.title {
   opacity: 0.5;
   font-weight: bold;
   margin-bottom:1em;
   font-variant:small-caps;
 }
 
-form div.row:not(.buttons) {
+form div.row:not(.buttons), div.form div.row:not(.buttons) {
   border:1px solid #EEEEEE;
   margin-top:8px;
 }
-form div.row > input,
-form div.row > textarea,
-form div.row > select,
-form div.row > select > option {
+form div.row > input, div.form div.row
+form div.row > textarea, div.form div.row > textarea,
+form div.row > select, div.form div.row > select,
+form div.row > select > option, div.form div.row > select > option
+{
   width: 90%;
   padding: 6px 12px;
 }
 
-form div.row > textarea {
+form div.row > textarea, div.form div.row > textarea
+{
   resize:none;
 }
-form div.row > textarea.medium {
+form div.row > textarea.medium, div.form div.row > textarea.medium
+{
   height: 3em;
 }
 
-form div.row.buttons {
+form div.row.buttons, div.form div.row.buttons
+{
   margin-top: 1em;
   text-align:right;
 }
 
-form div.row.buttons button {
+form div.row.buttons button, div.form div.row.buttons button
+{
   margin-left: 1em;
 }

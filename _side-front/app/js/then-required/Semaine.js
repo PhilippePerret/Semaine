@@ -13,14 +13,16 @@ class Semaine {
       }
     });
 
+    console.log("userDataFolder = ", App.userDataFolder)
     console.log("Je dois construire la semaine courante.")
-    console.log("Today indice = ", Jour.today_indice)
-    console.log("Nom du jour courant = ", Jour.today_name)
+    console.log("Today indice = ", Jour.todayIndice)
+    console.log("Nom du jour courant = ", Jour.todayName)
 
     var semaine = new Semaine()
 
-    for(var i=0; i<6; ++i){
-      JOURS.push(new Jour(semaine, i))
+    // Faire tous les jours
+    for(var i=1; i<7; ++i){
+      Object.assign(JOURS_SEMAINE, {[i]: new Jour({semaine:semaine, njour:i})})
     }
 
     // On doit instancier un nouveau curseur qui va :
@@ -56,10 +58,12 @@ class Semaine {
   build(){
     UI.content.append(DCreate('DIV',{id:'semaine-courante', class:'semaine'}))
     this.obj = DGet('div#semaine-courante')
-    JOURS.forEach(jour => {
-      jour.build()
-    })
 
+    // Créer tous les jours de la semaine
+    for(var ijour in JOURS_SEMAINE){
+      JOURS_SEMAINE[ijour].build()
+    }
+  
     // Tracer les lignes d'heures
     for(var h = HEURE_START; h <= HEURE_END; h += .5){
       var contenu = h == parseInt(h,10) ? Horloge.heure2horloge(h) : ''
