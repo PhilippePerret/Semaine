@@ -128,7 +128,7 @@ class CommonElementListing {
   add(item){
     var styles = []
     // Si l'item a une couleur associée, on l'indique
-    if ( item.accociatecolorId ) {
+    if ( item.associatecolorId ) {
       styles.push(`color:${item.associateColor.ftcolor};background-color:${item.associateColor.bgcolor}`)
     }
     styles = styles.join(';')

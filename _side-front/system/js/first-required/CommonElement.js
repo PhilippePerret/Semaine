@@ -307,7 +307,7 @@ class CommonElement {
     Propriété volatile
   **/
   get associateColor(){
-    return this._associatecolor || (this._associatecolor = AssociateColor.get(this.accociatecolorId))
+    return this._associatecolor || (this._associatecolor = AssociateColor.get(this.associatecolorId))
   }
 
   /**
@@ -336,7 +336,7 @@ class CommonElement {
     }
   }
   // L'ID de la couleur si elle est définie pour cette élément
-  get accociatecolorId() { return this._accociatecolorId }
+  get associatecolorId() { return this._associatecolorId }
 
   // Le premier parent de l'élément dans la suite des parents
   // possible
