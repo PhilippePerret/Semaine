@@ -20,6 +20,8 @@ class TravailEditor extends CommonElementEditor {
       , duree:        {hname: 'Durée',      type: 'float'}
       , projetId:     {hname: 'Projet',     type: 'Projet'}
       , categorieId:  {hname: 'Catégorie',  type: 'Categorie'}
+      , associatecolorId: {hname:'Couleur', type: 'AssociateColor'}
+
     }
   }
 
@@ -38,15 +40,16 @@ class TravailEditor extends CommonElementEditor {
       , this.rowFormForDuree('Durée', 'duree')
       , this.rowFormForType('Projet')
       , this.rowFormForType('Categorie')
+      , this.rowFormForType('AssociateColor')
       ]
   }
 
 
-  /**
-    Observation du formulaire
-  **/
-  observe(){
-    console.log("Je vais observer de façon particulière.")
-  }
+  // /**
+  //   Observation du formulaire
+  // **/
+  // observe(){
+  //
+  // }
 
 }

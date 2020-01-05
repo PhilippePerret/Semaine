@@ -57,8 +57,15 @@ form div.row.buttons button, div.form div.row.buttons button
 form select.short, div.form select.short {
   width: 40px !important;
 }
+form select.medium, div.form select.medium {
+  width: 50% !important;
+}
 form select.heure,
 div.form select.heure
 {
   width: 70px !important;
+}
+form select.auto, div.form select.auto {
+  width: auto !important;
+  padding: 0 1em !important;
 }

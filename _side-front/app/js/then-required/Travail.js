@@ -1,11 +1,5 @@
 'use strict'
 
-const HEURE_START   = 6 ;
-const HEURE_END     = 18 ;
-const HEURE_HEIGHT  = 50 ;
-const COEF_MINUTE   = HEURE_HEIGHT / 60 ;
-const TOP_START     = 30 ; // hauteur du nom du jour
-
 class Travail extends CommonElement {
 
   /** ---------------------------------------------------------------------
@@ -82,9 +76,18 @@ class Travail extends CommonElement {
   buildIn(container){
     var classCss = ['travail']
     this.selected && classCss.push('selected')
-    this.obj = DCreate('DIV',{class:classCss.join(' '),inner:[
-      DCreate('SPAN', {class:'tache', inner:`${this.formated_tache} à ${this.heure}` })
-    ]})
+    var styles = []
+    if ( this.f_color ) {
+      styles.push(`background-color:${this.f_color.bgcolor}`)
+      styles.push(`color:${this.f_color.ftcolor}`)
+    }
+    this.obj = DCreate('DIV',{
+        class:classCss.join(' ')
+      , inner:[
+          DCreate('SPAN', {class:'tache', inner:`${this.formated_tache} à ${this.heure}` })
+        ]
+      , style:styles.join(';')
+      })
     container.append(this.obj)
     this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
     if (this.duree){
@@ -203,7 +206,7 @@ class Travail extends CommonElement {
       fstr = fstr.replace(/\$\{([a-zA-Z]+)\}/, (corr, classe) => {
         classe = classe.toLowerCase()
         var prop = `${classe}Id`
-        if ( this[prop] ) {
+        if ( this[prop] && this[classe]) {
           return this[classe].name
         } else {
           return `- ${classe.toTitle()} inconnu -`
@@ -240,21 +243,5 @@ class Travail extends CommonElement {
   get jour(){
     return this._jour || ( this._jour = Jour.get(this.njour) )
   }
-  /**
-    La catégorie du travail
-  **/
-  get categorie(){
-    return this._categorie || (this._categorie = Categorie.get(this.categorieId))
-  }
-  get categorieId(){
-    return this._categorieId
-  }
 
-  /**
-    Le projet du travail
-  **/
-  get projet(){
-    return this._projet || (this._projet = Projet.get(this.projetId))
-  }
-  get projetId(){ return this._projetId }
-}
+}// /Travail

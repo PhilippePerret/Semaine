@@ -8,10 +8,10 @@
 class ProjetEditor extends CommonElementEditor {
   static get properties(){
     return {
-        id:             {hname:'ID',        type:'number', hidden:true}
-      , name:           {hname: 'Titre',    type:'string'}
-      , categorieId:    {hname:'Catégorie', type:'Categorie'}
-      , associateColor: {hname:'Couleur associée', type: 'AsssociateColor'}
+        id:               {hname:'ID',        type:'number', hidden:true}
+      , name:             {hname: 'Titre',    type:'string'}
+      , categorieId:      {hname:'Catégorie', type:'Categorie'}
+      , associatecolorId: {hname:'Couleur',   type:'AsssociateColor'}
     }
   }
 
@@ -22,8 +22,8 @@ class ProjetEditor extends CommonElementEditor {
   innerForm(){
     return [
       DCreate('INPUT',{type:'text', id:this.idFor('name')})
-    , this.rowFormForType('Categorie')
-    , this.rowFormForType('AssociateColor')
+    , this.rowFormForType(Categorie)
+    , this.rowFormForType(AssociateColor)
     ]
   }
 }

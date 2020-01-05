@@ -164,7 +164,7 @@ class CommonElementListing {
   }
 
   onClickItem(item, ev){
-    console.log("item = ", item)
+    // console.log("item = ", item)
     this.selected = item
   }
 

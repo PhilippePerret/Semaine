@@ -171,6 +171,17 @@ class CommonElement {
   **/
   static get humanName(){ return this.name }
 
+  static get firstInheritedClass(){
+    if (undefined === this._firstinheritedclass) {
+      this._firstinheritedclass = HIERARCHIE_PARENTS.indexOf(this.constructor.minClass)
+      if ( this._firstinheritedclass > -1 ) {
+        this._firstinheritedclass += 1
+      } else {
+        this._firstinheritedclass = null
+      }
+    } return this._firstinheritedclass
+  }
+
 
   /** ---------------------------------------------------------------------
     *   INSTANCE
@@ -190,16 +201,20 @@ class CommonElement {
   // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
   dispatch(newData){
     // console.log("Nouvelles données : ", newData)
+    console.log("this.data au début du dispatch : ", JSON.stringify(this._data))
     var realNewData = {} // celles qui ont vraiment changé
     var keysNewData = Object.keys(newData)
     for(var k in this.constructor.editorClass.properties){
       // console.log("k:'%s', value:'%s'", k, newData[k])
       if ( keysNewData.indexOf(k) > -1 ) {
-        // console.log("La clé '%s' est connu des données transmises", k)
-        // console.log("Valeur dans this.data:'%s' / nouvelle:'%s'", this.data[k], newData[k])
-        if ( this.data[k] != newData[k])
-        this._data[k] = this[`_${k}`] = newData[k]
-        Object.assign(realNewData, {[k]: newData[k]})
+        if ( this.data[k] != newData[k] ) {
+          this._data[k] = this[`_${k}`] = newData[k]
+          Object.assign(realNewData, {[k]: newData[k]})
+        } else {
+          console.log("Valeur de clé '%s' n'a pas changé (dans this.data:'%s', dans newData:'%s')", k, this.data[k], newData[k])
+        }
+      } else {
+        console.log("La propriété définie '%s' n'est pas connu des nouvelles données à transmettre", k)
       }
     }
 
@@ -209,8 +224,13 @@ class CommonElement {
     // Noter que ça ne devrait pas arriver au chargement (rappel : la méthode
     // est appelée à l'instanciation) car newdata et this.data sont identiques.
     if (Object.keys(realNewData).length){
+
       if (this.constructor.path){
         console.log("Données modifiées, je dois sauver…", realNewData)
+        // Mesure de prudence
+        delete this._data.isNew
+        // Aperçu des données data au moment de sauver
+        console.log("Avant la sauvegarder this.data de l'élément = ", this.data)
         // Les jours, par exemple, ne sont pas enregistrés
         this.constructor.save()
         // Il faut aussi actualiser l'affichage
@@ -300,10 +320,81 @@ class CommonElement {
   get isNew() {return this._isNew === true}
   set isNew(v){this._isNew = v; delete this._data.isNew /* au cas où */}
 
+  /**
+   * Méthodes pour trouver la couleur
+   */
+   /**
+      Retourne soit la couleur définie, soit la couleur héritée
+      par un parent.
+  **/
+  get f_color(){
+    if ( this.associatecolorId ){
+      return this.associateColor ;
+    } else {
+      // On va essayer de la trouver dans un parent
+      return this.getColorHeritee()
+    }
+  }
+  // L'ID de la couleur si elle est définie pour cette élément
   get accociatecolorId() { return this._accociatecolorId }
 
+  // Le premier parent de l'élément dans la suite des parents
+  // possible
+  get firstInheritedClass(){ return this.constructor.firstInheritedClass}
+
+
+  getColorHeritee(){
+    const nombreParents = HIERARCHIE_PARENTS.length
+    const firstParent = HIERARCHIE_PARENTS.indexOf(this.firstInheritedClass)
+    for(var iparent = firstParent; iparent < nombreParents; ++iparent){
+      var classMinParent = HIERARCHIE_PARENTS[iparent]
+      if ( this[`${classMinParent}Id`] ) {
+        if ( this[classMinParent] ) {
+          return this[classMinParent].f_color
+        } else {
+          // On se trouve en présence d'un élément qui possède un ID
+          // défini pour un élément parent, avec cet élément qui est
+          // inexistant, parce qu'il a peut-être été supprimé. Il faut
+          // signaler une erreur.
+          console.error("Problème avec l'élément '%s'", this.ref)
+          console.error("L'ID #%d de classe %s est défini mais ne renvoie aucun élément…", this[`${classMinParent}Id`], classMinParent)
+          message("Une erreur est survenue. Consulter la console.")
+        }
+      }
+    }
+    return ; // pas de couleur trouvée
+  }
+
+  /**
+    Pour faire référence à l'élément
+  **/
   get ref(){
     return this._ref || (this._ref = `${this.constructor.minName}-${this.id}`)
   }
+
+  /**
+    N0002
+    Ces méthodes sont communes à tous les éléments-commun, mais
+    c'est juste pour ne pas répéter les méthodes. En réalité, ils
+    ne sont pas tous pertinent. Par exemple, projetId n'a aucun
+    sens pour un Domaine, qui est une classe hiérarchiquement supérieure.
+  **/
+  // Catégorie (cf. N0002)
+  get categorie(){
+    return this._categorie || (this._categorie = Categorie.get(this.categorieId))
+  }
+  get categorieId(){ return this._categorieId }
+
+  // Domaine (cf. N0002)
+  get domaine(){
+    return this._domaine || (this._domaine = Domaine.get(this.domaineId))
+  }
+  get domaineId(){return this._domaineId}
+
+  // Projet (cf. N0002)
+  get projet(){
+    return this._projet || (this._projet = Projet.get(this.projetId))
+  }
+  get projetId(){ return this._projetId }
 
 }

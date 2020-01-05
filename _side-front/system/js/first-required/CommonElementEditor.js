@@ -128,7 +128,7 @@ class CommonElementEditor {
           /* Un type propre à l'application */
           var typeMin = dataProp.type.toLowerCase()
           // Champ id contenant l'identifiant de l'élément
-          var fieldId = this.idFor(typeMin+'Id')
+          var fieldId = this.idFor(prop)
           // Si la valeur est défini pour le propriétaire, il faut
           // aussi indiquer le nom
           var fieldNameId = this.idFor(`${typeMin}-name`)
@@ -151,11 +151,11 @@ class CommonElementEditor {
   getFormValues(){
     var newValues = {}
     for(var prop in this.constructor.properties){
-      console.log("Récupération de la propriété : ", prop)
+      // console.log("Récupération de la propriété : ", prop)
       let dataProp  = this.constructor.properties[prop]
       var fieldId   = this.idFor(prop)
       var domProp   = 'value'
-      var oldValue  = this.owner[prop]
+      var oldValue  = this.owner[`_${prop}`]
       switch (dataProp.type) {
         case 'string':
         case 'number':
@@ -166,11 +166,12 @@ class CommonElementEditor {
           break;
         default:
           /* Un type propre à l'application */
-          fieldId = this.idFor(dataProp.type.toLowerCase()+'Id')
+          // fieldId = this.idFor(dataProp.type.toLowerCase()+'Id')
+          fieldId = this.idFor(prop)
           // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
       }
       // On prend la valeur
-      var field = DGet(`#${fieldId}`)
+      var field = DGet(`#${fieldId}`);
       var value;
       // console.log("field : ", field)
       if (undefined != field) {
@@ -202,6 +203,8 @@ class CommonElementEditor {
             // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
         }
       }
+      // Une toute dernière vérification
+      if (value === 'undefined') value = null ;
 
       Object.assign(newValues, {[prop]: value})
     }
@@ -225,6 +228,8 @@ class CommonElementEditor {
    */
   onOk(){
     var newData = this.getFormValues()
+    // console.log("Nouvelles données : ", JSON.stringify(newData))
+    // console.log("this.data avant dispatch : ", JSON.stringify(this.owner.data))
     this.owner.dispatch(newData)
     this.hide()
   }
@@ -267,7 +272,7 @@ class CommonElementEditor {
     let row_header  = DCreate('DIV',{
       class: 'header'
     , inner: [
-        DCreate('DIV', {inner: `Éditeur ${this.owner.constructor.name}`})
+        DCreate('DIV', {inner: `Éditeur ${this.owner.constructor.name} #${this.owner.id}`})
       , DCreate('INPUT',{type:'hidden', id:this.idFor('id'), value: this.owner.id})
       ]
     })
@@ -334,8 +339,8 @@ class CommonElementEditor {
     return DCreate('DIV',{
         class:'row'
       , inner: [
-          DCreate('SPAN', {inner: titre})
-        , DCreate('SELECT', {id:this.idFor(prop), inner:optionsJours})
+          DCreate('SPAN', {inner: `${titre} : `})
+        , DCreate('SELECT', {id:this.idFor(prop), class:'auto', inner:optionsJours})
       ]
     })
   }
