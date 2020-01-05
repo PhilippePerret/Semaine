@@ -88,6 +88,7 @@ class CommonElementEditor {
   }
 
   show(options){
+    console.log("-> show de l'éditeur de ", this.owner)
     this.built || this.build()
     this.form.classList.remove('noDisplay')
     // On le place à l'endroit voulu si défini
@@ -269,6 +270,7 @@ class CommonElementEditor {
   **/
 
   build(){
+    console.log("-> construction de l'éditeur pour ", this.owner)
     let row_header  = DCreate('DIV',{
       class: 'header'
     , inner: [

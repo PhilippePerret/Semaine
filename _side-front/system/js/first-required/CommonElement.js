@@ -201,7 +201,7 @@ class CommonElement {
   // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
   dispatch(newData){
     // console.log("Nouvelles données : ", newData)
-    console.log("this.data au début du dispatch : ", JSON.stringify(this._data))
+    // console.log("this.data au début du dispatch : ", JSON.stringify(this._data))
     var realNewData = {} // celles qui ont vraiment changé
     var keysNewData = Object.keys(newData)
     for(var k in this.constructor.editorClass.properties){
@@ -211,7 +211,7 @@ class CommonElement {
           this._data[k] = this[`_${k}`] = newData[k]
           Object.assign(realNewData, {[k]: newData[k]})
         } else {
-          console.log("Valeur de clé '%s' n'a pas changé (dans this.data:'%s', dans newData:'%s')", k, this.data[k], newData[k])
+          // console.log("Valeur de clé '%s' n'a pas changé (dans this.data:'%s', dans newData:'%s')", k, this.data[k], newData[k])
         }
       } else {
         console.log("La propriété définie '%s' n'est pas connu des nouvelles données à transmettre", k)
@@ -226,11 +226,11 @@ class CommonElement {
     if (Object.keys(realNewData).length){
 
       if (this.constructor.path){
-        console.log("Données modifiées, je dois sauver…", realNewData)
+        // console.log("Données modifiées, je dois sauver…", realNewData)
         // Mesure de prudence
         delete this._data.isNew
         // Aperçu des données data au moment de sauver
-        console.log("Avant la sauvegarder this.data de l'élément = ", this.data)
+        // console.log("Avant la sauvegarder this.data de l'élément = ", this.data)
         // Les jours, par exemple, ne sont pas enregistrés
         this.constructor.save()
         // Il faut aussi actualiser l'affichage
@@ -252,7 +252,6 @@ class CommonElement {
     this.editor.show(ev)
     if (audessusDe) {
       var zindex = Number(audessusDe.style.zIndex)
-      console.log("zindex = ", zindex)
       this.editor.form.style.zIndex = zindex + 1
     }
     this.edited = true
