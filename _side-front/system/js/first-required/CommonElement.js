@@ -203,9 +203,17 @@ class CommonElement {
   }
 
   // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
-  dispatch(newData){
+  async dispatch(newData){
     // console.log("Nouvelles données : ", newData)
     // console.log("this.data au début du dispatch : ", JSON.stringify(this._data))
+
+    // Si une méthode before update existe, on l'appelle avec les données
+    // Cette méthode a été inaugurée pour les travaux récurrents.
+    // La méthode est asynchrone pour permettre des questions/confirmations
+    if ( this.beforeDispatch instanceof Function){
+      newData = await this.beforeDispatch.call(this, newData)
+    }
+
     var realNewData = {} // celles qui ont vraiment changé
     var keysNewData = Object.keys(newData)
     for(var k in this.constructor.editorClass.properties){
@@ -242,6 +250,9 @@ class CommonElement {
       }
     }
     this.edited = false
+
+    // Si une méthode d'après update existe
+    if ( this.afterDispatch instanceof Function) this.afterDispatch.call(this)
   }
 
   /**

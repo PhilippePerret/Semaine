@@ -90,10 +90,7 @@ class Jour /* extends CommonElement */ {
     Nettoyer le jour
   **/
   nettoie(){
-    console.log('-> Jour#%d.nettoie()', this.njour)
-    console.log('this.objTravaux = ', this.objTravaux)
     this.objTravaux.replaceWith(DCreate('DIV',{class:'travaux'}))
-    console.log('this.objTravaux (après) = ', this.objTravaux)
     delete this._objtravaux
   }
 

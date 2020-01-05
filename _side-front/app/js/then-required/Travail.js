@@ -134,6 +134,28 @@ class Travail extends CommonElement {
     this.obj.addEventListener('click', my.onClick.bind(my))
   }
 
+  async beforeDispatch(newData){
+    if ( ! newData.recurrent ) return newData ;
+    // On passe ici si c'est un travail récurrent
+    var choix = await confirmer("Voulez-vous vraiment faire de ce travail un travail récurrent ?")
+    if ( choix ) { return newData }
+    else { return Object.assign(newData, {recurrent: false}) }
+  }
+
+  /**
+    Méthode appelée après la méthode de dispatch commune
+    C'est cette méthode, pour Travail, qui va permettre de savoir
+    s'il faut transformer le travail en travail récurrent
+  **/
+  afterDispatch(){
+    if ( !this.isRecurrent ) return
+    // La récurrence doit être prise en compte. Cela consiste à :
+    //  - supprimer le travail de cette semaine
+    //  - l'ajouter à la liste des travaux récurrents
+    // TODO
+
+  }
+
   /**
    * Pour détruire le travail dans la semaine
    * (quand on le supprime)
@@ -181,7 +203,7 @@ class Travail extends CommonElement {
    * States
    */
   get isRecurrent(){
-    return !!this.recurrence
+    return this.recurrent === true
   }
 
   /**
@@ -203,8 +225,8 @@ class Travail extends CommonElement {
    */
 
   // Retourne la définition de la récurrence du travail
-  get recurrence(){
-    return this._recurrence
+  get recurrent(){
+    return this._recurrent
   }
 
   /**

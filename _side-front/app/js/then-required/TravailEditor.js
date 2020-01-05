@@ -18,6 +18,7 @@ class TravailEditor extends CommonElementEditor {
       , njour:        {hname: 'Jour',       type: 'number'}
       , heure:        {hname: 'Heure',      type: 'float'}
       , duree:        {hname: 'Durée',      type: 'float'}
+      , recurrent:    {hname: 'Récurrent',  type: 'boolean'}
       , projetId:     {hname: 'Projet',     type: 'Projet'}
       , categorieId:  {hname: 'Catégorie',  type: 'Categorie'}
       , associatecolorId: {hname:'Couleur', type: 'AssociateColor'}
@@ -41,6 +42,10 @@ class TravailEditor extends CommonElementEditor {
       , this.rowFormForType('Projet')
       , this.rowFormForType('Categorie')
       , this.rowFormForType('AssociateColor')
+      , DCreate('DIV',{class:'row', inner:[
+          DCreate('INPUT',{type:'checkbox', id:this.idFor('recurrent')})
+        , DCreate('LABEL', {for:this.idFor('recurrent'), inner: 'Travail récurrent'})
+      ]})
       ]
   }
 
