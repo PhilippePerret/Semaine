@@ -386,11 +386,13 @@ class CommonElementEditor {
   }
 
   rowFormForColor(propColor){
+    var spanDemoId = this.idFor(`propColor-demo`)
+    AColorPicker.from(spanDemoId)
     return DCreate('DIV',{
         class: 'row row-color'
       , inner: [
           DCreate('INPUT',{type:'hidden', id:this.idFor(propColor)})
-        , DCreate('SPAN', {class:'color-demo'})
+        , DCreate('SPAN', {id:spanDemoId, class:'color-demo'})
         , DCreate('BUTTON', {type:'button', inner: 'pick…'})
 
       ]

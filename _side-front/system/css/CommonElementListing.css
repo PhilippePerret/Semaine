@@ -48,9 +48,15 @@
   padding-bottom:3px;
 }
 
-.common-listing div.buttons button.button-ok {
+.common-listing div.buttons button.button-ok,
+.common-listing div.buttons button.button-cancel
+{
   font-size: 13.4pt;
   font-family: Arial,Geneva;
   margin-right:1em;
   margin-top:8px;
+}
+.common-listing div.buttons button.button-cancel {
+  margin-left:1em;
+  vertical-align:top;
 }

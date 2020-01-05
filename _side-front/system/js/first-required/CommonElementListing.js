@@ -10,9 +10,9 @@ class CommonElementListing {
     *
   *** --------------------------------------------------------------------- */
   static chooseFor(asker, audessusDe) {
-    console.log("Je dois affiche la liste '%s' pour choisir un élément pour", this.name, asker)
+    // console.log("Je dois afficher la liste '%s' pour choisir un élément pour", this.name, asker)
     const chooser = new this(asker)
-    chooser.show()
+    chooser.show(audessusDe)
   }
 
   static get listings(){
@@ -86,6 +86,7 @@ class CommonElementListing {
           DCreate('BUTTON', {class:'btn button-ok fright', inner:'Choisir'})
         , DCreate('SPAN',{class:'plusmoins-button plus-button', inner:'+'})
         , DCreate('SPAN',{class:'plusmoins-button moins-button', inner:'−'})
+        , DCreate('BUTTON', {class:'btn button-cancel', inner:'Renoncer'})
         ]
     })
 
@@ -113,6 +114,9 @@ class CommonElementListing {
     // Le bouton OK
     this.obj.querySelector('.button-ok')
       .addEventListener('click', my.onChoisir.bind(my))
+    // Le bouton Renoncer
+    this.obj.querySelector('.button-cancel')
+      .addEventListener('click', my.onCancel.bind(my))
     // Le bouton + pour ajouter un élément
     this.obj.querySelector('.plus-button')
       .addEventListener('click', my.onPlus.bind(my))
@@ -225,6 +229,13 @@ class CommonElementListing {
     } else {
       alert("Il faut choisir l'élément à associer.")
     }
+  }
+
+  /**
+   * Quand on clique sur le bouton pour renoncer (ou Escape)
+   */
+  onCancel(){
+    this.hide()
   }
 
   /**

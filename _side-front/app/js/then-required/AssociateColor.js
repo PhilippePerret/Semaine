@@ -7,6 +7,7 @@
   De façon brève, une "couleur associée", c'est deux couleurs, une pour
   le fond et une pour le texte. Mais ça pourra être développé.
 *** --------------------------------------------------------------------- */
+
 class AssociateColor extends CommonElement {
 
   /** ---------------------------------------------------------------------

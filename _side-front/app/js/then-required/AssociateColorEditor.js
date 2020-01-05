@@ -5,6 +5,8 @@
   *   Éditeur de projet
   *
 *** --------------------------------------------------------------------- */
+const AColorPicker = require('a-color-picker')
+
 class AssociateColorEditor extends CommonElementEditor {
   static get properties(){
     return {

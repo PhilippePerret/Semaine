@@ -23,6 +23,10 @@ global.tryRequire = function(rpath, folder){
   }
 }
 
+function log(msg, options = []){
+  console.log(msg, ...options)
+}
+
 function confirm(msg, options){
   options = options || {}
   let mbox = new MessageBox(isString(msg) ? Object.assign(options, {message: msg}) : msg)

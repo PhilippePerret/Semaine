@@ -23,7 +23,7 @@ class CommonElement {
   **/
   static get(item_id) {
     if (!item_id) return ;
-    return (this.items||{})[item_id]
+    return this.items[item_id]
   }
 
   /**
@@ -31,7 +31,6 @@ class CommonElement {
     Méthode appelée systématiquement à l'instanciation
   **/
   static add(item){
-    this.items || this.init()
     Object.assign(this.items, {[item.id]: item})
     if (item.id > this.lastId) this.lastId = Number(item.id)
   }
@@ -44,7 +43,6 @@ class CommonElement {
                             la boucle est interrompue.
   **/
   static forEach(method){
-    this.items || this.init()
     // console.log("this.items: ", this.items)
     for(var item_id in this.items){
       if ( false === method.call(null, this.items[item_id]) ) {
@@ -102,24 +100,17 @@ class CommonElement {
   static load(){
     this.path || raise(`Il faut définir le fichier ${this.name}.path, chemin d'accès au fichier de données.`)
     if ( fs.existsSync(this.path)){
-      this.items = {}
-      require(this.path).forEach(ditem => {
-        var item = new this(ditem)
-        Object.assign(this.items, {[item.id]: item})
-      })
-      // console.log("%s.items = ", this.name, this.items)
-    } else {
-      this.init()
+      require(this.path).forEach(ditem => new this(ditem))
     }
   }
 
   /**
-    Instanciation de la classe
+    Initialisation de la classe
   **/
   static init(){
     this.lastId = 0
     this.items  = {}
-    if(this.path && fs.existsSync(this.path)){ this.load() }
+    this.path && fs.existsSync(this.path) && this.load.call(this)
   }
 
   /**
@@ -152,7 +143,6 @@ class CommonElement {
     Retourne un identifiant libre
   **/
   static newId(){
-    this.lastId || this.init()
     return ++ this.lastId
   }
 
