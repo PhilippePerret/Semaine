@@ -45,6 +45,26 @@ function confirmer(msg, options){
     mbox.show()
   })
 }
+
+/**
+  Un simple message avec un bouton OK
+  @sync, s'utilise avec await.
+**/
+function message(msg, options){
+  options = options || {}
+  Object.assign(options, {
+      message:msg
+    , buttons:['OK']
+    , type:'notice'
+    , defaultButtonIndex: 0
+  })
+  let mbox = new MessageBox(options)
+  return new Promise((ok,ko)=>{
+    mbox.methodOnOK = () => {ok(true)}
+    mbox.show()
+  })
+}
+
 // Demande une réponse
 // On utilise `confirm` parce que la seule différence, c'est que `args`
 // définit `defaultAnswer` qui permet de savoir que c'est un prompt

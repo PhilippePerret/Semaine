@@ -1,0 +1,12 @@
+.plusmoins-button
+{
+  cursor: pointer;
+  color: #999999;
+  font-size: 26pt;
+  padding: 0px 13px 3px;
+  border:1px solid #CCCCCC;
+}
+.plusmoins-button:active {
+  background-color:#999999;
+  color:white;
+}

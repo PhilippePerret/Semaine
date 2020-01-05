@@ -5,6 +5,10 @@ Object.assign(App,{
     // Projet.buildDefaultValues() // ATTENTION ! RÉINITIALISE TOUS LES PROJETS
     // Projet.load()
 
+    /**
+      Construction de l'interface
+    **/
+    UI.prepare()
     /*
       Mettre ici le code à exécuter à l'initialisation de l'application
       (après le chargement complet de la page)

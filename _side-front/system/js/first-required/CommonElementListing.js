@@ -84,8 +84,8 @@ class CommonElementListing {
         class:'buttons'
       , inner:[
           DCreate('BUTTON', {class:'btn button-ok fright', inner:'Choisir'})
-        , DCreate('SPAN',{class:'button button-plus', inner:'+'})
-        , DCreate('SPAN',{class:'button button-moins', inner:'−'})
+        , DCreate('SPAN',{class:'plusmoins-button plus-button', inner:'+'})
+        , DCreate('SPAN',{class:'plusmoins-button moins-button', inner:'−'})
         ]
     })
 
@@ -114,10 +114,10 @@ class CommonElementListing {
     this.obj.querySelector('.button-ok')
       .addEventListener('click', my.onChoisir.bind(my))
     // Le bouton + pour ajouter un élément
-    this.obj.querySelector('.button-plus')
+    this.obj.querySelector('.plus-button')
       .addEventListener('click', my.onPlus.bind(my))
     // Le bouton - pour supprimer un élément
-    this.obj.querySelector('.button-moins')
+    this.obj.querySelector('.moins-button')
     .addEventListener('click', my.onMoins.bind(my))
   }
 
@@ -125,6 +125,23 @@ class CommonElementListing {
     let liItem = DCreate('LI', {id:this.liIdFor(item), class:'item', inner: item.name})
     this.ul.append(liItem)
     this._observeItem(item, liItem)
+  }
+
+  /**
+   * Actualisation de l'item
+   * Pour le moment, on part du principe qu'il n'y a que le .name à modifier
+   * Plus tard, s'il s'avère que le LI d'un item doit être plus complexe,
+   * il faudra revoir sa copie et faire plutôt une reconstruction-remplacement
+   * de l'élément (en s'inspirant de ce qui sera fait dans 'add' ci-dessus).
+   */
+  update(item){
+    var objItem = DGet(`#${this.liIdFor(item)}`)
+    objItem && (objItem.innerHTML = item.name)
+  }
+
+  remove(item){
+    let objItem = DGet(`#${this.liIdFor(item)}`)
+    objItem && objItem.remove()
   }
 
   liFor(item){return DGet(`#${this.liIdFor(item)}`)}

@@ -55,14 +55,17 @@ class CommonElement {
 
   /**
    * Méthode appelée quand on sélectionne un item
+   *
+   * Pour fonctionner, la classe concrète doit avoir une propriété
+   * d'instance `selected` qui traite la sélection (set selected(v){...})
    */
   static select(item){
-    if ( this.selectedItem ) {
-      this.deselect(this.selectedItem)
-      delete this.selectedItem
+    if ( this.selected ) {
+      this.deselect(this.selected)
+      delete this.selected
     }
-    this.selectedItem = item
-    this.selectedItem.selected = true
+    this.selected = item
+    this.selected.selected = true
   }
   static deselect(item){
     item.selected = false
@@ -120,6 +123,32 @@ class CommonElement {
   }
 
   /**
+    Méthode appelée quand on clique un bouton '+' qui permet
+    d'ajouter un élément de ce type.
+  **/
+  static onClickPlusButton(ev){
+    return stopEvent(ev)
+  }
+
+  /**
+    Méthode appelée quand on clique un bouton '-' qui permet
+    de supprimer un élément de ce type
+  **/
+  static async onClickMoinsButton(ev){
+    console.log('-> onClickMoinsButton')
+    if ( this.selected ) {
+      var choix = await confirmer(`Dois-je vraiment détruire l’élément “${this.selected.name}” ?`)
+      if (choix) {
+        this.selected.smartRemove()
+        delete this._selected
+      }
+    } else {
+      return message(`Merci de sélectionner l'élément ${this.name} à supprimer.`)
+    }
+    return stopEvent(ev)
+  }
+
+  /**
     Retourne un identifiant libre
   **/
   static newId(){
@@ -170,21 +199,21 @@ class CommonElement {
 
   // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
   dispatch(newData){
-    console.log("Nouvelles données : ", newData)
+    // console.log("Nouvelles données : ", newData)
     var realNewData = {} // celles qui ont vraiment changé
     var keysNewData = Object.keys(newData)
     for(var k in this.constructor.editorClass.properties){
       // console.log("k:'%s', value:'%s'", k, newData[k])
       if ( keysNewData.indexOf(k) > -1 ) {
-        console.log("La clé '%s' est connu des données transmises", k)
-        console.log("Valeu dans this.data:'%s' / nouvelle:'%s'", this.data[k], newData[k])
+        // console.log("La clé '%s' est connu des données transmises", k)
+        // console.log("Valeur dans this.data:'%s' / nouvelle:'%s'", this.data[k], newData[k])
         if ( this.data[k] != newData[k])
         this._data[k] = this[`_${k}`] = newData[k]
         Object.assign(realNewData, {[k]: newData[k]})
       }
     }
 
-    console.log("realNewData après dispatch:", realNewData)
+    // console.log("realNewData après dispatch:", realNewData)
     // Si des valeurs ont changées, il faut actualiser le
     // fichier
     // Noter que ça ne devrait pas arriver au chargement (rappel : la méthode
@@ -200,6 +229,7 @@ class CommonElement {
     }
     this.edited = false
   }
+
   /**
     Édition de l'élément, quel que soit son type (sa classe)
 
@@ -222,24 +252,35 @@ class CommonElement {
    * Procède à la destruction intelligente de l'élément.
    * Elle est "intelligente" dans le sens où si l'élément est utilisé
    * par d'autre élément (peut-être passé), il est gardé et seulement
-   * marqué 'removed'
+   * marqué 'removed'.
+   * Elle est intelligente aussi car elle peut détruire l'élément
+   * partout où il est, en lui-même, s'il est édité ou en listing
+   *
    * TODO Pour le moment, on le détruit simplement
+   *
    */
   smartRemove() {
     delete this.constructor.items[this.id]
     this.constructor.save()
+    this.removeDisplay instanceof Function && this.removeDisplay()
+    this.edited && this.editor.updateInnerForm()
+    this.removeInListing()
+  }
+  /**
+    Détruit l'élément dans les listings, if any
+  **/
+  removeInListing(){
+    this.constructor.listingClass.forEach(list => list.remove(this))
   }
 
   update(){
-    console.log("Je dois actualiser l'item, en édition, peut-être pas dans le listing")
-    // Actualisation dans l'affichage des semaines
-    if ( this instanceof Travail ) {
+    // console.log("Je dois actualiser l'item, en édition, peut-être pas dans le listing")
+
+    if ( this.rebuild instanceof Function ) {
+      // Actualisation particulière
       this.rebuild()
     }
-    if ( this.edited) {
-      // Actualiser en édition (if any) Utiliser un this.edited
-      this.editor.updateInnerForm()
-    }
+    this.edited && this.editor.updateInnerForm()
     // Actualiser dans les listings éventuels
     // TODO
   }

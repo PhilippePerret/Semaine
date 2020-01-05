@@ -68,8 +68,21 @@ class Travail extends CommonElement {
     }
   }
 
+  /**
+    Méthodes d'état
+  **/
+  get selected() { return this._selected}
+  set selected(v){
+    this._selected = v
+    this.obj.classList[v?'add':'remove']('selected')
+  }
+  /**
+    Méthodes de construction
+  **/
   buildIn(container){
-    this.obj = DCreate('DIV',{class:'travail',inner:[
+    var classCss = ['travail']
+    this.selected && classCss.push('selected')
+    this.obj = DCreate('DIV',{class:classCss.join(' '),inner:[
       DCreate('SPAN', {class:'tache', inner:`${this.tache} à ${this.heure}` })
     ]})
     container.append(this.obj)
@@ -102,10 +115,21 @@ class Travail extends CommonElement {
   observe(){
     const my = this
     this.obj.addEventListener('dblclick', my.onDblClick.bind(my))
+    this.obj.addEventListener('click', my.onClick.bind(my))
   }
+
+  /**
+   * Pour détruire le travail dans la semaine
+   * (quand on le supprime)
+   */
+  removeDisplay(){
+    this.obj && this.obj.remove()
+  }
+
   unobserve(){
     const my = this
     this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
+    this.obj.removeEventListener('click', my.onClick.bind(my))
   }
 
   /**
@@ -120,12 +144,22 @@ class Travail extends CommonElement {
     Méthodes d'évènement
   **/
 
+  /**
+   * Un double-clic sur un travail le met en édition
+   */
   onDblClick(ev){
     // console.log("Double clic sur le travail")
     this.edit(ev)
     return stopEvent(ev) // pour ne pas déclencher le jour
   }
 
+  /**
+   * CLic sur un travail => le sélectionner
+   */
+  onClick(ev){
+    this.constructor.select(this)
+    return stopEvent(ev)
+  }
 
   /**
    * States
@@ -161,6 +195,11 @@ class Travail extends CommonElement {
     Tâche à accomplir
   **/
   get tache(){ return this._tache }
+
+  /**
+    Pour la cohérence avec les autres CommonElement(s)
+  **/
+  get name(){return this.tache}
 
   /**
     Heure

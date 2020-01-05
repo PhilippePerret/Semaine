@@ -3,13 +3,20 @@ Pour l'apparence des travaux
  */
 div.travail {
   position:absolute;
-  background-color:blue;
   font-family: Optima, Arial;
   font-size: 11pt;
   color:white;
   width:100%;
-  z-index:20;
 }
 div.travail span.tache {
   padding: 0.2
+}
+
+div.travail.selected {
+  background-color:red;
+  z-index: 21;
+}
+div.travail:not(.selected) {
+  background-color:blue;
+  z-index: 20;
 }
