@@ -58,7 +58,7 @@ class CommonElementListing {
     this.obj.classList.remove('noDisplay')
     var zindex;
     if (audessusDe) {
-      zindex = audessusDe.style.zIndex || 500
+      zindex = Number(audessusDe.style.zIndex) || 500
     } else {
       zindex = 500
     }
@@ -126,7 +126,13 @@ class CommonElementListing {
   }
 
   add(item){
-    let liItem = DCreate('LI', {id:this.liIdFor(item), class:'item', inner: item.name})
+    var styles = []
+    // Si l'item a une couleur associée, on l'indique
+    if ( item.accociatecolorId ) {
+      styles.push(`color:${item.associateColor.ftcolor};background-color:${item.associateColor.bgcolor}`)
+    }
+    styles = styles.join(';')
+    let liItem = DCreate('LI', {id:this.liIdFor(item), class:'item', inner: item.name, style:styles})
     this.ul.append(liItem)
     this._observeItem(item, liItem)
   }

@@ -25,8 +25,7 @@ class AssociateColorEditor extends CommonElementEditor {
   innerForm(){
     return [
         DCreate('INPUT',{type:'text', id:this.idFor('name'), inner:this.name})
-      , this.rowFormForColor('ftcolor')
-      , this.rowFormForColor('bgcolor')
+      , this.rowFormForAssociateColor('ftcolor','bgcolor')
     ]
   }
 }

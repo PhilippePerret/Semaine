@@ -32,5 +32,6 @@ class AssociateColor extends CommonElement {
     super(data)
   }
 
-
+  get ftcolor(){return this._ftcolor}
+  get bgcolor(){return this._bgcolor}
 }

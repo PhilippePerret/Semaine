@@ -231,8 +231,8 @@ class CommonElement {
     this.editor || (this.editor = new this.editorClass(this))
     this.editor.show(ev)
     if (audessusDe) {
-      var zindex = audessusDe.style.zIndex
-      // console.log("zindex = ", zindex)
+      var zindex = Number(audessusDe.style.zIndex)
+      console.log("zindex = ", zindex)
       this.editor.form.style.zIndex = zindex + 1
     }
     this.edited = true
@@ -278,12 +278,21 @@ class CommonElement {
   get editorClass(){ return this.constructor.editorClass }
 
 
+
   /**
     Méthode d'évènements
   **/
 
   /**
+    Propriété volatile
+  **/
+  get associateColor(){
+    return this._associatecolor || (this._associatecolor = AssociateColor.get(this.accociatecolorId))
+  }
+
+  /**
     Propriétés fixes (enregistrées)
+    que possède tout type d'éléments
   **/
   get data()  {return this._data}
   get id()    {return this._id}
@@ -291,6 +300,7 @@ class CommonElement {
   get isNew() {return this._isNew === true}
   set isNew(v){this._isNew = v; delete this._data.isNew /* au cas où */}
 
+  get accociatecolorId() { return this._accociatecolorId }
 
   get ref(){
     return this._ref || (this._ref = `${this.constructor.minName}-${this.id}`)

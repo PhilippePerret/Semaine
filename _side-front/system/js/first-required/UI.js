@@ -123,6 +123,65 @@ const UI = {
     }
   }
 
+  /** ---------------------------------------------------------------------
+    *   Pour picker couleur
+    *   require('a-color-picker')
+    *
+  *** --------------------------------------------------------------------- */
+, pickColorFor(button, ev){
+    if (this.pickerColorIsVisible) {
+      this.aBGcolorpicker.hide()
+      this.aFTcolorpicker.hide()
+    } else {
+
+      // Le champ pour mettre la valeur
+      let hiddenFTcolor = button.getAttribute('data-ft-hidden')
+      let hiddenBGcolor = button.getAttribute('data-bg-hidden')
+      hiddenFTcolor || raise("Il faut définir l'attribut 'data-ft-hidden' (ID du champ hidden pour consigner la couleur de police — de départ et nouvelle) dans le bouton picker de couleur.")
+      hiddenBGcolor || raise("Il faut définir l'attribut 'data-bg-hidden' (ID du champ hidden pour consigner la couleur de fond — de départ et nouvelle) dans le bouton picker de couleur.")
+      hiddenFTcolor = DGet(`#${hiddenFTcolor}`)
+      hiddenBGcolor = DGet(`#${hiddenBGcolor}`)
+
+      // Le span qu'on devra coloriser
+      let spanColor   = button.getAttribute('data-span')
+      spanColor || raise("Il faut définir l'attribut 'data-span' (ID du span pour montrer la couleur) dans le bouton picker de couleur.")
+      spanColor = DGet(`#${spanColor}`)
+
+      let BGPickerColor = DGet('div#acolorpicker-bg-container');
+      let FTPickerColor = DGet('div#acolorpicker-ft-container');
+      if (!BGPickerColor){
+        document.body.append(DCreate('DIV',{id:'acolorpicker-bg-container', class:'apickerforcolor', style:`position:fixed;top:0px;right:0px;width:auto;height:auto;z-index:1000;`}))
+        document.body.append(DCreate('DIV',{id:'acolorpicker-ft-container', class:'apickerforcolor', style:`position:fixed;top:0px;right:232px;width:auto;height:auto;z-index:1000;`}))
+        BGPickerColor = DGet('#acolorpicker-bg-container')
+        FTPickerColor = DGet('#acolorpicker-ft-container')
+        this.aBGcolorpicker = AColorPicker.createPicker(BGPickerColor, {paletteEditable:true})
+        this.aFTcolorpicker = AColorPicker.createPicker(FTPickerColor, {paletteEditable:true})
+      }
+
+      this.foregroundColor = hiddenFTcolor.value || '#FFFFFF'
+      this.backgroundColor = hiddenBGcolor.value || '#00FF00'
+      this.aFTcolorpicker.setColor(this.foregroundColor, true)
+      this.aBGcolorpicker.setColor(this.backgroundColor, true)
+
+      this.aFTcolorpicker.on('change', (picker, color) => {
+        color = AColorPicker.parseColor(color, "hex");
+        spanColor.style.color = this.foregroundColor = color
+        hiddenFTcolor.value = color
+      })
+      this.aBGcolorpicker.on('change', (picker, color) => {
+        color = AColorPicker.parseColor(color, "hex");
+        spanColor.style.backgroundColor = this.backgroundColor = color
+        hiddenBGcolor.value = color
+      })
+      this.aBGcolorpicker.show()
+      this.aFTcolorpicker.show()
+    }
+    this.pickerColorIsVisible = !this.pickerColorIsVisible;
+
+
+    return stopEvent(ev)
+  }
+
 
 }
 Object.defineProperties(UI,{

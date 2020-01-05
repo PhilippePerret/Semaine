@@ -16,8 +16,8 @@ class CategorieEditor extends CommonElementEditor {
     return {
         id:               {hname:'ID',      type:'number', hidden:true}
       , name:             {hname: 'Nom',    type:'string'}
-      , domaineId:        {hname:'Domaine', type:'Domaine' /* donc ID */}
-      , associateColorId: {hname:'Couleur', type:'AssociateColor' /* donc ID */}
+      , domaineId:        {hname:'Domaine', type:'Domaine'}
+      , accociatecolorId: {hname:'Couleur', type:'AssociateColor'}
     }
   }
 

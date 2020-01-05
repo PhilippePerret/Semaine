@@ -385,15 +385,17 @@ class CommonElementEditor {
     })
   }
 
-  rowFormForColor(propColor){
+  rowFormForAssociateColor(propFTcolor, propBGcolor){
     var spanDemoId = this.idFor(`propColor-demo`)
-    AColorPicker.from(spanDemoId)
+    var hiddenFTvalueField = this.idFor(propFTcolor)
+    var hiddenBGvalueField = this.idFor(propBGcolor)
     return DCreate('DIV',{
-        class: 'row row-color'
+        class: 'row row-color right'
       , inner: [
-          DCreate('INPUT',{type:'hidden', id:this.idFor(propColor)})
-        , DCreate('SPAN', {id:spanDemoId, class:'color-demo'})
-        , DCreate('BUTTON', {type:'button', inner: 'pick…'})
+          DCreate('INPUT',{type:'hidden', id:hiddenFTvalueField, value: this.owner.ftcolor})
+        , DCreate('INPUT',{type:'hidden', id:hiddenBGvalueField, value: this.owner.bgcolor})
+        , DCreate('DIV', {id:spanDemoId, class:'acolorpicker-demo', inner: "Pour voir les couleurs fond/font", style:`background-color:${this.owner.bgcolor||'white'};color:${this.owner.ftcolor||'black'};`})
+        , DCreate('BUTTON', {type:'button', class:'acolorpicker-button', 'data-span':spanDemoId, 'data-ft-hidden':hiddenFTvalueField, 'data-bg-hidden':hiddenBGvalueField, inner: 'Pick…'})
 
       ]
     })
@@ -408,8 +410,12 @@ class CommonElementEditor {
       var classe = button.getAttribute('data-type')
       button.addEventListener('click', my.onChooseType.bind(my, classe))
     })
-  }
 
+    this.form.querySelectorAll('.acolorpicker-button').forEach(button => {
+      button.addEventListener('click', UI.pickColorFor.bind(UI, button))
+    })
+
+  }
 
   get buttonOkId(){
     return this._butokid || (this._butokid = this.idFor('ok-button'))

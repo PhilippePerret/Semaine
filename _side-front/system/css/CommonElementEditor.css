@@ -42,8 +42,7 @@
 .common-editor div.row.row-color {
 
 }
-.common-editor div.row.row-color span.color-demo {
-  display: inline-block;
-  width: 40px;
-  height: 20px;
+.common-editor div.row.row-color .acolorpicker-demo {
+  font-size: 16pt;
+  padding: 1em;
 }
