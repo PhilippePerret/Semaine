@@ -83,7 +83,7 @@ class Travail extends CommonElement {
     var classCss = ['travail']
     this.selected && classCss.push('selected')
     this.obj = DCreate('DIV',{class:classCss.join(' '),inner:[
-      DCreate('SPAN', {class:'tache', inner:`${this.tache} à ${this.heure}` })
+      DCreate('SPAN', {class:'tache', inner:`${this.formated_tache} à ${this.heure}` })
     ]})
     container.append(this.obj)
     this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
@@ -191,6 +191,27 @@ class Travail extends CommonElement {
     return this._recurrence
   }
 
+  /**
+    La tâche à accomplir, formatée
+
+    Pour le moment, on gère les variables dollar.
+  **/
+  get formated_tache(){
+    let fstr = this.tache;
+    if ( this.tache.match(/\$\{/) ){
+      // console.log("'%s' est une tâche avec variable", this.tache)
+      fstr = fstr.replace(/\$\{([a-zA-Z]+)\}/, (corr, classe) => {
+        classe = classe.toLowerCase()
+        var prop = `${classe}Id`
+        if ( this[prop] ) {
+          return this[classe].name
+        } else {
+          return `- ${classe.toTitle()} inconnu -`
+        }
+      })
+    }
+    return fstr
+  }
   /**
     Tâche à accomplir
   **/
