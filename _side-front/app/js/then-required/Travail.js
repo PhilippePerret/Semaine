@@ -29,8 +29,21 @@ class Travail extends CommonElement {
     new_travail.edit(ev)
   }
 
+  /**
+    Initialisation de la classe
+    Surclasse la méthode abstraite (pour ne pas charger tout de suite
+    les données, qui ont besoin de connaitre la semaine à afficher)
+  **/
+  static init(){
+    this.lastId = 0
+    this.items  = {}
+  }
+
+  // Le path des travaux, doit maintenant être défini par la semaine
+  // courante
   static get path(){
-    return this._path || (this._path = path.join(App.userDataFolder,'travaux.json'))
+    // console.log("Path = ", Semaine.current.path)
+    return Semaine.current.path
   }
 
   /** ---------------------------------------------------------------------

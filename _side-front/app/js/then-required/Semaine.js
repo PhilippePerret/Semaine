@@ -5,7 +5,25 @@ const YAML = require('js-yaml')
 const ICON_PATH = '/Users/philippeperret/Programmation/Semaine/icons/app2.icns';
 
 class Semaine {
-  static build_main_semaine(){
+
+
+  static build(){
+    UI.content.append(DCreate('DIV',{id:'semaine-courante', class:'semaine'}))
+    this.obj = DGet('div#semaine-courante')
+    // Construire les 6 jours de la semaine courante
+    Jour.build()
+  } // build
+
+  static get current()  { return this._current }
+  static set current(v) {
+    this._current = v
+    this._current.writeInfos()
+  }
+
+  /**
+    On commence par construire la semaine courante
+  **/
+  static build_current_semaine(){
 
     Notification.requestPermission().then(function(result) {
       if (result != 'granted'){
@@ -13,12 +31,8 @@ class Semaine {
       }
     });
 
-    var semaine = new Semaine()
-
-    // Faire tous les jours
-    for(var i=1; i<7; ++i){
-      Object.assign(JOURS_SEMAINE, {[i]: new Jour({semaine:semaine, njour:i})})
-    }
+    this.current = new Semaine(this.todaySemaine)
+    this.build()
 
     // On doit instancier un nouveau curseur qui va :
     //  - afficher une ligne pour suivre le temps sur la semaine
@@ -26,51 +40,139 @@ class Semaine {
     //    sur leur temps.
     new Cursor();
 
-    // il faut instancier le curseur avant de charger et construire
-    // la semaine, car on va enregistrer les travaux à jouer aujourd'hui
-    // dans le curseur
-    semaine.build();
+    console.log("-> showCurrent")
+    this.showCurrent()
 
-    // On peut construire le curseur (ce qu'on ne peut pas faire avant
-    // d'avoir construit la semaine, ce qui sera à corriger TODO)
-    Cursor.current.build()
+  }
 
-    // On met en route le curseur.
-    Cursor.current.startMoving()
+  static showCurrent(){
+    this.showWeek(this.todaySemaine)
+  }
 
+  static showPrevious(){
+    var index = this.current.index - 1
+    var annee = this.current.annee
+    if ( index < 1 ) {annee -= 1; index = 52}
+    this.showWeek({semaine:index, annee:annee})
+  }
+  static showNext(){
+    var index = this.current.index + 1
+    var annee = this.current.annee
+    if ( index > 52 ) {index = 1; annee += 1}
+    this.showWeek({semaine:index, annee:annee})
   }
 
   /**
-   * INSTANCE
-   */
-  constructor(data){
-    // TODO On doit pouvoir spécifier la semaine à utiliser.
-    // Note : c'est un fichier dans les dossiers de l'user
+    Méthode générique qui affiche la semaine définie par les
+    données +data+
+    +Params+::
+      +data+::[Hash]
+        semaine [Number]  Indice de la semaine
+        annee   [Number]  Année de la semaine
+  **/
+  static showWeek(data){
+    // On purge éventuellement les travaux précédents
+    Jour.nettoie()
+    // On définit la nouvelle semaine
+    this.current = new Semaine(data)
+    // On construit les travaux de la semaine
+    this.current.build()
+
+    const couranteData = this.todaySemaine
+    // Si c'est la semaine courante, on affiche le curseur, sinon,
+    // on le détruit
+    const isCourante =  this.current.annee == couranteData.annee &&
+                        this.current.index == couranteData.semaine
+
+    if ( isCourante ) {
+      // On peut construire le curseur
+      new Cursor()
+      Cursor.current.build()
+      // On met en route le curseur.
+      Cursor.current.startMoving()
+    } else if ( Cursor.current ) {
+      Cursor.current.obj.remove()
+      delete Cursor.current
+    }
   }
 
+  /**
+    Retourne les informations sur la semaine courante
+  **/
+  static get todaySemaine(){
+    return this.daySemaine(new Date())
+  }
+
+  /**
+    Retourne les informations de semaine du jour donné
+    +Params+::
+      +jour+::  [Date] L'instance Date du jour voulu
+                [Array] Une liste contenant [annee, mois, jour]
+                        mois est 1-start
+  **/
+  static daySemaine(jour){
+    if (undefined === jour) {
+      jour = new Date()
+    } else if (!(jour instanceof Date)) {
+      jour[1] -= 1
+      jour = new Date(...jour)
+    }
+    const year      = jour.getFullYear()
+    const yearDay1  = new Date(year,0,1,0,0,0);
+    const nowMilli  = jour.getTime();
+    const yearMilli = yearDay1.getTime();
+    // console.log("nowMilli: %d, yearMilli: %d", nowMilli, yearMilli)
+    const diff    = parseInt((nowMilli - yearMilli) / 1000, 10)
+    const nbDays  = Math.floor(diff / (3600 * 24), 10)
+    const nWeek   = Math.ceil((nbDays + 1) / 7 );
+    // console.log("diff:%d, nbDays:%d", diff, nbDays)
+    return {annee:year, semaine:nWeek, jour:jour}
+  }
+
+
+  /**
+   * Path au dossier qui contient toutes les semaines définies
+   */
+  static get folderSemaines(){
+    if ( undefined === this._foldersemaines) {
+      this._foldersemaines = path.join(App.userDataFolder,'semaines')
+      fs.existsSync(this._foldersemaines) || fs.mkdirSync(this._foldersemaines)
+    }
+    return this._foldersemaines
+  }
+
+  /** ---------------------------------------------------------------------
+    *   INSTANCE
+    *
+  *** --------------------------------------------------------------------- */
+  /**
+   * INSTANCE
+   */
+  constructor({annee, semaine}){
+    this.annee  = annee
+    this.index = semaine
+  }
+
+  /**
+    Pour écrire les informations numériques de la
+    semaine courante.
+  **/
+  writeInfos(){
+    DGet('#annee-semaine').innerHTML = this.annee
+    DGet('#index-semaine').innerHTML = this.index
+
+  }
   /**
    * Méthode principale de construction de la semaine
    */
   build(){
-    UI.content.append(DCreate('DIV',{id:'semaine-courante', class:'semaine'}))
-    this.obj = DGet('div#semaine-courante')
-
-    // Créer tous les jours de la semaine
-    for(var ijour in JOURS_SEMAINE){
-      JOURS_SEMAINE[ijour].build()
-    }
-
-    // Tracer les lignes d'heures
-    for(var h = HEURE_START; h <= HEURE_END; h += .5){
-      var contenu = h == parseInt(h,10) ? Horloge.heure2horloge(h) : ''
-      this.obj.append(DCreate('DIV',{class:'hourline', style:`top:${(h-HEURE_START)*HEURE_HEIGHT+TOP_START}px;`, inner:[
-        DCreate('SPAN', {class:'hourspan', inner:contenu})
-      ]}))
-    }
-
     // Construire les travaux
-    this.data.forEach(w => w.build())
+    this.travaux.forEach(w => w.build())
+  }
 
+  get travaux(){
+    return this.data
+    // TODO Il faut ajouter les travaux récurrents
   }
 
   get data(){
@@ -78,20 +180,27 @@ class Semaine {
   }
 
   loadData(){
-    // Pour le moment, on prend tous les travaux
-    // TODO Il faudra ensuite charger par semaine
     Travail.load()
     return Object.values(Travail.items)
   }
 
+
   /**
-   * Retourne le chemin d'accès au fichier des données qui doit se
-   * trouver dans le dossier de l'user.
-   * Mais pour le moment, je le prends ici.
-   */
-  get dataPath(){
-    if (undefined === this._datapath) {
-      this._datapath = path.join(App.homeDirectory,'Programmation','Semaine','sample_data.yaml')
-    } return this._datapath
+    Path de la semaine courante
+  **/
+  get path(){
+    return this._path||(this._path = path.join(this.constructor.folderSemaines,this.pathName))
   }
+
+  /**
+    Nom de la semaine courante utilisée pour le(s) path(s)
+  **/
+  get pathName(){
+    return this._pathname || (this._pathname = `${this.affixeName}.json` )
+  }
+
+  get affixeName(){
+    return this._affixename || (this._affixename = `semaine-${this.annee}-${this.index}`)
+  }
+
 }

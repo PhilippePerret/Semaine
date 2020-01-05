@@ -12,12 +12,44 @@ const DATA_JOURS = {
   // , 7: {index:7, hname: "Dimanche", short_name: 'dim'}
 }
 
-class Jour extends CommonElement {
+class Jour /* extends CommonElement */ {
 
   /** ---------------------------------------------------------------------
     *   CLASSE
     *
   *** --------------------------------------------------------------------- */
+
+  /**
+    Pour la construction du gabarit de tous les jours
+  **/
+  static build(){
+
+    // On crée des instances de jours qu'on va mettre dans JOURS_SEMAINE
+    for(var i=1; i<7; ++i){
+      Object.assign(JOURS_SEMAINE, {[i]: new Jour({njour:i})})
+    }
+
+    // Créer tous les jours de la semaine, avec leur nom, leur date
+    // courante, leur colonne, en d'autres termes
+    for(var ijour in JOURS_SEMAINE){
+      JOURS_SEMAINE[ijour].build()
+    }
+
+    // Tracer les lignes d'heures
+    for(var h = HEURE_START; h <= HEURE_END; h += .5){
+      var contenu = h == parseInt(h,10) ? Horloge.heure2horloge(h) : ''
+      Semaine.obj.append(DCreate('DIV',{class:'hourline', style:`top:${(h-HEURE_START)*HEURE_HEIGHT+TOP_START}px;`, inner:[
+        DCreate('SPAN', {class:'hourspan', inner:contenu})
+      ]}))
+    }
+
+  }
+
+  static nettoie(){
+    for(var ijour in JOURS_SEMAINE){
+      JOURS_SEMAINE[ijour].nettoie()
+    }
+  }
 
   // Indice du jour de la semaine courant, 1-start pour lundi
   static get todayIndice(){
@@ -36,10 +68,10 @@ class Jour extends CommonElement {
   *** --------------------------------------------------------------------- */
 
   constructor(data){
-    super(data)
+    this.data = data
+    this._njour = data.njour
   }
 
-  get semaine(){return this._semaine}
   get njour(){return this._njour}
 
   /**
@@ -50,8 +82,19 @@ class Jour extends CommonElement {
         DCreate('DIV',{class:'titre', inner:this.jname})
       , DCreate('DIV',{class:'travaux'})
     ]})
-    this.semaine.obj.append(this.obj)
+    Semaine.obj.append(this.obj)
     this.observe()
+  }
+
+  /**
+    Nettoyer le jour
+  **/
+  nettoie(){
+    console.log('-> Jour#%d.nettoie()', this.njour)
+    console.log('this.objTravaux = ', this.objTravaux)
+    this.objTravaux.replaceWith(DCreate('DIV',{class:'travaux'}))
+    console.log('this.objTravaux (après) = ', this.objTravaux)
+    delete this._objtravaux
   }
 
   /**

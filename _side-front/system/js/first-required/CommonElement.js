@@ -101,6 +101,10 @@ class CommonElement {
     this.path || raise(`Il faut définir le fichier ${this.name}.path, chemin d'accès au fichier de données.`)
     if ( fs.existsSync(this.path)){
       require(this.path).forEach(ditem => new this(ditem))
+    } else {
+      // Pour le travail
+      this.lastId = 0
+      this.items  = {}
     }
   }
 
