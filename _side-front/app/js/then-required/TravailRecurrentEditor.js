@@ -16,9 +16,10 @@ class TravailRecurrentEditor extends CommonElementEditor {
         id:               {hname: 'ID',         type: 'number', hidden: true}
       , tache:            {hname: 'Tâche',      type: 'string'}
       , njour:            {hname: 'Jour',       type: 'number'}
-      , recurrence:       {hname: 'Récurrence', type: 'string'}
-      , recurrence_value: {hname: 'Valeur de récurrence', type:'string'}
-      , startLe:          {hname: 'Commence le',type: 'string'}
+      , recurrence:       {hname: 'Récurrence', type: 'string', default: 'none'}
+      , recurrence_value: {hname: 'Valeur de récurrence', type:'string', default:''}
+      , startAt:          {hname: 'Commence le',type: 'string', default: TODAY.asJJMMAA(' ')}
+      , endAt:            {hname: 'Fini le',    type: 'string', default: ''}
       , heure:            {hname: 'Heure',      type: 'float'}
       , duree:            {hname: 'Durée',      type: 'float'}
       , projetId:         {hname: 'Projet',     type: 'Projet'}
@@ -50,6 +51,14 @@ class TravailRecurrentEditor extends CommonElementEditor {
         , DCreate('SELECT', {id:this.idFor('recurrence'), inner:OptionsRecurrence, class:'auto'})
         , DCreate('INPUT',{type:'text', class:'noDisplay short', id:this.idFor('recurrence_value')})
         , DCreate('DIV', {class:'rec-expli', id:this.idFor('recurrence_explication')})
+        ]})
+      , DCreate('DIV', {class:'row', inner:[
+            DCreate('LABEL', {inner:'Commence le : '})
+          , DCreate('INPUT',{type:'text', class:'medium', id:this.idFor('startAt'), placeholder:"JJ MM AA"})
+        ]})
+      , DCreate('DIV', {class:'row', inner:[
+            DCreate('LABEL', {inner:'Fini le : '})
+          , DCreate('INPUT',{type:'text', class:'medium', id:this.idFor('endAt'), placeholder:"JJ MM AA ou rien"})
         ]})
       , this.rowFormForHour('Heure', 'heure')
       , this.rowFormForDuree('Durée', 'duree')

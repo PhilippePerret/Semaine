@@ -34,7 +34,14 @@ form div.row > select > option, div.form div.row > select > option
   padding: 6px 12px;
 }
 
-form div.row > textarea, div.form div.row > textarea
+form div.row input[type="text"].medium,
+div.form div.row input[type="text"].medium
+{
+  width:50%;
+}
+
+form div.row > textarea,
+div.form div.row > textarea
 {
   resize:none;
 }

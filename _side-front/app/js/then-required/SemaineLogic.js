@@ -213,6 +213,8 @@ class SemaineLogic {
   build(){
     // Construire les travaux
     this.travaux.forEach(w => w.build())
+    // Construire les travaux récurrent
+    TravailRecurrent.build()
   }
 
   get travaux(){

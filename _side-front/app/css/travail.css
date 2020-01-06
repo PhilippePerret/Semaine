@@ -7,6 +7,8 @@ div.travail {
   font-size: 11pt;
   color:white;
   width:100%;
+  width:calc(100% - 4px);
+  border-left: 4px solid transparent;
 }
 div.travail span.tache {
   padding: 0.2
@@ -19,6 +21,14 @@ div.travail.selected {
 div.travail:not(.selected) {
   background-color:blue;
   z-index: 20;
+}
+
+/*
+Travaux récurrents
+Ils ont l'aspect des travaux, mais avec un petit détail en plus
+ */
+div.travail.recurrent {
+  border-left-color:orange;
 }
 
 /*

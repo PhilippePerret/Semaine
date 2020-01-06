@@ -55,13 +55,16 @@ class SmartDay {
   **/
   formate(format){
     return format
-      .replace(/%d/g, this.number)
+      .replace(/%d/g, this.number2)
       .replace(/%m/g, this.month2)
       .replace(/%M/g, this.humanMonth)
       .replace(/%y/g, this.smallYear)
       .replace(/%Y/g, this.year)
   }
 
+  asJJMMAA(separateur = '/'){
+    return this.asDDMMYY
+  }
   get asDDMMYY(){
     return this._asddmmyy || (this._asddmmyy = this.formate('%d %m %y'))
   }
@@ -119,6 +122,9 @@ class SmartDay {
   // Le jour du mois (de 1 à 31)
   get number(){
     return this._number || (this._number = this.initialDate.getDate())
+  }
+  get number2(){
+    return this._number2 || (this._number2 = String(this.number).padStart(2,'0'))
   }
 
   /**

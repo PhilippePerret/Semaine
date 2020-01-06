@@ -63,69 +63,61 @@ class Semaine {
     }
     return this._foldersemaines
   }
-
-  /** ---------------------------------------------------------------------
-    *   INSTANCE
-    *
-  *** --------------------------------------------------------------------- */
-  /**
-   * INSTANCE
-   */
-  constructor({annee, semaine}){
-    this.annee  = annee
-    this.index  = semaine
-  }
-
-  /**
-    Pour écrire les informations numériques de la
-    semaine courante.
-  **/
-  writeInfos(){
-    DGet('#annee-semaine').innerHTML = this.annee
-    DGet('#index-semaine').innerHTML = this.index
-    // Ici, un calcul plus fin est nécessaire : il faut afficher les jours
-    // plutôt que le numéro de semaine qui est une information qui ne matche
-    // pas avec les semaines affichées du lundi au samedi
-
-  }
-  /**
-   * Méthode principale de construction de la semaine
-   */
-  build(){
-    // Construire les travaux
-    this.travaux.forEach(w => w.build())
-  }
-
-  get travaux(){
-    return this.data
-    // TODO Il faut ajouter les travaux récurrents
-  }
-
-  get data(){
-    return this._data || this.loadData()
-  }
-
-  loadData(){
-    Travail.load()
-    return Object.values(Travail.items)
-  }
-
-  /**
-    Path de la semaine courante
-  **/
-  get path(){
-    return this._path||(this._path = path.join(this.constructor.folderSemaines,this.pathName))
-  }
-
-  /**
-    Nom de la semaine courante utilisée pour le(s) path(s)
-  **/
-  get pathName(){
-    return this._pathname || (this._pathname = `${this.affixeName}.json` )
-  }
-
-  get affixeName(){
-    return this._affixename || (this._affixename = `semaine-${this.annee}-${this.index}`)
-  }
+  //
+  // /** ---------------------------------------------------------------------
+  //   *   INSTANCE
+  //   *
+  // *** --------------------------------------------------------------------- */
+  // /**
+  //  * INSTANCE
+  //  */
+  // constructor({annee, semaine}){
+  //   this.annee  = annee
+  //   this.index  = semaine
+  // }
+  //
+  // /**
+  //   Pour écrire les informations numériques de la
+  //   semaine courante.
+  // **/
+  // writeInfos(){
+  //   DGet('#annee-semaine').innerHTML = this.annee
+  //   DGet('#index-semaine').innerHTML = this.index
+  //   // Ici, un calcul plus fin est nécessaire : il faut afficher les jours
+  //   // plutôt que le numéro de semaine qui est une information qui ne matche
+  //   // pas avec les semaines affichées du lundi au samedi
+  //
+  // }
+  // //
+  // // get travaux(){
+  // //   return this.data
+  // // }
+  // //
+  // // get data(){
+  // //   return this._data || this.loadData()
+  // // }
+  // //
+  // // loadData(){
+  // //   Travail.load()
+  // //   return Object.values(Travail.items)
+  // // }
+  //
+  // /**
+  //   Path de la semaine courante
+  // **/
+  // get path(){
+  //   return this._path||(this._path = path.join(this.constructor.folderSemaines,this.pathName))
+  // }
+  //
+  // /**
+  //   Nom de la semaine courante utilisée pour le(s) path(s)
+  // **/
+  // get pathName(){
+  //   return this._pathname || (this._pathname = `${this.affixeName}.json` )
+  // }
+  //
+  // get affixeName(){
+  //   return this._affixename || (this._affixename = `semaine-${this.annee}-${this.index}`)
+  // }
 
 }

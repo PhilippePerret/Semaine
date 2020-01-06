@@ -38,7 +38,7 @@ Object.assign(App,{
 
     log('* Chargement des travaux récurrents…')
     TravailRecurrent.init()
-    log('OK, travaux chargés')
+    log('OK, travaux récurrents chargés')
 
     /*
       On affiche toujours la semaine courante

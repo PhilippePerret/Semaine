@@ -35,27 +35,33 @@ class TravailRecurrent extends Travail {
     *
   *** --------------------------------------------------------------------- */
 
+  /**
+    Construction des travaux récurrents
+    Si un fichier de travaux récurrents existe, on prend ses données pour
+    afficher les travaux récurrents.
+  **/
+  static build(){
+    // console.log("items de TravailRecurrent : ", this.items)
+    Object.values(this.items).forEach(item => item.buildIfNecessary())
+  }
+
+  // Le nom humain propre à cette classe
   static get humanName(){
     return 'Travail récurrent'
   }
 
+  // Nom minuscule obligatoire, sinon il est calculé d'après Travail
   static get minName(){return 'travailrecurrent'}
 
-  // Le path des travaux, doit maintenant être défini par la semaine
-  // courante
-  static get path(){
-    return this._path || (this._path = path.join(App.userDataFolder,'travaux_recurrents.json'))
-  }
 
   /**
     Créer un nouveau travail récurrent à partir du travail +travail+ (instance
     Travail)
   **/
   static createFromTravail(travail){
-    console.log("Je vais créer le travail récurrent")
     // On commence par prendre les valeurs de toutes les propriétés que
     // les deux classes partagent.
-    var cwData = {isNew: true, recurrence:'none', recurrence_value:''}
+    var cwData = {isNew: true}
     for(var prop in TravailEditor.properties){
       if ( TravailRecurrentEditor.properties[prop] ) {
         // <= Cette propriété existe pour le travail récurrent
@@ -63,12 +69,22 @@ class TravailRecurrent extends Travail {
         Object.assign(cwData, {[prop]: travail[prop]})
       }
     }
+    // Pour forcer un nouvel ID propre aux travaux propres
     delete cwData.id
 
-    console.log("Propriétés à conserver :", cwData)
+    // Pour forcer l'ajout des nouvelles propriétés propres aux
+    // travaux récurrents
+    for (var prop in TravailRecurrentEditor.properties){
+      // Si la propriété n'est pas connue des travaux, il faut ajouter
+      // la valeur par défaut
+      if ( undefined === TravailEditor.properties[prop]){
+        Object.assign(cwData, {[prop]: TravailRecurrentEditor.properties[prop].default})
+      }
+    }
+
+    // console.log("Propriétés à conserver :", cwData)
     let recWork = new this(cwData)
     recWork.build()
-    console.log("classe Éditeur :", this.editorClass)
     recWork.edit()
   }
 
@@ -80,8 +96,14 @@ class TravailRecurrent extends Travail {
   static init(){
     this.lastId = 0
     this.items  = {}
+    this.path && fs.existsSync(this.path) && this.load.call(this)
   }
 
+  // Le path des travaux, doit maintenant être défini par la semaine
+  // courante
+  static get path(){
+    return this._path || (this._path = path.join(App.userDataFolder,'travaux_recurrents.json'))
+  }
 
   // Il faut forcer ces valeurs, sinon, ce sont celles de Travail
   // qui sont utilisées
@@ -96,6 +118,14 @@ class TravailRecurrent extends Travail {
   /**
     Méthodes de construction
   **/
+
+  /**
+    Méthode qui regarde si le travail récurrent doit être construit
+    et le construit le cas échéant.
+  **/
+  buildIfNecessary(){
+    console.log("Est-ce que ce travail doit être construit ?", this)
+  }
 
   // Construction du travail récurrent dans le container
   // +container+
@@ -195,8 +225,16 @@ class TravailRecurrent extends Travail {
    * Propriétés fixes
    */
 
+  // Date de début
+  get startAt(){return this._startAt}
+  get endAt(){return this._endAt}
+
   // Retourne la définition de la récurrence du travail
   get recurrence(){ return this._recurrence }
+
+  // Retourne la valeur personnalisée pour la récurrence, si c'est
+  // nécessaire
+  get recurrence_value(){return this._recurrence_value}
 
   /**
     Jour du travail
