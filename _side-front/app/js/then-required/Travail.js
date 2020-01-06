@@ -65,7 +65,7 @@ class Travail extends CommonElement {
     //    - le travail appartient au jour courant,
     //    - et son heure est inférieure au temps courant
     // ALORS il faut ajouter un trigger
-    if ( this.njour == Jour.todayIndice && this.heure > Horloge.currentHour) {
+    if ( this.njour == TODAY.wDay && this.heure > Horloge.currentHour) {
       Cursor.current.addTrigger(this)
     } else {
       // Pour être tranquille, mais il faut bien mesurer le fait que
@@ -97,7 +97,7 @@ class Travail extends CommonElement {
     this.obj = DCreate('DIV',{
         class:classCss.join(' ')
       , inner:[
-          DCreate('SPAN', {class:'tache', inner:`${this.formated_tache} à ${this.heure}` })
+          DCreate('SPAN', {class:'tache', inner:this.formated_tache })
         ]
       , style:styles.join(';')
       })

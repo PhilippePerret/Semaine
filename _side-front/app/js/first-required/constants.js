@@ -1,7 +1,5 @@
 'use strict'
 
-const TODAY = new SmartDay()
-
 const HIERARCHIE_PARENTS = ['travail','projet','categorie','domaine']
 
 const HEURE_START   = 6 ;

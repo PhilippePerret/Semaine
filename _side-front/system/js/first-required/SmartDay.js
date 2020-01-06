@@ -3,8 +3,16 @@
   *   Classe SmartDay
   *   ---------------
   *   Gestion intelligente des jours
-  *
+
+  NOTE
+    Définition de TODAY en bas de ce module
+
+  NOTE
+    En bas de ce module, il y a la possibilité de changer le
+    jour courant, pour des essais.
 *** --------------------------------------------------------------------- */
+
+
 class SmartDay {
   static get DATA_JOURS(){return{
       0:{index:0, hname: 'Lundi',    shorthname:'lun'}
@@ -30,6 +38,46 @@ class SmartDay {
     return this._beginning
   }
 
+
+  /**
+    Retourne le jour à +nombreJours+ du jour. Si +nombreJours+ est positif,
+    on cherche +nombreJours+ après le jour courant, si +nombreJours+ est
+    négatif, on cherche +nombreJours+ avant le jour courant. Si zéro, on
+    retourne le jour courant
+  **/
+  from(nombreJours){
+    if (nombreJours === 0) return this;
+    return new SmartDay(new Date(this.time + (nombreJours * 3600 * 24 * 1000)))
+  }
+
+  /**
+    Méthodes de formatage
+  **/
+  formate(format){
+    return format
+      .replace(/%d/g, this.number)
+      .replace(/%m/g, this.month2)
+      .replace(/%M/g, this.humanMonth)
+      .replace(/%y/g, this.smallYear)
+      .replace(/%Y/g, this.year)
+  }
+
+  get asDDMMYY(){
+    return this._asddmmyy || (this._asddmmyy = this.formate('%d %m %y'))
+  }
+
+  get asDDMMYYYY(){
+    return this._asddmmyy || (this._asddmmyy = this.formate('%d %m %Y'))
+  }
+
+  get asLong(){
+    return this._aslong || (this._aslong = this.formate('%d %M %Y'))
+  }
+
+  /**
+    Méthodes de données
+  **/
+
   /**
     L'indice 0-start du jour de la semaine, mais commence à lundi contrairement
     à la valeur owDay original qui commence à dimanche
@@ -52,8 +100,21 @@ class SmartDay {
   get year(){
     return this._year || (this._year = this.initialDate.getFullYear())
   }
+  get smallYear(){
+    return this._smallyear || (this._smallyear = String(this.year).substring(2,4))
+  }
+
   get month(){
-    return this._month || (this._month = this.initialDate.getMonth() + 1)
+    return this._month || (this._month = 1 + this.month0start)
+  }
+  get month0start(){
+    return this._month0start || (this._month0start = this.initialDate.getMonth())
+  }
+  get humanMonth(){
+    return this._hmonth || (this._hmonth = MOIS[this.month0start].long)
+  }
+  get month2(){
+    return String(this.month).padStart(2,'0')
   }
   // Le jour du mois (de 1 à 31)
   get number(){
@@ -97,3 +158,10 @@ class SmartDay {
   }
 
 }
+
+// Le jour courant
+const TODAY = new SmartDay()
+
+// var d = new Date()
+// const TODAY = new SmartDay().from(4)
+// console.log("TODAY faux : ", TODAY)

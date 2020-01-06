@@ -26,20 +26,13 @@ class Jour /* extends CommonElement */ {
 
   }
 
-  static nettoie(){
-    SemaineLogic.forEachJour(jour => jour.nettoie())
+  // Actualise les jours, c'est-à-dire, principalement,
+  // les nettoie en supprimant les travaux et ajuste la
+  // date à la semaine affichée.
+  static update(){
+    SemaineLogic.forEachJour(jour => jour.update())
   }
 
-  // Indice du jour de la semaine courant, 1-start pour lundi
-  static get todayIndice(){
-    return this._todayindice || (this._todayindice = new Date().getUTCDay())
-  }
-  static get todayData(){
-    return this._todaydata || (this._todaydata = SmartDay.DATA_JOURS[this.todayIndice])
-  }
-  static get todayName(){
-    return this._todayname || (this._todayname = this.todayData.hname)
-  }
 
   /** ---------------------------------------------------------------------
     *   INSTANCE
@@ -47,8 +40,8 @@ class Jour /* extends CommonElement */ {
   *** --------------------------------------------------------------------- */
 
   constructor(data){
-    this.data = data
-    this._njour = data.njour
+    this.data   = data
+    this._njour = data.njour // 0 pour lundi, 6 pour dimanche (si affiché)
   }
 
   get njour(){return this._njour}
@@ -58,7 +51,7 @@ class Jour /* extends CommonElement */ {
    */
   build(){
     this.obj = DCreate('DIV',{id:`jour-${this.njour}`, class:'jour',inner:[
-        DCreate('DIV',{class:'titre', inner:this.jname})
+        DCreate('DIV',{class:'titre', inner:this.f_jname})
       , DCreate('DIV',{class:'travaux'})
     ]})
     SemaineLogic.obj.append(this.obj)
@@ -66,11 +59,29 @@ class Jour /* extends CommonElement */ {
   }
 
   /**
+    Actualise le jour
+      - le nettoie (le vide de ses travaux)
+      - ajuste sa date en titre
+  **/
+  update(){
+    delete this._smartDay
+    this.nettoie()
+    this.updateDateEntete()
+  }
+  /**
     Nettoyer le jour
   **/
   nettoie(){
     this.objTravaux.replaceWith(DCreate('DIV',{class:'travaux'}))
     delete this._objtravaux
+  }
+
+  updateDateEntete(){
+    this.titreObj.innerHTML = this.f_jname
+  }
+
+  get titreObj(){
+    return this._titreobj || (this._titreobj = DGet('.titre',this.obj))
   }
 
   /**
@@ -106,8 +117,41 @@ class Jour /* extends CommonElement */ {
   get absData(){
     return this._absdata || (this._absdata = SmartDay.DATA_JOURS[this.njour])
   }
+
+  /**
+    Retourne le nom du jour formaté, c'est-à-dire son nom de semaine
+    avec sa date précise
+  **/
+  get f_jname(){
+    return `${this.jname} ${this.smartDay.asLong}`
+  }
+
   get jname(){
     return this.absData.hname
+  }
+
+  /**
+    Retourne la date réelle de ce jour, en fonction de la semaine
+    courante et de l'année.
+    Instance SmartDay
+  **/
+  get smartDay(){
+    if ( undefined === this._smartDay){
+      // On connait njour avec 0 pour le lundi, 1 pour le mardi, etc.
+      // On connait TODAY qui est la date d'aujourd'hui et notamment
+      // TODAY.wDay qui retourne l'indice 0-start du jour de la semaine
+      // à partir de lundi
+      // Donc, on peut déduire la date du lundi de la semaine courante
+      // Se rappeler qu'ici on parle des 7 jours de la semaine, donc
+      // qu'on peut être mardi ou jeudi, ou autre
+      // diff se comprendre comme "diff jour après le jour courant" si
+      // positif ou "diff jour avant le jour courant" si négatif ou
+      // "est le jour courant" si zéro
+      console.log("SemaineLogic.current.offset : ", SemaineLogic.current.offset)
+      var diff = this.njour - TODAY.wDay + (SemaineLogic.current.offset * 7)
+      this._smartDay = TODAY.from(diff)
+    }
+    return this._smartDay
   }
 
   get works(){

@@ -281,11 +281,13 @@ function valOrNull(value, options){
   return value
 }
 
-function DGet(selector){
-  return document.querySelector(selector)
+function DGet(selector, container){
+  if (undefined === container) container = document
+  return container.querySelector(selector)
 }
-function DGetAll(selector){
-  return document.querySelectorAll(selector)
+function DGetAll(selector, container){
+  if (undefined === container) container = document
+  return container.querySelectorAll(selector)
 }
 
 /**

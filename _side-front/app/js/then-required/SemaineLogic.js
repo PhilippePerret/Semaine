@@ -86,10 +86,15 @@ class SemaineLogic {
         annee   [Number]  Année de la semaine
   **/
   static showWeek(data){
-    // On purge éventuellement les travaux précédents
-    Jour.nettoie()
     // On définit la nouvelle semaine
     this.current = new SemaineLogic(data)
+
+    // On purge éventuellement les travaux précédents
+    // Noter qu'il faut le faire après l'instanciation de la nouvelle
+    // semaine logique (pour connaitre le bon offset et pouvoir régler
+    // correctement les valeurs de jours)
+    Jour.update()
+
     // On construit les travaux de la semaine
     this.current.build()
 
@@ -98,7 +103,7 @@ class SemaineLogic {
     // on le détruit
     const isCourante =  this.current.annee == couranteData.annee &&
                         this.current.index == couranteData.semaine
-    console.log("isCourante = %d", isCourante)
+    console.log("isCourante = %s", isCourante)
     console.log("avec this.current.annee:%d, couranteData.annee:%d", this.current.annee,couranteData.annee)
     console.log("avec this.current.index:%d, couranteData.semaine:%d", this.current.index, couranteData.semaine)
 
@@ -188,6 +193,20 @@ class SemaineLogic {
     // pas avec les semaines affichées du lundi au samedi
 
   }
+
+  /**
+    Décalage de cette instance semaine logique avec la semaine
+    du jour courant. Utile pour connaitre les jours à afficher
+    L'offset est négatif s'il s'agit d'une semaine avant, il est positif
+    dans le cas contraire.
+  **/
+  get offset(){
+    if (undefined === this._offset) {
+      this._offset = this.index - TODAY.nSemaineLogic
+    }
+    return this._offset
+  }
+
   /**
    * Méthode principale de construction de la semaine
    */
