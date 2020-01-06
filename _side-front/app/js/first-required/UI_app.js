@@ -9,10 +9,10 @@ Object.assign(UI,{
         DCreate('DIV', {class:'buttons footer-buttons', inner:[
             DCreate('SPAN', {id:'plus-button-travail', class:'plusmoins-button plus-button', inner:'+'})
           , DCreate('SPAN', {id:'moins-button-travail', class:'plusmoins-button moins-button', inner:'−'})
-          , DCreate('SPAN', {id:'prev-week-button', inner:'◀︎', style:'margin-left:4em;margin-right:1em;'})
+          , DCreate('SPAN', {id:'prev-week-button', class:'prevnext-button', inner:'◀︎'})
           , DCreate('INPUT', {type:'hidden', id:'index-semaine'}) // inutile maintenant, mais bon…
           , DCreate('BUTTON',{id:'curr-week-button', inner:'Aujourd’hui'})
-          , DCreate('SPAN', {id:'next-week-button', inner:'▶︎', style:'margin-left:1em;margin-right:1em'})
+          , DCreate('SPAN', {id:'next-week-button', class:'prevnext-button',inner:'▶︎'})
           , DCreate('SPAN', {inner:"Année : "})
           , DCreate('SPAN', {id:'annee-semaine'})
         ]})

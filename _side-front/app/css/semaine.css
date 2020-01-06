@@ -24,6 +24,33 @@ div.semaine div.hourline span.hourspan {
   text-align:right;
 }
 
+/*
+Les boutons dans le pied de page
+ */
+div.footer-buttons {
+
+}
+div.footer-buttons span.prevnext-button
+{
+  font-size:26pt;
+  cursor:pointer;
+  vertical-align:top;
+}
+div.footer-buttons span.prevnext-button:active {
+  color:green;
+}
+
+div.footer-buttons span#prev-week-button {
+  margin-left:4em;margin-right:1em;
+}
+div.footer-buttons span#next-week-button {
+  margin-left:1em;margin-right:1em
+}
+div.footer-buttons button#curr-week-button {
+  font-size: 17pt;
+  vertical-align:text-bottom;
+}
+
 div#time-cursor {
   position:absolute;
   width:100%;

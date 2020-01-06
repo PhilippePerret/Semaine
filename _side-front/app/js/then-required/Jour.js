@@ -147,7 +147,6 @@ class Jour /* extends CommonElement */ {
       // diff se comprendre comme "diff jour après le jour courant" si
       // positif ou "diff jour avant le jour courant" si négatif ou
       // "est le jour courant" si zéro
-      console.log("SemaineLogic.current.offset : ", SemaineLogic.current.offset)
       var diff = this.njour - TODAY.wDay + (SemaineLogic.current.offset * 7)
       this._smartDay = TODAY.from(diff)
     }
