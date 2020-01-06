@@ -269,6 +269,10 @@ class CommonElementEditor {
     Méthode de construction
   **/
 
+  get ownerHumanName(){
+    return this.owner.constructor.humanName || this.owner.constructor.name
+  }
+
   build(){
     console.log("-> construction de l'éditeur pour ", this.owner)
     let row_header  = DCreate('DIV',{

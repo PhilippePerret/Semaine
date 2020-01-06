@@ -35,6 +35,12 @@ class TravailRecurrent extends Travail {
     *
   *** --------------------------------------------------------------------- */
 
+  static get humanName(){
+    return 'Travail récurrent'
+  }
+
+  static get minName(){return 'travailrecurrent'}
+
   // Le path des travaux, doit maintenant être défini par la semaine
   // courante
   static get path(){
@@ -57,12 +63,25 @@ class TravailRecurrent extends Travail {
         Object.assign(cwData, {[prop]: travail[prop]})
       }
     }
-    // console.log("Propriétés à conserver :", cwData)
+    delete cwData.id
+
+    console.log("Propriétés à conserver :", cwData)
     let recWork = new this(cwData)
     recWork.build()
     console.log("classe Éditeur :", this.editorClass)
     recWork.edit()
   }
+
+  /**
+    Initialisation de la classe
+    Surclasse la méthode abstraite (pour ne pas charger tout de suite
+    les données, qui ont besoin de connaitre la semaine à afficher)
+  **/
+  static init(){
+    this.lastId = 0
+    this.items  = {}
+  }
+
 
   // Il faut forcer ces valeurs, sinon, ce sont celles de Travail
   // qui sont utilisées
