@@ -41,6 +41,34 @@ class TravailRecurrent extends Travail {
     return this._path || (this._path = path.join(App.userDataFolder,'travaux_recurrents.json'))
   }
 
+  /**
+    Créer un nouveau travail récurrent à partir du travail +travail+ (instance
+    Travail)
+  **/
+  static createFromTravail(travail){
+    console.log("Je vais créer le travail récurrent")
+    // On commence par prendre les valeurs de toutes les propriétés que
+    // les deux classes partagent.
+    var cwData = {isNew: true, recurrence:'none', recurrence_value:''}
+    for(var prop in TravailEditor.properties){
+      if ( TravailRecurrentEditor.properties[prop] ) {
+        // <= Cette propriété existe pour le travail récurrent
+        // => On prend la valeur
+        Object.assign(cwData, {[prop]: travail[prop]})
+      }
+    }
+    // console.log("Propriétés à conserver :", cwData)
+    let recWork = new this(cwData)
+    recWork.build()
+    console.log("classe Éditeur :", this.editorClass)
+    recWork.edit()
+  }
+
+  // Il faut forcer ces valeurs, sinon, ce sont celles de Travail
+  // qui sont utilisées
+  static get editorClass(){return TravailRecurrentEditor}
+  static get listingClass(){return TravailRecurrentListing}
+
   /** ---------------------------------------------------------------------
     *   INSTANCE
     *
@@ -53,7 +81,7 @@ class TravailRecurrent extends Travail {
   // Construction du travail récurrent dans le container
   // +container+
   buildIn(container){
-    var classCss = ['travail']
+    var classCss = ['travail recurrent']
     this.selected && classCss.push('selected')
     var styles = []
     if ( this.f_color ) {
@@ -82,7 +110,7 @@ class TravailRecurrent extends Travail {
    */
   build(){
     // TODO Récurrence supra hebdomadaire
-    this.buildIn(JOURS_SEMAINE[this.njour].objTravaux)
+    this.buildIn(SemaineLogic.jours[this.njour].objTravaux)
     this.observe()
   }
 
@@ -90,7 +118,7 @@ class TravailRecurrent extends Travail {
    * Reconstruction du travail après modification
    */
   rebuild(){
-    // TODO Récurrence supra hebdomadaire
+    // TODO Récurrence supra hebdomadaire => plusieurs occurences
     this.unobserve()
     this.obj.remove()
     this.build()

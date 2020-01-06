@@ -59,13 +59,16 @@ class CommonElement {
    */
   static select(item){
     if ( this.selected ) {
-      this.deselect(this.selected)
-      delete this.selected
+      this.deselect()
     }
     this.selected = item
     this.selected.selected = true
   }
   static deselect(item){
+    if (undefined === item) { // => c'est la sélection courante
+      item = this.selected
+      delete this.selected
+    }
     item.selected = false
   }
 
@@ -122,6 +125,7 @@ class CommonElement {
     d'ajouter un élément de ce type.
   **/
   static onClickPlusButton(ev){
+    // TODO Créer un nouveau travail sur le premier emplacement libre
     return stopEvent(ev)
   }
 
@@ -130,17 +134,24 @@ class CommonElement {
     de supprimer un élément de ce type
   **/
   static async onClickMoinsButton(ev){
-    console.log('-> onClickMoinsButton')
     if ( this.selected ) {
       var choix = await confirmer(`Dois-je vraiment détruire l’élément “${this.selected.name}” ?`)
-      if (choix) {
-        this.selected.smartRemove()
-        delete this._selected
-      }
+      choix && this.remove(this.selected)
     } else {
       return message(`Merci de sélectionner l'élément ${this.name} à supprimer.`)
     }
     return stopEvent(ev)
+  }
+
+  /**
+    Détruit l'itme +item+
+    ---------------------
+    C'est juste pour avoir une méthode de classe claire, car on pourrait
+    se contenter d'appeler la méthode 'smartRemove' de l'item, qui se
+    charge de tout.
+  **/
+  static remove(item){
+    item.smartRemove()
   }
 
   /**
@@ -175,6 +186,14 @@ class CommonElement {
   **/
   static get humanName(){ return this.name }
 
+  /**
+    Retourne la première classe héritée dans la suite :
+    Travail, Projet, Catégorie, Domaine
+    Note : ce n'est pas une suite stricte dans le sens où un travail peut
+    directement avoir un Domaine, sans passer par le projet. Mais en terme
+    général, un travail (corriger le texte) appartient à un Projet (le roman),
+    qui a une Catégorie (Mes romans) qui appartient à un Domaine (l'écriture).
+  **/
   static get firstInheritedClass(){
     if (undefined === this._firstinheritedclass) {
       this._firstinheritedclass = HIERARCHIE_PARENTS.indexOf(this.constructor.minClass)
@@ -280,10 +299,11 @@ class CommonElement {
    * Elle est intelligente aussi car elle peut détruire l'élément
    * partout où il est, en lui-même, s'il est édité ou en listing
    *
-   * TODO Pour le moment, on le détruit simplement
+   * TODO Chercher si l'élément est utilisé ailleurs
    *
    */
   smartRemove() {
+    this.isSelection && this.constructor.deselect()
     delete this.constructor.items[this.id]
     this.constructor.save()
     this.removeDisplay instanceof Function && this.removeDisplay()
@@ -311,7 +331,17 @@ class CommonElement {
 
   get editorClass(){ return this.constructor.editorClass }
 
+  /**
+    Méthodes d'état
+  **/
 
+  // Retourne true si l'élément est l'élément sélectionné
+  // (dans le listing si c'est une couleur, un projet etc. ou dans l'agenda
+  //  pour un travail)
+  get isSelection(){
+    return this.selected === true
+    // return this.constructor.selected && this.constructor.selected.id == this.id
+  }
 
   /**
     Méthode d'évènements
@@ -333,6 +363,29 @@ class CommonElement {
   get name()  {return this._name}
   get isNew() {return this._isNew === true}
   set isNew(v){this._isNew = v; delete this._data.isNew /* au cas où */}
+
+  /**
+    Retourne le jour du mois de ce travail
+    Note : ce jour dépend du njour de la semaine et de la semaine
+  **/
+  get mDay(){
+    console.error("Il faut recalculer ça")
+  }
+  /**
+    Méthodes formatage
+  **/
+  get f_duree(){
+    return Horloge.heure2horloge(this.duree)
+  }
+  get f_heure(){
+    return Horloge.heure2horloge(this.heure)
+  }
+  get f_njour(){
+    return SmartDay.DATA_JOURS[this.njour].hname.toLowerCase()
+  }
+  get f_mDay(){
+    return String(this.mDay)
+  }
 
   /**
    * Méthodes pour trouver la couleur

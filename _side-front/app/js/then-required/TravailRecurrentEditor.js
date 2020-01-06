@@ -5,7 +5,7 @@
   *   Pour l'édition d'un travail récurrent
   *
 *** --------------------------------------------------------------------- */
-class TravailCurrentEditor extends CommonElementEditor {
+class TravailRecurrentEditor extends CommonElementEditor {
 
   /** ---------------------------------------------------------------------
     *   CLASSE
@@ -15,8 +15,9 @@ class TravailCurrentEditor extends CommonElementEditor {
     return {
         id:               {hname: 'ID',         type: 'number', hidden: true}
       , tache:            {hname: 'Tâche',      type: 'string'}
-      , jours:            {hname: 'Jours',      type: 'string'}
+      , njour:            {hname: 'Jour',       type: 'number'}
       , recurrence:       {hname: 'Récurrence', type: 'string'}
+      , recurrence_value: {hname: 'Valeur de récurrence', type:'string'}
       , startLe:          {hname: 'Commence le',type: 'string'}
       , heure:            {hname: 'Heure',      type: 'float'}
       , duree:            {hname: 'Durée',      type: 'float'}
@@ -35,17 +36,8 @@ class TravailCurrentEditor extends CommonElementEditor {
   /**
     Retourne le contenu principal du formulaire d'édition
   **/
-  DATA_RECURRENCES = {
-      'jour':   {hname: 'tous les jours'}
-    , 'hebdo':  {hname: 'un par semaine (~ briefing)'}
-    , 'bihed':  {hname: 'un toutes les 2 semaines'}
-    , 'mois':   {hname: 'un par mois (~ bilan)'}
-    , 'bimen':  {hname: 'bimensuel'}
-    , 'trim':   {hname: 'trimestriel (~ conseil)'}
-    , 'annee':  {hname: 'un par an (~ anniversaire)'}
-  }
   innerForm(){
-    OptionsRecurrence = []
+    var OptionsRecurrence = []
     for(var rec in DATA_RECURRENCES){
       var dataRec = DATA_RECURRENCES[rec]
       OptionsRecurrence.push(DCreate('OPTION', {inner:dataRec.hname, value:rec}))
@@ -53,12 +45,11 @@ class TravailCurrentEditor extends CommonElementEditor {
 
     return [
         DCreate('INPUT',{type:'text',   id:this.idFor('tache'), placeholder:"Tâche à exécuter"})
-      , DCreate('INPUT',{type:'text',   id:this.idFor('jours'), placeholder:'all ou liste d’indices'})
       , DCreate('DIV', {class:'row select', inner:[
-          DCreate('LABEL',{inner: "Récurrence"})
+          DCreate('LABEL',{inner: "Récurrence : "})
         , DCreate('SELECT', {id:this.idFor('recurrence'), inner:OptionsRecurrence, class:'auto'})
-        , DCreate('INPUT',{type:'text', class:'hidden short', id:this.idFor('recurrence_value')})
-
+        , DCreate('INPUT',{type:'text', class:'noDisplay short', id:this.idFor('recurrence_value')})
+        , DCreate('DIV', {class:'rec-expli', id:this.idFor('recurrence_explication')})
         ]})
       , this.rowFormForHour('Heure', 'heure')
       , this.rowFormForDuree('Durée', 'duree')
@@ -82,7 +73,15 @@ class TravailCurrentEditor extends CommonElementEditor {
     Méthode appelée quand on change la récurrence
   **/
   onChangeRecurrence(ev){
-    console.log("Changement de la récurrence")
+    // console.log("Changement de la récurrence")
+    const recMenu = DGet(`#${this.idFor('recurrence')}`)
+    const recExpli = DGet(`#${this.idFor('recurrence_explication')}`)
+    const recSupValeu = DGet(`#${this.idFor('recurrence_value')}`)
+    const recValue = recMenu.value
+    console.log("Valeur de récurrence :", recValue)
+    const recData = DATA_RECURRENCES[recValue]
+    recSupValeu.classList[recData.definable?'remove':'add']('noDisplay')
+    recExpli.innerHTML = recData.explication.replace(/\$\{([a-zA-Z]+)\}/g, (tout,prop) => {return this.owner[`f_${prop}`]})
     return stopEvent(ev)
   }
 

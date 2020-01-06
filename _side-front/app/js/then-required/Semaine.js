@@ -6,96 +6,6 @@ const ICON_PATH = '/Users/philippeperret/Programmation/Semaine/icons/app2.icns';
 
 class Semaine {
 
-
-  static build(){
-    UI.content.append(DCreate('DIV',{id:'semaine-courante', class:'semaine'}))
-    this.obj = DGet('div#semaine-courante')
-    // Construire les 6 jours de la semaine courante
-    Jour.build()
-  } // build
-
-  static get current()  { return this._current }
-  static set current(v) {
-    this._current = v
-    this._current.writeInfos()
-  }
-
-  /**
-    On commence par construire la semaine courante
-  **/
-  static build_current_semaine(){
-
-    Notification.requestPermission().then(function(result) {
-      if (result != 'granted'){
-        alert("Attention, pour une raison inconnue, je ne pourrai pas faire de notification.")
-      }
-    });
-
-    this.current = new Semaine(this.todaySemaine)
-    this.build()
-
-    // On doit instancier un nouveau curseur qui va :
-    //  - afficher une ligne pour suivre le temps sur la semaine
-    //  - déclencher les notifications des travaux quand il passera
-    //    sur leur temps.
-    new Cursor();
-
-    console.log("-> showCurrent")
-    this.showCurrent()
-
-  }
-
-  static showCurrent(){
-    this.showWeek(this.todaySemaine)
-  }
-
-  static showPrevious(){
-    var index = this.current.index - 1
-    var annee = this.current.annee
-    if ( index < 1 ) {annee -= 1; index = 52}
-    this.showWeek({semaine:index, annee:annee})
-  }
-  static showNext(){
-    var index = this.current.index + 1
-    var annee = this.current.annee
-    if ( index > 52 ) {index = 1; annee += 1}
-    this.showWeek({semaine:index, annee:annee})
-  }
-
-  /**
-    Méthode générique qui affiche la semaine définie par les
-    données +data+
-    +Params+::
-      +data+::[Hash]
-        semaine [Number]  Indice de la semaine
-        annee   [Number]  Année de la semaine
-  **/
-  static showWeek(data){
-    // On purge éventuellement les travaux précédents
-    Jour.nettoie()
-    // On définit la nouvelle semaine
-    this.current = new Semaine(data)
-    // On construit les travaux de la semaine
-    this.current.build()
-
-    const couranteData = this.todaySemaine
-    // Si c'est la semaine courante, on affiche le curseur, sinon,
-    // on le détruit
-    const isCourante =  this.current.annee == couranteData.annee &&
-                        this.current.index == couranteData.semaine
-
-    if ( isCourante ) {
-      // On peut construire le curseur
-      new Cursor()
-      Cursor.current.build()
-      // On met en route le curseur.
-      Cursor.current.startMoving()
-    } else if ( Cursor.current ) {
-      Cursor.current.obj.remove()
-      delete Cursor.current
-    }
-  }
-
   /**
     Retourne les informations sur la semaine courante
   **/
@@ -131,6 +41,19 @@ class Semaine {
 
 
   /**
+    Méthode qui calcule le numéro dans le mois du jour qui correspond
+    à la semaine d'indice +nWeek+ et au jour +wDay+ de cette semaine
+  **/
+  static calcDayOfMonthFromJourAndSemaine(nWeek, wDay){
+    // console.log("Semaine:%d, Jour semaine:%d", nWeek, wDay)
+    var secondes = (((nWeek - 1) * 7) + (wDay - 1)) * 24 * 3600
+    const year      = new Date().getFullYear()
+    const wantedDay = new Date(year,0,1,0,0,secondes);
+    // console.log("wantedDay = ", wantedDay)
+    return wantedDay.getDate() // retourne le jour du mois…
+  }
+
+  /**
    * Path au dossier qui contient toutes les semaines définies
    */
   static get folderSemaines(){
@@ -150,7 +73,7 @@ class Semaine {
    */
   constructor({annee, semaine}){
     this.annee  = annee
-    this.index = semaine
+    this.index  = semaine
   }
 
   /**
@@ -160,6 +83,9 @@ class Semaine {
   writeInfos(){
     DGet('#annee-semaine').innerHTML = this.annee
     DGet('#index-semaine').innerHTML = this.index
+    // Ici, un calcul plus fin est nécessaire : il faut afficher les jours
+    // plutôt que le numéro de semaine qui est une information qui ne matche
+    // pas avec les semaines affichées du lundi au samedi
 
   }
   /**
@@ -183,7 +109,6 @@ class Semaine {
     Travail.load()
     return Object.values(Travail.items)
   }
-
 
   /**
     Path de la semaine courante

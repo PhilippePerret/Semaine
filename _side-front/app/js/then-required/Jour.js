@@ -1,17 +1,5 @@
 'use strict'
 
-const JOURS_SEMAINE = {} ;
-
-const DATA_JOURS = {
-    1: {index:1, hname: 'Lundi',    short_name: 'lun'}
-  , 2: {index:2, hname: 'Mardi',    short_name: 'mar'}
-  , 3: {index:3, hname: 'Mercredi', short_name: 'mer'}
-  , 4: {index:4, hname: 'Jeudi',    short_name: 'jeu'}
-  , 5: {index:5, hname: 'Vendredi', short_name: 'ven'}
-  , 6: {index:6, hname: 'Samedi',   short_name: 'sam'}
-  // , 7: {index:7, hname: "Dimanche", short_name: 'dim'}
-}
-
 class Jour /* extends CommonElement */ {
 
   /** ---------------------------------------------------------------------
@@ -24,21 +12,14 @@ class Jour /* extends CommonElement */ {
   **/
   static build(){
 
-    // On crée des instances de jours qu'on va mettre dans JOURS_SEMAINE
-    for(var i=1; i<7; ++i){
-      Object.assign(JOURS_SEMAINE, {[i]: new Jour({njour:i})})
-    }
-
     // Créer tous les jours de la semaine, avec leur nom, leur date
     // courante, leur colonne, en d'autres termes
-    for(var ijour in JOURS_SEMAINE){
-      JOURS_SEMAINE[ijour].build()
-    }
+    SemaineLogic.forEachJour(jour => jour.build())
 
     // Tracer les lignes d'heures
     for(var h = HEURE_START; h <= HEURE_END; h += .5){
       var contenu = h == parseInt(h,10) ? Horloge.heure2horloge(h) : ''
-      Semaine.obj.append(DCreate('DIV',{class:'hourline', style:`top:${(h-HEURE_START)*HEURE_HEIGHT+TOP_START}px;`, inner:[
+      SemaineLogic.obj.append(DCreate('DIV',{class:'hourline', style:`top:${(h-HEURE_START)*HEURE_HEIGHT+TOP_START}px;`, inner:[
         DCreate('SPAN', {class:'hourspan', inner:contenu})
       ]}))
     }
@@ -46,9 +27,7 @@ class Jour /* extends CommonElement */ {
   }
 
   static nettoie(){
-    for(var ijour in JOURS_SEMAINE){
-      JOURS_SEMAINE[ijour].nettoie()
-    }
+    SemaineLogic.forEachJour(jour => jour.nettoie())
   }
 
   // Indice du jour de la semaine courant, 1-start pour lundi
@@ -56,7 +35,7 @@ class Jour /* extends CommonElement */ {
     return this._todayindice || (this._todayindice = new Date().getUTCDay())
   }
   static get todayData(){
-    return this._todaydata || (this._todaydata = DATA_JOURS[this.todayIndice])
+    return this._todaydata || (this._todaydata = SmartDay.DATA_JOURS[this.todayIndice])
   }
   static get todayName(){
     return this._todayname || (this._todayname = this.todayData.hname)
@@ -82,7 +61,7 @@ class Jour /* extends CommonElement */ {
         DCreate('DIV',{class:'titre', inner:this.jname})
       , DCreate('DIV',{class:'travaux'})
     ]})
-    Semaine.obj.append(this.obj)
+    SemaineLogic.obj.append(this.obj)
     this.observe()
   }
 
@@ -125,7 +104,7 @@ class Jour /* extends CommonElement */ {
   }
 
   get absData(){
-    return this._absdata || (this._absdata = DATA_JOURS[this.njour])
+    return this._absdata || (this._absdata = SmartDay.DATA_JOURS[this.njour])
   }
   get jname(){
     return this.absData.hname

@@ -43,7 +43,7 @@ class Travail extends CommonElement {
   // courante
   static get path(){
     // console.log("Path = ", Semaine.current.path)
-    return Semaine.current.path
+    return SemaineLogic.current.path
   }
 
   /** ---------------------------------------------------------------------
@@ -112,7 +112,7 @@ class Travail extends CommonElement {
    * Demande de construction du travail
    */
   build(){
-    this.buildIn(JOURS_SEMAINE[this.njour].objTravaux)
+    this.buildIn(SemaineLogic.jours[this.njour].objTravaux)
     this.observe()
   }
 
@@ -152,7 +152,8 @@ class Travail extends CommonElement {
     // La récurrence doit être prise en compte. Cela consiste à :
     //  - supprimer le travail de cette semaine
     //  - l'ajouter à la liste des travaux récurrents
-    // TODO
+    TravailRecurrent.createFromTravail(this)
+    Travail.remove(this)
 
   }
 
@@ -238,7 +239,7 @@ class Travail extends CommonElement {
     let fstr = this.tache;
     if ( this.tache.match(/\$\{/) ){
       // console.log("'%s' est une tâche avec variable", this.tache)
-      fstr = fstr.replace(/\$\{([a-zA-Z]+)\}/, (corr, classe) => {
+      fstr = fstr.replace(/\$\{([a-zA-Z]+)\}/g, (corr, classe) => {
         classe = classe.toLowerCase()
         var prop = `${classe}Id`
         if ( this[prop] && this[classe]) {

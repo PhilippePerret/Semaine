@@ -20,3 +20,18 @@ div.travail:not(.selected) {
   background-color:blue;
   z-index: 20;
 }
+
+/*
+  Le div qui contient l'explication (parfois détaillée) sur
+  la récurrence choisie pour un travail récurrent
+ */
+div.rec-expli {
+  font-size: 11pt;
+  padding:1em;
+}
+/* Quand on affiche une grosse explication comme pour le cron-like */
+div.rec-expli pre {
+  width:900px;
+  padding:0.5em;
+  background-color:white;
+}

@@ -335,8 +335,8 @@ class CommonElementEditor {
    */
   rowFormForJour(titre, prop){
     var optionsJours = []
-    for(var ijour in DATA_JOURS){
-      optionsJours.push(DCreate('OPTION',{value: ijour, inner: DATA_JOURS[ijour].hname}))
+    for(var ijour in SmartDay.DATA_JOURS){
+      optionsJours.push(DCreate('OPTION',{value: ijour, inner: SmartDay.DATA_JOURS[ijour].hname}))
     }
     return DCreate('DIV',{
         class:'row'

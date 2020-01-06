@@ -2,6 +2,12 @@
 Object.assign(App,{
   onInit(){
 
+    Notification.requestPermission().then(function(result) {
+      if (result != 'granted'){
+        alert("Attention, pour une raison inconnue, je ne pourrai pas faire de notification.")
+      }
+    });
+
     /**
       Construction de l'interface
     **/
@@ -33,7 +39,7 @@ Object.assign(App,{
     /*
       On affiche toujours la semaine courante
     */
-    Semaine.build_current_semaine()
+    SemaineLogic.buildCurrent()
 
   }
 })
