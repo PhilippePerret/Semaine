@@ -8,6 +8,16 @@ class Jour /* extends CommonElement */ {
   *** --------------------------------------------------------------------- */
 
   /**
+    Retourne l'instance +n_jour+ des jours
+    Noter que contrairement aux autres classes, ici, les items sont pris
+    dans SemaineLogic, qu'on trouve dans la propriété `jours`.
+    Contrairement aux autres classes, également, njour est 0-start (et
+    commence à lundi)
+  **/
+  static get(njour){
+    return SemaineLogic.jours[njour]
+  }
+  /**
     Pour la construction du gabarit de tous les jours
   **/
   static build(){

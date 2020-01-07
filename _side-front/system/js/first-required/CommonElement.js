@@ -86,7 +86,6 @@ class CommonElement {
     var datas = Object.values(this.items).map(item => {
       if ( item.isNew ){
         item.isNew = false // pour la clarté
-        console.log("J'ai mis le nouvel item à ancien")
       }
       return item.data
     })
@@ -367,9 +366,11 @@ class CommonElement {
   /**
     Retourne le jour du mois de ce travail
     Note : ce jour dépend du njour de la semaine et de la semaine
+    Note : this.jour n'est défini que pour un Travail et un TravailRecurrent,
+    pas pour une Catergorie, une AssociateCouleur ou autre.
   **/
   get mDay(){
-    console.error("Il faut recalculer ça")
+    return this.jour.smartDay.mDay
   }
   /**
     Méthodes formatage

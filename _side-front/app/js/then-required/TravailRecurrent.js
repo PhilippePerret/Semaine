@@ -153,12 +153,16 @@ class TravailRecurrent extends Travail {
   **/
   isActiveOn(jour){
     const jourDay   = jour.smartDay
-        , recval    = this.recurrenceValue
-        , startDay  = SmartDay.parseDDMMYY(this.startAt);
+    const recval    = this.recurrenceValue
+    const startDay  = SmartDay.parseDDMMYY(this.startAt)
+    const endDay    = this.endAt && SmartDay.parseDDMMYY(this.endAt)
 
     // Dans tous les cas, si on se trouve avant la date de départ,
     // on ne doit pas afficher le travail
     if ( jourDay.time < startDay.time ) return false ;
+    // Dans tous les cas, si on se trouve après la date de fin, on
+    // ne doit pas afficher le travail (et il pourra être détruit)
+    if ( this.endAt && jourDay.time > endDay.time ) return false ;
 
     switch(this.recurrence){
       case 'none'   : return false ;
@@ -230,44 +234,46 @@ class TravailRecurrent extends Travail {
     faudrait plutôt que ce soit une méthode séparée.
   **/
   beforeDispatch(newData){
-    const recval = newData.recurrenceValue
-    let v = null, s = null
-    // console.log("newData avant rectif pour travail récurrent:", newData)
-    const newDataDay = SemaineLogic.jours[newData.njour].smartDay
-    switch(newData.recurrence){
-      case 'bimen':
-      case 'trim':
-        // La date de démarrage (startAt) déterminera ce qui sera le
-        // premier mois.
-        s = newDataDay.asDDMMYY
-        // Pas de break
-      case 'month':
-        // On met en valeur de récurrence le numéro du jour du mois correspond
-        // à l'indice de la semaine du jour choisi (on peut être mercredi et
-        // avoir choisir un travail pour vendredi) et son mDay
-        v = newDataDay.mDay
-        break
-      case 'months':
-        // Comme la valeur de récurrence est déjà définie, ici,
-        // on utilise plutôt le `startAt` pour définir le premier jour.
-        s = newDataDay.asDDMMYY
-        break
-      case 'annee':
-        // On met la valeur de récurrence à "DD/MM"
-        v = `${newDataDay.mDay2}/${newDataDay.month2}`
-        break
-    }
-    if ( v !== null ) {
-      console.log("recurrenceValue mis à ", v)
-      newData.recurrenceValue = v
-    }
-    if ( s != null ) {
-      console.log("startAt mis à ", s)
-      newData.startAt = s
-    }
+    return new Promise((ok,ko) => {
+      const recval = newData.recurrenceValue
+      let v = null, s = null
+      // console.log("newData avant rectif pour travail récurrent:", newData)
+      const newDataDay = SemaineLogic.jours[newData.njour].smartDay
+      switch(newData.recurrence){
+        case 'bimen':
+        case 'trim':
+          // La date de démarrage (startAt) déterminera ce qui sera le
+          // premier mois.
+          s = newDataDay.asDDMMYY
+          // Pas de break
+        case 'month':
+          // On met en valeur de récurrence le numéro du jour du mois correspond
+          // à l'indice de la semaine du jour choisi (on peut être mercredi et
+          // avoir choisir un travail pour vendredi) et son mDay
+          v = newDataDay.mDay
+          break
+        case 'months':
+          // Comme la valeur de récurrence est déjà définie, ici,
+          // on utilise plutôt le `startAt` pour définir le premier jour.
+          s = newDataDay.asDDMMYY
+          break
+        case 'annee':
+          // On met la valeur de récurrence à "DD/MM"
+          v = `${newDataDay.mDay2}/${newDataDay.month2}`
+          break
+      }
+      if ( v !== null ) {
+        console.log("recurrenceValue mis à ", v)
+        newData.recurrenceValue = v
+      }
+      if ( s != null ) {
+        console.log("startAt mis à ", s)
+        newData.startAt = s
+      }
 
-    console.log("newData après rectification pour travail récurrent", newData)
-    return newData
+      console.log("newData après rectification pour travail récurrent", newData)
+      ok(newData)
+    })
   }
 
   /**
@@ -284,6 +290,8 @@ class TravailRecurrent extends Travail {
 
   // Construction du travail récurrent dans le container
   // +container+
+  // TODO Si la construction est la même que pour les travaux non récurrents,
+  // il faudra peut-être supprimer cette méthode propre.
   buildIn(container){
     var classCss = ['travail recurrent']
     this.selected && classCss.push('selected')
@@ -295,7 +303,7 @@ class TravailRecurrent extends Travail {
     this.obj = DCreate('DIV',{
         class:classCss.join(' ')
       , inner:[
-          DCreate('SPAN', {class:'tache', inner:`${this.formated_tache} à ${this.heure}` })
+          DCreate('SPAN', {class:'tache', inner:`${this.formated_tache}` })
         ]
       , style:styles.join(';')
       })
@@ -323,7 +331,7 @@ class TravailRecurrent extends Travail {
    */
   rebuild(){
     // TODO Récurrence supra hebdomadaire => plusieurs occurences
-    raise("Doit être implémenté")
+    raise("TravailRecurrent#rebuild doit être ré-implémenté")
     this.unobserve()
     this.obj.remove()
     this.build()
@@ -337,7 +345,7 @@ class TravailRecurrent extends Travail {
    * occurence passera par là.
    */
   removeDisplay(){
-    raise("Doit être implémenté")
+    raise("TravailRecurrent#removeDisplay doit être implémenté")
     this.obj && this.obj.remove()
   }
 
