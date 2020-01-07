@@ -205,7 +205,7 @@ class TravailRecurrent extends Travail {
         return false
         // TODO Le plus gros…
         var dataRec = CRON.parse(recval)
-        var [mns, hrs, mjr, mon, wjr] = recval.split(' ')
+
         /**
           Rappel :
             mns   minutes
@@ -313,7 +313,7 @@ class TravailRecurrent extends Travail {
    * un travail quotidien par exemple
    */
   build(njour){
-    // TODO Récurrence supra hebdomadaire
+    njour = njour || this.njour
     this.buildIn(SemaineLogic.jours[njour].objTravaux)
     this.observe()
   }
