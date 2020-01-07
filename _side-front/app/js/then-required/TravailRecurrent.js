@@ -154,8 +154,12 @@ class TravailRecurrent extends Travail {
   isActiveOn(jour){
     const jourDay   = jour.smartDay
         , recval    = this.recurrenceValue
-        , startDay  = SmartDay.parseDDMMYY(this.startAt)
-        ;
+        , startDay  = SmartDay.parseDDMMYY(this.startAt);
+
+    // Dans tous les cas, si on se trouve avant la date de départ,
+    // on ne doit pas afficher le travail
+    if ( jourDay.time < startDay.time ) return false ;
+
     switch(this.recurrence){
       case 'none'   : return false ;
       case 'jour'   : return true  ; // tous les jours
@@ -164,10 +168,12 @@ class TravailRecurrent extends Travail {
       case 'hebdo'  : // une fois par semaine, au jour et à l'heure dite
         return jourDay.wDay == this.njour
       case 'biheb'  :
+        // Il faut que ce soit le même jour
         if ( jourDay.wDay != this.njour ) return false ;
-        // Calcul plus compliqué pour savoir si c'est tous les 15 jours
-        // TODO
-        raise("Dois être implémenté")
+        const is14joursAvant  = jourDay.mDay == startDay.mDay - 14
+        const isSameJour      = jourDay.mDay == startDay.mDay
+        const is14joursApres  = jourDay.mDay == startDay.mDay + 14
+        return isSameJour || is14joursApres || is14joursAvant
       case 'month'  : // une fois par mois
         // Calcul encore plus compliqué : il faut connaitre le premier jour
         // Noter qu'on ne peut pas le connaitre d'après startAt puisque le
@@ -195,8 +201,20 @@ class TravailRecurrent extends Travail {
       case 'annee' : // annuel
         return `${jourDay.mDay2}/${jourDay.month2}` == String(recval)
       case 'cron' : // une récurrence CRON
+        console.error("Le traitement par CRON doit être implémenté. Pour le moment, je ne construit pas le travail.")
+        return false
         // TODO Le plus gros…
-        raise("Dois être implémenté")
+        var dataRec = CRON.parse(recval)
+        var [mns, hrs, mjr, mon, wjr] = recval.split(' ')
+        /**
+          Rappel :
+            mns   minutes
+            hrs   heures
+            mjr   jour du mois
+            mon   mois
+            wjr   Jour de la semaine
+        **/
+
       default:
         raise(`La valeur de récurrence ${this.recurrence} est inconnue…`)
     }
@@ -248,7 +266,7 @@ class TravailRecurrent extends Travail {
       newData.startAt = s
     }
 
-    console.log("newData après rectification pour travail récurrent")
+    console.log("newData après rectification pour travail récurrent", newData)
     return newData
   }
 
