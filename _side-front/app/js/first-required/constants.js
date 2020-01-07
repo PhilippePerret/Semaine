@@ -44,11 +44,11 @@ const DATA_RECURRENCES = {
   , 'cron':   {definable:true, hname: 'façon CRON…', explication: explicationCron}
   , 'jour':   {hname: 'tous les jours', explication: "Ce travail de ${duree} sera répété chaque jour à ${heure}."}
   , 'jours':  {definable:true, hname: 'seulement les jours…', explication: "Ce travail sera répété seulement les jours indiqués. Le lundi vaut 1 et le samedi vaut 6. On peut spécifier les valeurs en les séparant ou non par n'importe quel caractère, par exemple '134' ou '1,3,4' ou '1 3 4'."}
-  , 'hebdo':  {hname: 'un par semaine (~ briefing)', explication: "Ce travail de  ${duree} sera répété chaque semaine, le ${njour} à ${heure}."}
-  , 'bihed':  {hname: 'un toutes les 2 semaines', explication: "Ce travail de ${duree} sera répété tous les quinze jours, le ${njour} à ${heure}."}
-  , 'month':  {hname: 'un par mois (~ bilan)', explication: "Ce travail de ${duree} sera répété tous les ${mDay} du mois à ${heure}."}
-  , 'months': {definable:true, hname: 'seulement les mois…', explication: "Le travail sera répété seulement les mois indiqués. La valeur doit être une liste d'indice de mois (1 pour janvier, 2 pour février, etc.) séparés par des espaces. Par exemple '1 3 11' pour janvier, mars et novembre."}
+  , 'hebdo':  {hname: 'un par semaine (aka "briefing")', explication: "Ce travail de  ${duree} sera répété chaque semaine, le ${njour} à ${heure}."}
+  , 'biheb':  {hname: 'un toutes les 2 semaines', explication: "Ce travail de ${duree} sera répété tous les quinze jours, le ${njour} à ${heure}."}
+  , 'month':  {hname: 'un par mois (aka "bilan")', explication: "Ce travail de ${duree} sera répété tous les ${mDay} du mois à ${heure}."}
+  , 'months': {definable:true, hname: 'seulement les mois…', explication: "Le travail sera répété seulement les mois indiqués. La valeur doit être une liste d'indice de mois (1 pour janvier, 2 pour février, 10 pour octobre, etc.) séparés par des espaces. Par exemple '1 3 11' pour janvier, mars et novembre. Ne pas mettre les mois sur deux chiffres."}
   , 'bimen':  {hname: 'bimensuel', explication: "Le travail sera répété tous les deux mois, le même numéro de jour du mois."}
-  , 'trim':   {hname: 'trimestriel (~ conseil)', explication: "Le travail sera répété tous les trois mois, le même numéro de jour du mois."}
-  , 'annee':  {hname: 'un par an (~ anniversaire)', explication: "Le travail ne sera répété qu'une fois par an, précisément le jour spécifié (en prenant en compte la semaine)."}
+  , 'trim':   {hname: 'trimestriel (aka "conseil")', explication: "Le travail sera répété tous les trois mois, le même numéro de jour du mois."}
+  , 'annee':  {hname: 'un par an (aka "anniversaire")', explication: "Le travail ne sera répété qu'une fois par an, précisément le jour spécifié (en prenant en compte la semaine)."}
 }

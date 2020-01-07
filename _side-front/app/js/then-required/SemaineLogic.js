@@ -8,6 +8,10 @@ class SemaineLogic {
   **/
   /**
     Pour exécuter une méthode sur chaque jour de la semaine logique
+
+    Ce sont les instances qui gèrent les jours de l'agenda, à l'affichage
+    principalement. Leur propriété `smartDay` retourne l'instance SmartDay
+    du jour courant.
   **/
   static forEachJour(method){
     this.jours.forEach( jour => method(jour) )
@@ -54,6 +58,7 @@ class SemaineLogic {
     //  - déclencher les notifications des travaux quand il passera
     //    sur leur temps.
     new Cursor();
+    Cursor.current.build()
 
     console.log("-> showCurrent")
     this.showCurrent()
@@ -103,19 +108,12 @@ class SemaineLogic {
     // on le détruit
     const isCourante =  this.current.annee == couranteData.annee &&
                         this.current.index == couranteData.semaine
-    console.log("isCourante = %s", isCourante)
-    console.log("avec this.current.annee:%d, couranteData.annee:%d", this.current.annee,couranteData.annee)
-    console.log("avec this.current.index:%d, couranteData.semaine:%d", this.current.index, couranteData.semaine)
 
     if ( isCourante ) {
-      // On peut construire le curseur
-      new Cursor()
-      Cursor.current.build()
       // On met en route le curseur.
       Cursor.current.startMoving()
     } else if ( Cursor.current ) {
-      Cursor.current.obj.remove()
-      delete Cursor.current
+      Cursor.current.hideAndStop()
     }
   }
 
@@ -142,20 +140,6 @@ class SemaineLogic {
     }
     const smartDay = new SmartDay(jour)
     return {annee:smartDay.year, semaine:smartDay.nSemaineLogic, jour:jour}
-  }
-
-
-  /**
-    Méthode qui calcule le numéro dans le mois du jour qui correspond
-    à la semaine d'indice +nWeek+ et au jour +wDay+ de cette semaine
-  **/
-  static calcDayOfMonthFromJourAndSemaine(nWeek, wDay){
-    // console.log("Semaine:%d, Jour semaine:%d", nWeek, wDay)
-    var secondes = (((nWeek - 1) * 7) + (wDay - 1)) * 24 * 3600
-    const year      = new Date().getFullYear()
-    const wantedDay = new Date(year,0,1,0,0,secondes);
-    // console.log("wantedDay = ", wantedDay)
-    return wantedDay.getDate() // retourne le jour du mois…
   }
 
   /**

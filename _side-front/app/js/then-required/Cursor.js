@@ -61,6 +61,8 @@ class Cursor {
    * Démarrage du déplacement du curseur
    */
   startMoving(){
+    // On affiche le curseur
+    this.obj.classList.remove('noDisplay')
     // TODO
     // Ici, on pourrait mettre une boucle d'attendre pour attendre vraiment
     // d'être sur une minute ronde.
@@ -68,6 +70,16 @@ class Cursor {
     // On lance la boucle qui va déplacer le curseur
     this.timer = setInterval(this.move.bind(this), 60*1000)
     this.move.call(this)
+  }
+
+  /**
+    Cache et arrête le curseur courant
+    Utilisé lorsque la semaine courante n'est pas la semaine affichée.
+  **/
+  hideAndStop(){
+    this.timer && clearInterval(this.timer)
+    delete this.timer
+    this.obj.classList.add('noDisplay')
   }
   /**
    * Déplacer le curseur de temps. La méthode est appelée en

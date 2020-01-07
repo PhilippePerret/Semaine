@@ -39,20 +39,6 @@ class Semaine {
     return {annee:year, semaine:nWeek, jour:jour}
   }
 
-
-  /**
-    Méthode qui calcule le numéro dans le mois du jour qui correspond
-    à la semaine d'indice +nWeek+ et au jour +wDay+ de cette semaine
-  **/
-  static calcDayOfMonthFromJourAndSemaine(nWeek, wDay){
-    // console.log("Semaine:%d, Jour semaine:%d", nWeek, wDay)
-    var secondes = (((nWeek - 1) * 7) + (wDay - 1)) * 24 * 3600
-    const year      = new Date().getFullYear()
-    const wantedDay = new Date(year,0,1,0,0,secondes);
-    // console.log("wantedDay = ", wantedDay)
-    return wantedDay.getDate() // retourne le jour du mois…
-  }
-
   /**
    * Path au dossier qui contient toutes les semaines définies
    */

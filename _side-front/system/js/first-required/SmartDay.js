@@ -24,7 +24,25 @@ class SmartDay {
     , 6:{index:6, hname: 'Dimanche', shorthname:'dim'}
   }}
 
+  // Reçoit '31 12 98' et retourne l'instance Date du 31 décembre 2098
+  static parseDDMMYY(ddmmyy){
+    var [j,m,a] = ddmmyy.split(' ')
+    return new SmartDay(new Date(`${m}/${j}/20${a}`))
+  }
+  // Reçoit '31 12 2020' et retourne l'instance date du 31 décembre 2020
+  static parseDDMMYYYY(ddmmyyyy){
+    var [j,m,a] = ddmmyy.split(' ')
+    return new SmartDay(new Date(`${m}/${j}/${a}`))
+  }
+
+
   constructor(date){
+    switch(typeof date){
+      case 'string':
+      case 'number':
+        date = new Date(date)
+        break;
+    }
     this.initialDate = date || (new Date())
   }
 
@@ -62,8 +80,17 @@ class SmartDay {
       .replace(/%Y/g, this.year)
   }
 
-  asJJMMAA(separateur = '/'){
-    return this.asDDMMYY
+  /**
+    Retourne une valeur qui pourra être "parsé" par l'instanciation
+    Permet par exemple d'enregistrer en JSON cette valeur pour pouvoir
+    ensuite retrouve le SmartDay correspondant
+  **/
+  get asParsable(){
+    return this.formate('%m/%d/%Y')
+  }
+
+  asJJMMAA(separator = '/'){
+    return this.formate(`%d${separator}%m${separator}%y`)
   }
   get asDDMMYY(){
     return this._asddmmyy || (this._asddmmyy = this.formate('%d %m %y'))
@@ -119,13 +146,15 @@ class SmartDay {
   get month2(){
     return String(this.month).padStart(2,'0')
   }
-  // Le jour du mois (de 1 à 31)
+  // Le jour du mois (de 1 à 31). Alias : mDay
   get number(){
     return this._number || (this._number = this.initialDate.getDate())
   }
+  get mDay(){return this.number}
   get number2(){
     return this._number2 || (this._number2 = String(this.number).padStart(2,'0'))
   }
+  get mDay2(){return this.number2}
 
   /**
     Retourne l'index de la semaine du lundi au dimanche pour le jour

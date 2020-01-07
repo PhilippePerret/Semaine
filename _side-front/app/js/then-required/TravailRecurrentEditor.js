@@ -17,7 +17,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
       , tache:            {hname: 'Tâche',      type: 'string'}
       , njour:            {hname: 'Jour',       type: 'number'}
       , recurrence:       {hname: 'Récurrence', type: 'string', default: 'none'}
-      , recurrence_value: {hname: 'Valeur de récurrence', type:'string', default:''}
+      , recurrenceValue: {hname: 'Valeur de récurrence', type:'string', default:''}
       , startAt:          {hname: 'Commence le',type: 'string', default: TODAY.asJJMMAA(' ')}
       , endAt:            {hname: 'Fini le',    type: 'string', default: ''}
       , heure:            {hname: 'Heure',      type: 'float'}
@@ -49,7 +49,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
       , DCreate('DIV', {class:'row select', inner:[
           DCreate('LABEL',{inner: "Récurrence : "})
         , DCreate('SELECT', {id:this.idFor('recurrence'), inner:OptionsRecurrence, class:'auto'})
-        , DCreate('INPUT',{type:'text', class:'noDisplay short', id:this.idFor('recurrence_value')})
+        , DCreate('INPUT',{type:'text', class:'noDisplay short', id:this.idFor('recurrenceValue')})
         , DCreate('DIV', {class:'rec-expli', id:this.idFor('recurrence_explication')})
         ]})
       , DCreate('DIV', {class:'row', inner:[
@@ -60,6 +60,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
             DCreate('LABEL', {inner:'Fini le : '})
           , DCreate('INPUT',{type:'text', class:'medium', id:this.idFor('endAt'), placeholder:"JJ MM AA ou rien"})
         ]})
+      , this.rowFormForJour('Jour', 'njour')
       , this.rowFormForHour('Heure', 'heure')
       , this.rowFormForDuree('Durée', 'duree')
       , this.rowFormForType('Projet')
@@ -74,7 +75,6 @@ class TravailRecurrentEditor extends CommonElementEditor {
     Observation du formulaire
   **/
   observe(){
-    console.log('-> observe du formulaire de travail récurrent')
     DGet(`#${this.idFor('recurrence')}`).addEventListener('change', this.onChangeRecurrence.bind(this))
   }
 
@@ -85,7 +85,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
     // console.log("Changement de la récurrence")
     const recMenu = DGet(`#${this.idFor('recurrence')}`)
     const recExpli = DGet(`#${this.idFor('recurrence_explication')}`)
-    const recSupValeu = DGet(`#${this.idFor('recurrence_value')}`)
+    const recSupValeu = DGet(`#${this.idFor('recurrenceValue')}`)
     const recValue = recMenu.value
     console.log("Valeur de récurrence :", recValue)
     const recData = DATA_RECURRENCES[recValue]

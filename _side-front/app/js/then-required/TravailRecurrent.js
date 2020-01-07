@@ -124,7 +124,144 @@ class TravailRecurrent extends Travail {
     et le construit le cas échéant.
   **/
   buildIfNecessary(){
-    console.log("Est-ce que ce travail doit être construit ?", this)
+    /**
+      Méthode : faut-il passer en revue chaque jour (les 7) et voir
+      s'il faut ajouter ce travail à ce jour ?
+      Par exemple, on teste le 7 janvier 2020
+        - si récurrence tous les jours (jour) => oui
+        - si récurrence seulement les jours (jours) et que ce jour est du
+          même nombre (wDay) => oui
+        - si une fois par semaine
+    **/
+    SemaineLogic.forEachJour(jour => {
+      // console.log("jour = ", jour)
+      if ( ! this.isActiveOn(jour) ) return ;
+      this.build(jour.njour)
+    })
+  }
+
+  /**
+    Retourne true si le travail courant est active le jour +jour+ {Jour}
+
+    Note : c'est la propriété `recurrence` qui va déterminer en premier
+    lieu si le travail doit être affiché.
+
+    +Params+::
+      +jour+:: [Jour]   Instance du jour à checker. Contient notamment la
+                        propriété `smartDay` qui retourne le SmartDay du
+                        jour en question.
+  **/
+  isActiveOn(jour){
+    const jourDay   = jour.smartDay
+        , recval    = this.recurrenceValue
+        , startDay  = SmartDay.parseDDMMYY(this.startAt)
+        ;
+    switch(this.recurrence){
+      case 'none'   : return false ;
+      case 'jour'   : return true  ; // tous les jours
+      case 'jours'  : // seulement les jours voulus
+        return recval.indexOf(String(jourDay.wDay)) > -1
+      case 'hebdo'  : // une fois par semaine, au jour et à l'heure dite
+        return jourDay.wDay == this.njour
+      case 'biheb'  :
+        if ( jourDay.wDay != this.njour ) return false ;
+        // Calcul plus compliqué pour savoir si c'est tous les 15 jours
+        // TODO
+        raise("Dois être implémenté")
+      case 'month'  : // une fois par mois
+        // Calcul encore plus compliqué : il faut connaitre le premier jour
+        // Noter qu'on ne peut pas le connaitre d'après startAt puisque le
+        // travail a pu être créé pour un autre jour. TODO Pour la simplicité du
+        // calcul, il pourrait être préférable de calculer la valeur au moment
+        // de l'enregistrement et de l'utiliser ici.
+        return ( jourDay.mDay == Number(recval) )
+      case 'months' : // seulement les mois choisis
+        // Donc le jour testé doit correspondre à la valeur de récurrence
+        // calculé et son mois doit être un de ceux retenu.
+        // La date de départ a été mise au jour du mois voulu
+        return ( jourDay.mDay == startDay.mDay && recval.split(' ').indexOf(startDay.month) > -1)
+      case 'bimen' : // bimensuel => tous les deux mois
+        // Est un mois sur deux ?
+        // Ici, on se sert du jour du mois où ça doit être affiché et de
+        // la date de démarrage
+        if ( jourDay.mDay != Number(recval) ) return false ;
+        // Ensuite, il faut que le mois courant du jour ait la même 'parité'
+        // que le mois du travail
+        return jourDay.month % 2 == startDay.month % 2
+      case 'trim' : // trimestriel => tous les trois mois
+        // Est-ce un mois sur trois ?
+        if ( jourDay.mDay != Number(recval) ) return false ;
+        return jourDay.month % 3 == startDay.month % 3
+      case 'annee' : // annuel
+        return `${jourDay.mDay2}/${jourDay.month2}` == String(recval)
+      case 'cron' : // une récurrence CRON
+        // TODO Le plus gros…
+        raise("Dois être implémenté")
+      default:
+        raise(`La valeur de récurrence ${this.recurrence} est inconnue…`)
+    }
+  }
+
+  /**
+    Méthode appelée avant de dispathcher les données. Elle permet
+    notamment de définir la valeur `recurrenceValue` pour certaines
+    récurrences afin de faciliter l'analyse au cours de la construction (cf.
+    ci-dessus la méthode `isActiveOn`)
+
+    On doit vérifier aussi la validité des données TODO Mais il
+    faudrait plutôt que ce soit une méthode séparée.
+  **/
+  beforeDispatch(newData){
+    const recval = newData.recurrenceValue
+    let v = null, s = null
+    // console.log("newData avant rectif pour travail récurrent:", newData)
+    const newDataDay = SemaineLogic.jours[newData.njour].smartDay
+    switch(newData.recurrence){
+      case 'bimen':
+      case 'trim':
+        // La date de démarrage (startAt) déterminera ce qui sera le
+        // premier mois.
+        s = newDataDay.asDDMMYY
+        // Pas de break
+      case 'month':
+        // On met en valeur de récurrence le numéro du jour du mois correspond
+        // à l'indice de la semaine du jour choisi (on peut être mercredi et
+        // avoir choisir un travail pour vendredi) et son mDay
+        v = newDataDay.mDay
+        break
+      case 'months':
+        // Comme la valeur de récurrence est déjà définie, ici,
+        // on utilise plutôt le `startAt` pour définir le premier jour.
+        s = newDataDay.asDDMMYY
+        break
+      case 'annee':
+        // On met la valeur de récurrence à "DD/MM"
+        v = `${newDataDay.mDay2}/${newDataDay.month2}`
+        break
+    }
+    if ( v !== null ) {
+      console.log("recurrenceValue mis à ", v)
+      newData.recurrenceValue = v
+    }
+    if ( s != null ) {
+      console.log("startAt mis à ", s)
+      newData.startAt = s
+    }
+
+    console.log("newData après rectification pour travail récurrent")
+    return newData
+  }
+
+  /**
+    Retourne true si le travail récurrent est actif
+    Rappel : normalement, il suffit de vérifier la date de démarrage, car
+    si un travail récurrent est "dépassé", il n'est plus enregistré
+  **/
+  get isActive(){
+    return this.realStartAt < TODAY.time
+  }
+  get realStartAt(){
+    return ((this.startAt && SmartDay.parseDDMMYY(this.startAt))||TODAY.from(-7)).time
   }
 
   // Construction du travail récurrent dans le container
@@ -157,9 +294,9 @@ class TravailRecurrent extends Travail {
    * On doit créer toutes les occurences de la semaine, si c'est
    * un travail quotidien par exemple
    */
-  build(){
+  build(njour){
     // TODO Récurrence supra hebdomadaire
-    this.buildIn(SemaineLogic.jours[this.njour].objTravaux)
+    this.buildIn(SemaineLogic.jours[njour].objTravaux)
     this.observe()
   }
 
@@ -168,6 +305,7 @@ class TravailRecurrent extends Travail {
    */
   rebuild(){
     // TODO Récurrence supra hebdomadaire => plusieurs occurences
+    raise("Doit être implémenté")
     this.unobserve()
     this.obj.remove()
     this.build()
@@ -181,6 +319,7 @@ class TravailRecurrent extends Travail {
    * occurence passera par là.
    */
   removeDisplay(){
+    raise("Doit être implémenté")
     this.obj && this.obj.remove()
   }
 
@@ -234,7 +373,7 @@ class TravailRecurrent extends Travail {
 
   // Retourne la valeur personnalisée pour la récurrence, si c'est
   // nécessaire
-  get recurrence_value(){return this._recurrence_value}
+  get recurrenceValue(){return this._recurrenceValue}
 
   /**
     Jour du travail
