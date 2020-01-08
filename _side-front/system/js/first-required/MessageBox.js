@@ -17,6 +17,7 @@
                     Par défaut : ['Annuler', 'OK']
       :title        Le titre de la fenêtre
                     Par défaut : vide
+      :type                 Le type du message ('error', 'notice', 'alert')
       :defaultButtonIndex   L'index du bouton (dans :buttons) sélectionné par
                             défaut. C'est lui qui réagira à la touche Return
                             Par défaut : 1
@@ -45,7 +46,7 @@ class MessageBox {
     this.data       = data
     this.id         = data.id || `mbox${Number(new Date())}${Math.rand(1000)}`
     this.title      = data.title || data.titre
-    this.type       = data.type || 'alert' // 'alert', 'confirm' // inusité
+    this.type       = data.type || 'alert' // 'alert', 'confirm'
     this.width      = data.width
     this.message    = data.message.replace(/\n/g,'<br>')
     this.defaultButtonIndex = data.defaultButtonIndex
@@ -150,6 +151,7 @@ build(){
 
   var divs = [
       DCreate('DIV',{class:'title', inner: this.title})
+    , DCreate('DIV',{class:'icon', inner: this.iconByType})
     , DCreate('DIV',{class:'message', inner: this.message})
   ]
   if ( this.isPrompt() ) {
@@ -172,6 +174,14 @@ build(){
     }
   }
   document.body.appendChild(this.obj)
+}
+
+get iconByType(){
+  if ( this.type == 'alert' || this.type == 'error') {
+    return '🖐'
+  } else {
+    return '💬'
+  }
 }
 
 observe(){

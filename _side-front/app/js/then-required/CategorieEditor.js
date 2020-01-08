@@ -15,7 +15,7 @@ class CategorieEditor extends CommonElementEditor {
   static get properties(){
     return {
         id:               {hname:'ID',      type:'number', hidden:true}
-      , name:             {hname: 'Nom',    type:'string'}
+      , name:             {hname: 'Nom',    type:'string', validator:{required:true, uniq:true, minLength:3, maxLength:50}}
       , domaineId:        {hname:'Domaine', type:'Domaine'}
       , associatecolorId: {hname:'Couleur', type:'AssociateColor'}
     }

@@ -14,10 +14,14 @@ class TravailEditor extends CommonElementEditor {
   static get properties(){
     return {
         id:           {hname: 'ID',         type: 'number', hidden: true}
-      , tache:        {hname: 'Tâche',      type: 'string'}
+      , tache:        {feminin:true, hname: 'Tâche',      type: 'string', validator:{required:true, minLength:3, maxLength:255}}
       , njour:        {hname: 'Jour',       type: 'number'}
-      , heure:        {hname: 'Heure',      type: 'float'}
-      , duree:        {hname: 'Durée',      type: 'float'}
+      // Note : je ne préfère pas valider l'heure et la durée au niveau des
+      // chevauchement maintenant car ce serait trop compliqué avec les travaux
+      // récurrents. Les chevauchements sont checkés au moment de la construc-
+      // tion.
+      , heure:        {feminin:true, le:'l’', hname: 'Heure', type: 'float'}
+      , duree:        {feminin:true, hname: 'Durée', type: 'float'}
       , recurrent:    {hname: 'Récurrent',  type: 'boolean'}
       , projetId:     {hname: 'Projet',     type: 'Projet'}
       , categorieId:  {hname: 'Catégorie',  type: 'Categorie'}
@@ -48,13 +52,4 @@ class TravailEditor extends CommonElementEditor {
       ]})
       ]
   }
-
-
-  // /**
-  //   Observation du formulaire
-  // **/
-  // observe(){
-  //
-  // }
-
 }

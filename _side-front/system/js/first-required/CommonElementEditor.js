@@ -212,6 +212,69 @@ class CommonElementEditor {
   }
 
   /**
+    Méthode qui valide (ou non) les données en fonction du validateur
+    défini pour chaque propriété (dans la propriété `properties` des classes
+    d'éditeur).
+    Une propriété à valider doit définir un attribut
+        validator
+    qui peut être soit un objet soit un string
+    • Quand c'est un string, c'est le nom d'une méthode de l'éditor qui doit
+    retourner true en cas de validation correcte ou raiser le corps du message.
+    d'erreur en cas de problème. La méthode est appelée avec en premier argument
+    la valeur de la propriété et en second argument toutes les autres données
+    (qui peuvent être utiles).
+    • Quand `validator` est un object, il peut contenir ces définitions :
+        required    Si true, une valeur est absolument requise
+        uniq        Si true, la valeur doit être unique
+        minLength   Si défini, doit donner la longueur minimale de value
+        maxLength   Si défini, doit donner la longueur maximale de value
+  **/
+  validateFormValues(data){
+    for(var prop in data){
+      if ( !this.validateFormValue(prop, data[prop], data) ) return false
+    }
+    return true ;// tout est OK
+  }
+  async validateFormValue(prop, value, data){
+    try {
+      const vd = this.constructor.properties[prop].validator
+      if (undefined === vd) return true ;
+      if ('string' == typeof vd) {
+        // <= La validation est un string
+        // => C'est une méthode propre qu'il faut appeler pour valider
+        this[vd].call(this,value,data)
+      } else {
+        (vd.required && undefined !== value) || raise("doit absolument être définie.")
+        const same = this.findSameAs(prop,value)
+        vd.uniq && same && raise(`doit être unique (l'élément #${same.id} possède cette valeur).`)
+        vd.minLength && value.length < vd.minLength && raise(`doit faire au moins ${vd.minLength} caractères.`)
+        vd.maxLength && value.length > vd.maxLength && raise(`ne doit pas faire plus de ${vd.maxLength} caractères.`)
+      }
+
+    } catch (e) {
+      const dataProp = this.constructor.properties[prop]
+      let Le;
+      if (dataProp.le) {Le = dataProp.le.toUpperCase()} else {Le = dataProp.feminin?'La ':'Le '}
+      await error(`${Le}${dataProp.hname} ${e}`)
+      return false
+    }
+  }
+  findSameAs(prop,value){
+    var found = undefined ;
+    this.constructor.masterClass.forEach( item => {
+      if ( item[prop] == value && item.id != this.owner.id ) {
+        found = item
+        return false
+      }
+    })
+    return found
+  }
+
+  /**
+    / Fin des méthodes de validations
+  **/
+
+  /**
     Méthodes d'évènement
   **/
   onCancel(){
@@ -228,8 +291,10 @@ class CommonElementEditor {
    */
   onOk(){
     var newData = this.getFormValues()
-    this.owner.dispatch(newData)
-    this.hide()
+    if ( this.validateFormValues(newData) ){
+      this.owner.dispatch(newData)
+      this.hide()
+    }
   }
 
   // Retourne true si c'est un nouvel élément. Le seul moyen

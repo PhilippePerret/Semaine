@@ -59,7 +59,7 @@ function message(msg, options){
   Object.assign(options, {
       message:msg
     , buttons:['OK']
-    , type:'notice'
+    , type: options.type || 'notice'
     , defaultButtonIndex: 0
   })
   let mbox = new MessageBox(options)
@@ -67,6 +67,12 @@ function message(msg, options){
     mbox.methodOnOK = () => {ok(true)}
     mbox.show()
   })
+}
+
+function error(msg, options){
+  options = options || {}
+  Object.assign(options, {type:'error'})
+  return message(msg, options)
 }
 
 // Demande une réponse

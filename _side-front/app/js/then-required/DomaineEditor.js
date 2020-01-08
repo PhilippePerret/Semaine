@@ -9,8 +9,8 @@ class DomaineEditor extends CommonElementEditor {
   static get properties(){
     return {
         id:         {hname:'ID',      type:'number', hidden:true}
-      , name:       {hname: 'Nom',    type:'string'}
-      , associatecolorId: {hname:'Couleur', type:'AssociateColor' /* donc ID */}
+      , name:       {hname: 'Nom',    type:'string', validator:{required:true, uniq:true, minLength:3, maxLength:50}}
+      , associatecolorId: {feminin:true, hname:'Couleur', type:'AssociateColor' /* donc ID */}
     }
   }
 
