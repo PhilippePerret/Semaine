@@ -10,9 +10,15 @@ div.semaine div.jour {
   max-width:250px;
   min-height:800px;
   height:800px;
-  background-color:#EEF9E8;
   margin-left:2px;
 }
+div.semaine div.jour:not(.courant) {
+  background-color:#EEF9E8;
+}
+div.semaine div.jour.courant {
+  background-color:#8FB4F9;
+}
+
 div.semaine div.jour div.titre {
   /* font-weight: bold; */
   height: 30px;

@@ -7,10 +7,10 @@ div.semaine {
   position:relative;
 }
 
-div.semaine.current {
+div.semaine.courante {
   opacity:1;
 }
-div.semaine:not(.current){
+div.semaine:not(.courante){
   opacity:0.5;
 }
 

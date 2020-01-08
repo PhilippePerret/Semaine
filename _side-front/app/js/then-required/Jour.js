@@ -66,6 +66,7 @@ class Jour /* extends CommonElement */ {
     ]})
     SemaineLogic.obj.append(this.obj)
     this.observe()
+    this.setAsCourantOrNot()
   }
 
   /**
@@ -77,6 +78,7 @@ class Jour /* extends CommonElement */ {
     delete this._smartDay
     this.nettoie()
     this.updateDateEntete()
+    this.setAsCourantOrNot()
   }
   /**
     Nettoyer le jour
@@ -88,6 +90,10 @@ class Jour /* extends CommonElement */ {
 
   updateDateEntete(){
     this.titreObj.innerHTML = this.f_jname
+  }
+
+  setAsCourantOrNot(){
+    this.obj.classList[this.isJourCourant ? 'add' : 'remove']('courant')
   }
 
   get titreObj(){
@@ -124,6 +130,18 @@ class Jour /* extends CommonElement */ {
     return stopEvent(ev)
   }
 
+  /**
+    Méthodes d'état
+  **/
+
+  // Retourne true si le jour est le jour courant
+  get isJourCourant(){
+    return SemaineLogic.current.isSemaineCourante && this.njour == TODAY.wDay
+  }
+
+  /**
+    Méthodes de données
+  **/
   get absData(){
     return this._absdata || (this._absdata = SmartDay.DATA_JOURS[this.njour])
   }

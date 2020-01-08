@@ -49,7 +49,7 @@ class SemaineLogic {
     - elle met une classe spéciale au jour courant
   **/
   static setAsCourante(){
-    this.obj.classList[this.current.isSemaineCourante ? 'add' : 'remove']('current')
+    this.obj.classList[this.current.isSemaineCourante ? 'add' : 'remove']('courante')
 
   }
 
@@ -181,10 +181,6 @@ class SemaineLogic {
   writeInfos(){
     DGet('#annee-semaine').innerHTML = this.annee
     DGet('#index-semaine').innerHTML = this.index
-    // Ici, un calcul plus fin est nécessaire : il faut afficher les jours
-    // plutôt que le numéro de semaine qui est une information qui ne matche
-    // pas avec les semaines affichées du lundi au samedi
-
   }
 
   /**
