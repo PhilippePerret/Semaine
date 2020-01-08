@@ -62,12 +62,14 @@ class Travail extends CommonElement {
     this._selected = v
     this.obj.classList[v?'add':'remove']('selected')
   }
+
   /**
     Méthodes de construction
   **/
-  buildIn(container){
+  buildIn(container, overlap){
     var classCss = ['travail'] ;
     this.isRecurrent && classCss.push('recurrent')
+    overlap > 0 && classCss.push('overlap')
     this.selected && classCss.push('selected')
     var styles = []
     if ( this.f_color ) {
@@ -86,18 +88,82 @@ class Travail extends CommonElement {
       })
 
     container.append(this.obj)
-    this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
-    if (this.duree){
-      this.obj.style.height = (this.duree * HEURE_HEIGHT) + 'px'
+    // On place correctement l'objet (noter que top et height ont pu être
+    // rectifiés suivant les chevauchements)
+    this.obj.style.top    = `${this.top}px`
+    this.obj.style.height = `${this.height}px`
+  }
+
+  /**
+    Méthode qui check les éventuels chevauchement avec un autre travail déjà
+    inscrit dans l'agenda.
+
+    La méthode retourne
+      3   En cas d'erreur fatale => le travail ne sera pas écrit
+      1   En cas d'erreur non fatale => le travail sera écrit mais marqué
+      0   Aucun problème de chevauchement
+  **/
+  checkOverlap(njour){
+    njour = njour || this.njour
+    const top = this.top = (this.heure - HEURE_START) * HEURE_HEIGHT ;
+    this.height = this.duree * HEURE_HEIGHT ;
+    const bottom  = Number(this.top + this.height) ;
+    // var plages = SemaineLogic.jours[this.njour]
+    var err = null
+    var fatalError = false
+    const jour = SemaineLogic.jours[njour]
+    var plages = jour.plages.slice()
+    var newPlages = []
+    for(var plage of plages){
+      // Si le travail qu'on étudie est celui qu'on checke, on passe (cela
+      // arrive lorsque l'on reconstruit un travail)
+      if (plage.travail.id == this.id){
+        continue ; // donc on ne le prend pas
+      } else {
+        newPlages.push(plage)
+      }
+      if ( plage.start == top ){
+        // => IMPOSSIBLE (les deux travaux commencent en même temps)
+        err = `le travail “${this.name}” et le travail “${plage.travail.name}” ne peuvent pas commencer en même temps !`
+        fatalError = true
+      } else if ( plage.start < top && plage.end > top) {
+        err = `le travail “${this.name}” est chevauché par le travail “${plage.travail.name}”`
+        this.top = plage.end // on repousse la hauteur
+        this.height = bottom - this.top
+        plage.travail.markOverlaped()
+      } else if ( plage.start > top && plage.end < bottom) {
+        err = `le travail “${this.name}” chevauche le travail “${plage.travail.name}”`
+        this.height = plage.end - top // on réduit la hauteur du travail courant
+      } else {
+        // <= Aucun chevauchement
+      }
+    }
+    if ( fatalError ) {
+      return 3
+    } else {
+      newPlages.push({start:this.top, end:this.top + this.height, travail:this})
+      jour.plages = newPlages
+      err && error(`${jour.jname}, ${err}`)
+      return err ? 1 : 0
     }
   }
 
+  markOverlaped(){
+    this.obj.classList.add('overlap')
+  }
+  unmarkOverLaped(){
+    this.obj.classList.remove('overlap')
+  }
   /**
    * Demande de construction du travail
    */
   build(){
-    this.buildIn(SemaineLogic.jours[this.njour].objTravaux)
-    this.observe()
+    const overlap = this.checkOverlap()
+    console.log("overlap=",overlap)
+    if ( overlap < 3 ) {
+      this.buildIn(this.jour.objTravaux, overlap)
+      this.observe()
+    }
   }
 
   /**

@@ -73,12 +73,14 @@ class Jour /* extends CommonElement */ {
     Actualise le jour
       - le nettoie (le vide de ses travaux)
       - ajuste sa date en titre
+      - remet ses plages à rien
   **/
   update(){
     delete this._smartDay
     this.nettoie()
     this.updateDateEntete()
     this.setAsCourantOrNot()
+    this.plages = []
   }
   /**
     Nettoyer le jour

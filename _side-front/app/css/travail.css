@@ -39,6 +39,10 @@ div.travail.recurrent {
   border-left-color:orange;
 }
 
+div.travail.overlap {
+  border-left-color:red!important;
+}
+
 /*
   Le div qui contient l'explication (parfois détaillée) sur
   la récurrence choisie pour un travail récurrent

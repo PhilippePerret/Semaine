@@ -62,7 +62,7 @@ div#time-cursor {
   position:absolute;
   width:100%;
   height:2px;
-  background-color:red;
+  background-color:#29CE00;
   z-index:50;
 }
 div#time-cursor span.current_hour {

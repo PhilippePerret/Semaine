@@ -328,8 +328,11 @@ class TravailRecurrent extends Travail {
    */
   build(njour){
     njour = njour || this.njour
-    this.buildIn(SemaineLogic.jours[njour].objTravaux)
-    this.observe()
+    const overlap = this.checkOverlap(njour)
+    if (overlap < 3) {
+      this.buildIn(SemaineLogic.jours[njour].objTravaux, overlap)
+      this.observe()
+    }
   }
 
   /**
