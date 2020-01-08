@@ -7,8 +7,9 @@ Object.assign(UI,{
     // Construction des deux boutons pour ajouter ou supprimer un travail
     document.body.append(
         DCreate('DIV', {class:'buttons footer-buttons', inner:[
-            DCreate('SPAN', {id:'plus-button-travail', class:'plusmoins-button plus-button', inner:'+'})
-          , DCreate('SPAN', {id:'moins-button-travail', class:'plusmoins-button moins-button', inner:'−'})
+            DCreate('SPAN', {id:'plus-button-travail', class:'plusmoins-button plus-button', inner:'+', placeholder:'Nouveau travail…'})
+          , DCreate('SPAN', {id:'moins-button-travail', class:'plusmoins-button moins-button', inner:'−', placeholder:'Supprimer le travail sélectionné'})
+          , DCreate('SPAN', {id:'list-button-travail', class:'plusmoins-button list-button', inner:'🗃', placeholder:'Liste des travaux'})
           , DCreate('SPAN', {id:'prev-week-button', class:'prevnext-button', inner:'◀︎'})
           , DCreate('INPUT', {type:'hidden', id:'index-semaine'}) // inutile maintenant, mais bon…
           , DCreate('BUTTON',{id:'curr-week-button', inner:'Aujourd’hui'})
@@ -22,6 +23,7 @@ Object.assign(UI,{
 , observe(){
     DGet('#plus-button-travail').addEventListener('click', Travail.onClickPlusButton.bind(Travail))
     DGet('#moins-button-travail').addEventListener('click', Travail.onClickMoinsButton.bind(Travail))
+    DGet('#list-button-travail').addEventListener('click', TravailListing.chooseFor.bind(TravailListing))
     DGet('#prev-week-button').addEventListener('click',SemaineLogic.showPrevious.bind(SemaineLogic))
     DGet('#next-week-button').addEventListener('click',SemaineLogic.showNext.bind(SemaineLogic))
     DGet('#curr-week-button').addEventListener('click',SemaineLogic.showCurrent.bind(SemaineLogic))
