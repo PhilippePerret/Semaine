@@ -33,13 +33,25 @@ class SemaineLogic {
     Méthodes semaine
   **/
   static build(){
-    UI.content.append(DCreate('DIV',{id:'semaine-courante', class:'semaine'}))
-    this.obj = DGet('div#semaine-courante')
+    UI.content.append(DCreate('DIV',{id:'semaine-logic', class:'semaine'}))
+    this.obj = DGet('div#semaine-logic')
     // Initialiser le curseur
     Cursor.init()
     // Construire les 6 jours de la semaine courante
     Jour.build()
   } // build
+
+  /**
+    Règle l'affichage pour indiquer que c'est la semaine courante
+    Attention : ce "courante" n'a rien à voir avec "current" qui concerne
+    l'instance courante.
+    - La méthode applique ou retire la classe 'current' à div#semaine-logic
+    - elle met une classe spéciale au jour courant
+  **/
+  static setAsCourante(){
+    this.obj.classList[this.current.isSemaineCourante ? 'add' : 'remove']('current')
+
+  }
 
   static get current()  { return this._current }
   static set current(v) {
@@ -48,16 +60,12 @@ class SemaineLogic {
   }
 
   /**
-    On commence par construire la semaine logique courante
+    Construction de la semaine courante
   **/
   static buildCurrent(){
-
     this.current = new SemaineLogic(this.todaySemaine)
     this.build()
-
-    console.log("-> showCurrent")
     this.showCurrent()
-
   }
 
   /**
@@ -110,13 +118,7 @@ class SemaineLogic {
     // On construit les travaux de la semaine
     this.current.build()
 
-    const couranteData = this.todaySemaine
-    // Si c'est la semaine courante, on affiche le curseur, sinon,
-    // on le détruit
-    const isCourante =  this.current.annee == couranteData.annee &&
-                        this.current.index == couranteData.semaine
-
-    if ( isCourante ) {
+    if ( this.current.isSemaineCourante ) {
       // On met en route le curseur.
       Cursor.current.startMoving()
     } else if ( Cursor.current ) {
@@ -206,10 +208,30 @@ class SemaineLogic {
     this.travaux.forEach(w => w.build())
     // Construire les travaux récurrent
     TravailRecurrent.build()
+    // Appliquer la classe en fonction du fait que c'est la semaine
+    // courante ou non
+    SemaineLogic.setAsCourante()
   }
 
+  /**
+    Méthodes d'état
+  **/
+
+  // Retourne true si cette semaine logique est la semaine courante
+  get isSemaineCourante(){
+    if (undefined === this._iscurrentweek) {
+      const todaySem = this.constructor.todaySemaine
+      this._iscurrentweek = this.annee == todaySem.annee &&
+                            this.index == todaySem.semaine
+    }
+    return this._iscurrentweek
+  }
+
+  /**
+    Méthodes de données
+  **/
+
   get travaux(){
-    // TODO Il faut ajouter les travaux récurrents
     return this.data
   }
 

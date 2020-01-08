@@ -140,7 +140,7 @@ class Cursor {
    * Construction du curseur de temps
    */
   build(){
-    DGet('#semaine-courante').append(DCreate('DIV',{id:'time-cursor', inner:[
+    DGet('#semaine-logic').append(DCreate('DIV',{id:'time-cursor', inner:[
       DCreate('SPAN',{class:'current_hour', inner:'---'})
     ]}))
     this.obj = DGet('div#time-cursor')

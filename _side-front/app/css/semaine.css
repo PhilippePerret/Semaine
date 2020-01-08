@@ -7,6 +7,13 @@ div.semaine {
   position:relative;
 }
 
+div.semaine.current {
+  opacity:1;
+}
+div.semaine:not(.current){
+  opacity:0.5;
+}
+
 
 div.semaine div.hourline {
   position:absolute;
