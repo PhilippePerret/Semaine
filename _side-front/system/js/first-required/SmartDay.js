@@ -35,6 +35,14 @@ class SmartDay {
     return new SmartDay(new Date(`${m}/${j}/${a}`))
   }
 
+  /**
+    Retourne une instance du jour courant, avec son commencement
+  **/
+  static todayBeginning(){
+    var d = new Date()
+    return new Date(d.getFullYear(),d.getMonth(),d.getDate(),0,0,0)
+  }
+
 
   constructor(date){
     switch(typeof date){
@@ -43,7 +51,7 @@ class SmartDay {
         date = new Date(date)
         break;
     }
-    this.initialDate = date || (new Date())
+    this.initialDate = date || this.constructor.todayBeginning()
   }
 
   /**

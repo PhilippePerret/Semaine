@@ -39,10 +39,18 @@ Les JOURS peuvent être spécifié par :
 
 </pre></code>
 `
+/**
+  Données des récurrences
+  -----------------------
+  Si une donnée a besoin de définir recurrenceValue, qui va la définir,
+  alors il faut ajouter `definable:true`
+**/
+
 const DATA_RECURRENCES = {
     'none':   {hname: 'Choisir…', explication:'Choisir obligatoirement le type de récurrence à appliquer.'}
   , 'cron':   {definable:true, hname: 'façon CRON…', explication: explicationCron}
   , 'jour':   {hname: 'tous les jours', explication: "Ce travail de ${duree} sera répété chaque jour à ${heure}."}
+  , 'xjour':  {definable:true, hname: 'tous les x jours', explication: "Ce travail de ${duree} sera répété tous les x jours à ${heure} à compter du ${date}."}
   , 'jours':  {definable:true, hname: 'seulement les jours…', explication: "Ce travail sera répété seulement les jours indiqués. Le lundi vaut 1 et le samedi vaut 6. On peut spécifier les valeurs en les séparant ou non par n'importe quel caractère, par exemple '134' ou '1,3,4' ou '1 3 4'."}
   , 'hebdo':  {hname: 'un par semaine (aka "briefing")', explication: "Ce travail de  ${duree} sera répété chaque semaine, le ${njour} à ${heure}."}
   , 'biheb':  {hname: 'un toutes les 2 semaines', explication: "Ce travail de ${duree} sera répété tous les quinze jours, le ${njour} à ${heure}."}

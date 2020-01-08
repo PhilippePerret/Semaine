@@ -169,6 +169,11 @@ class TravailRecurrent extends Travail {
       case 'jour'   : return true  ; // tous les jours
       case 'jours'  : // seulement les jours voulus
         return recval.indexOf(String(jourDay.wDay)) > -1
+      case 'xjour'  : // tous les x jours
+        // Le principe à appliquer ici est que le jour courant soit à un
+        // nombre de jours correspondant à la définition de la répétition.
+        // Par exemple, si c'est "tous les 3 jours", il faut que le jour
+        // courant soit à un nombre /
       case 'hebdo'  : // une fois par semaine, au jour et à l'heure dite
         return jourDay.wDay == this.njour
       case 'biheb'  :
@@ -263,15 +268,15 @@ class TravailRecurrent extends Travail {
           break
       }
       if ( v !== null ) {
-        console.log("recurrenceValue mis à ", v)
+        // console.log("recurrenceValue mis à ", v)
         newData.recurrenceValue = v
       }
       if ( s != null ) {
-        console.log("startAt mis à ", s)
+        // console.log("startAt mis à ", s)
         newData.startAt = s
       }
 
-      console.log("newData après rectification pour travail récurrent", newData)
+      // console.log("newData après rectification pour travail récurrent", newData)
       ok(newData)
     })
   }
