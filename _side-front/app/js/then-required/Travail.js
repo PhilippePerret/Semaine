@@ -66,20 +66,25 @@ class Travail extends CommonElement {
     Méthodes de construction
   **/
   buildIn(container){
-    var classCss = ['travail']
+    var classCss = ['travail'] ;
+    this.isRecurrent && classCss.push('recurrent')
     this.selected && classCss.push('selected')
     var styles = []
     if ( this.f_color ) {
       styles.push(`background-color:${this.f_color.bgcolor}`)
       styles.push(`color:${this.f_color.ftcolor}`)
     }
+
+    // L'objet du travail
     this.obj = DCreate('DIV',{
         class:classCss.join(' ')
       , inner:[
           DCreate('SPAN', {class:'tache', inner:this.formated_tache })
+        , DCreate('SPAN', {class:'infos', inner:this.formated_infos })
         ]
       , style:styles.join(';')
       })
+
     container.append(this.obj)
     this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
     if (this.duree){
@@ -195,9 +200,9 @@ class Travail extends CommonElement {
   /**
    * States
    */
-  get isRecurrent(){
-    return this.recurrent === true
-  }
+
+
+  get isRecurrent(){ return false }
 
   /**
    * Propriétés volatiles
@@ -216,11 +221,6 @@ class Travail extends CommonElement {
   /**
    * Propriétés fixes
    */
-
-  // Retourne la définition de la récurrence du travail
-  get recurrent(){
-    return this._recurrent
-  }
 
   /**
     La tâche à accomplir, formatée
@@ -243,6 +243,18 @@ class Travail extends CommonElement {
     }
     return fstr
   }
+
+  /**
+    Retourne les informations de la tâche
+  **/
+  get formated_infos(){
+    let fstr = ''
+    if ( !this.tache.match('${projet}') && this.projet ) {
+      fstr += `Projet “${this.projet.name}”`
+    }
+    return fstr
+  }
+
   /**
     Tâche à accomplir
   **/

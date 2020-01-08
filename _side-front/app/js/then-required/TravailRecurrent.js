@@ -293,31 +293,32 @@ class TravailRecurrent extends Travail {
     return ((this.startAt && SmartDay.parseDDMMYY(this.startAt))||TODAY.from(-7)).time
   }
 
-  // Construction du travail récurrent dans le container
-  // +container+
-  // TODO Si la construction est la même que pour les travaux non récurrents,
-  // il faudra peut-être supprimer cette méthode propre.
-  buildIn(container){
-    var classCss = ['travail recurrent']
-    this.selected && classCss.push('selected')
-    var styles = []
-    if ( this.f_color ) {
-      styles.push(`background-color:${this.f_color.bgcolor}`)
-      styles.push(`color:${this.f_color.ftcolor}`)
-    }
-    this.obj = DCreate('DIV',{
-        class:classCss.join(' ')
-      , inner:[
-          DCreate('SPAN', {class:'tache', inner:`${this.formated_tache}` })
-        ]
-      , style:styles.join(';')
-      })
-    container.append(this.obj)
-    this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
-    if (this.duree){
-      this.obj.style.height = (this.duree * HEURE_HEIGHT) + 'px'
-    }
-  }
+  // // Construction du travail récurrent dans le container
+  // // +container+
+  // // TODO Si la construction est la même que pour les travaux non récurrents,
+  // // il faudra peut-être supprimer cette méthode propre. NOTE Seule la classe
+  // // change ?
+  // buildIn(container){
+  //   var classCss = ['travail recurrent']
+  //   this.selected && classCss.push('selected')
+  //   var styles = []
+  //   if ( this.f_color ) {
+  //     styles.push(`background-color:${this.f_color.bgcolor}`)
+  //     styles.push(`color:${this.f_color.ftcolor}`)
+  //   }
+  //   this.obj = DCreate('DIV',{
+  //       class:classCss.join(' ')
+  //     , inner:[
+  //         DCreate('SPAN', {class:'tache', inner:`${this.formated_tache}` })
+  //       ]
+  //     , style:styles.join(';')
+  //     })
+  //   container.append(this.obj)
+  //   this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
+  //   if (this.duree){
+  //     this.obj.style.height = (this.duree * HEURE_HEIGHT) + 'px'
+  //   }
+  // }
 
   /**
    * Demande de construction du travail
@@ -334,12 +335,11 @@ class TravailRecurrent extends Travail {
   /**
    * Reconstruction du travail après modification
    */
-  rebuild(){
-    // TODO Récurrence supra hebdomadaire => plusieurs occurences
-    raise("TravailRecurrent#rebuild doit être ré-implémenté")
+  rebuild(njour){
+    njour = njour || this.njour
     this.unobserve()
     this.obj.remove()
-    this.build()
+    this.build(njour)
   }
 
   /**
@@ -375,7 +375,11 @@ class TravailRecurrent extends Travail {
   /**
    * States
    */
-  get isRecurrent(){ true }
+
+  // Renvoie true si c'est un travail récurrent
+  // Note : pour faire la différence avec les travaux normaux (les deux
+  // instances partagent beaucoup de méthodes)
+  get isRecurrent(){ return true }
 
   /**
    * Propriétés volatiles
