@@ -11,6 +11,20 @@ class Cursor {
   *** --------------------------------------------------------------------- */
 
   /**
+    Initialisation du curseur
+    Note : pour chaque session, il y a un seul curseur (Cursor.current) qu'on
+    affichage et qu'on masque à volonté suivant qu'il s'agit de la semaine
+    courante ou non.
+  **/
+  static init(){
+    // On doit instancier un nouveau curseur qui va :
+    //  - afficher une ligne pour suivre le temps sur la semaine
+    //  - déclencher les notifications des travaux quand il passera
+    //    sur leur temps.
+    new Cursor();
+    Cursor.current.build()
+  }
+  /**
     Curseur courant (qui, notamment, reçoit les triggers)
   **/
   static get current(){return this._current}
@@ -26,37 +40,54 @@ class Cursor {
   }
 
   /**
-   * Ajout d'un trigger
-   * +travail+ Instance Travail
+    Ajout d'un trigger
+    ------------------
+    C'est cet ajout qui va faire que le travail va provoquer une notification
+    au moment de sa venue, pour le travail +travail+
+    +Params+::
+      +travail+::[Travail|TravailRecurrent] Instance de travail, fixe ou
+                  récurrent
+
+    Noter que maintenant l'ajout peut se faire dans n'importe quel ordre
+    puisque tous les triggers du jour (qui ne seront jamais nombreux) seront
+    toujours passés en revue intégralement
    */
   addTrigger(travail){
-    if (undefined === this._triggers) {
-      this._triggers = []
+    if (undefined === this.triggers) {
+      this.triggers = new Map()
+    } else {
+      // Si ce travail a déjà produit un trigger, on le supprime
+      this.triggers.has(travail.id) && this.triggers.delete(travail.id)
     }
-    this._triggers.push(travail)
+    this.triggers.set(travail.id, travail)
   }
 
   /**
    * Méthode qui regarde si un trigger ne doit pas être déclenché
-   * Ce trigger est fait toutes les minutes
+   * Ce check est fait toutes les minutes
    */
   checkTrigger(){
-    if (undefined === this._triggers) return ;//rien à faire
-    if (this._triggers.length < 1) return ; // plus rien à faire
+    if (undefined === this.triggers) return ;//rien à faire
+    if (this.triggers.size < 1) return ; // plus rien à faire
     // console.log("Check à : ", Horloge.currentHour)
 
-    // On retire les triggers tant qu'ils sont dépassés
-    while (this.triggers[0].heure < Horloge.currentHour){
-      this._triggers.shift()
+    for( var trigWork of this.triggers.values() ){
+      if ( trigWork.heure < Horloge.currentHour ) {
+        // <= Le trigger est dépassé
+        // => On le retire
+        this.triggers.delete(trigWork.id)
+      } else if ( Horloge.currentHour >= trigWork.heure && Horloge.currentHour < (trigWork.heure + 0.10)  ) {
+        // <= Le trigger est tout proche
+        // => On l'affiche et on le supprime des triggers
+        trigWork.notify()
+        this.triggers.delete(trigWork.id)
+      }
     }
 
-    let nextTrigger = this.triggers[0] ;
-    if ( Horloge.currentHour >= nextTrigger.heure && Horloge.currentHour < (nextTrigger.heure + 0.10) ){
-      nextTrigger.notify()
-      this._triggers.shift()
-    }
-    if ( this._triggers.length === 0 ) delete this._triggers ;
+    // Pour simplifier le travail
+    if ( this.triggers.size === 0 ) delete this.triggers ;
   }
+
   /**
    * Démarrage du déplacement du curseur
    */
@@ -116,9 +147,4 @@ class Cursor {
     this.objHour = DGet('div#time-cursor span.current_hour')
   }
 
-  /**
-   * Les triggers, c'est-à-dire la liste des travaux qui doivent être
-   * fait aujourd'hui.
-   */
-  get triggers() { return this._triggers }
 }

@@ -51,28 +51,7 @@ class Travail extends CommonElement {
     *
   *** --------------------------------------------------------------------- */
   constructor(data){
-    /**
-     * Va définir:
-     *    tache       La tâche à accomplir
-     *    heure       L'heure à laquelle il faut l'accomplir
-     *    njour       L'indice du jour de la semaine (de 0 à 6)
-     *    duree       La durée du travail
-     *    recurrence  La récurrence éventuelle
-     */
     super(data)
-
-    // SI
-    //    - le travail appartient au jour courant,
-    //    - et son heure est inférieure au temps courant
-    // ALORS il faut ajouter un trigger
-    if ( this.njour == TODAY.wDay && this.heure > Horloge.currentHour) {
-      Cursor.current.addTrigger(this)
-    } else {
-      // Pour être tranquille, mais il faut bien mesurer le fait que
-      // si on change de jour, ça ne fonctionnera pas, les tâches du
-      // jour suivant ne seront pas signalées.
-      this.notified = true
-    }
   }
 
   /**
@@ -127,11 +106,24 @@ class Travail extends CommonElement {
 
   /**
     Observation de l'objet
+    ----------------------
+    Ici, on doit aussi ajouter un "trigger" pour le travail s'il appartient
+    au jour courant et qu'il n'est pas encore passé
   **/
   observe(){
     const my = this
     this.obj.addEventListener('dblclick', my.onDblClick.bind(my))
     this.obj.addEventListener('click', my.onClick.bind(my))
+    // SI
+    //    - le travail appartient au jour courant,
+    //    - et son heure est inférieure au temps courant
+    // ALORS il faut ajouter un trigger
+    if ( this.njour == TODAY.wDay && this.heure > Horloge.currentHour) {
+      Cursor.current.addTrigger(this)
+    } else {
+      // Pour être tranquille, mais problème si on passe minuit.
+      this.notified = true
+    }
   }
 
   async beforeDispatch(newData){

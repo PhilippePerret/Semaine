@@ -35,6 +35,8 @@ class SemaineLogic {
   static build(){
     UI.content.append(DCreate('DIV',{id:'semaine-courante', class:'semaine'}))
     this.obj = DGet('div#semaine-courante')
+    // Initialiser le curseur
+    Cursor.init()
     // Construire les 6 jours de la semaine courante
     Jour.build()
   } // build
@@ -53,28 +55,31 @@ class SemaineLogic {
     this.current = new SemaineLogic(this.todaySemaine)
     this.build()
 
-    // On doit instancier un nouveau curseur qui va :
-    //  - afficher une ligne pour suivre le temps sur la semaine
-    //  - déclencher les notifications des travaux quand il passera
-    //    sur leur temps.
-    new Cursor();
-    Cursor.current.build()
-
     console.log("-> showCurrent")
     this.showCurrent()
 
   }
 
+  /**
+    Affichage de la semaine courante
+  **/
   static showCurrent(){
     this.showWeek(this.todaySemaine)
   }
 
+  /**
+    Affichage de la semaine précédente
+  **/
   static showPrevious(){
     var index = this.current.index - 1
     var annee = this.current.annee
     if ( index < 1 ) {annee -= 1; index = 52}
     this.showWeek({semaine:index, annee:annee})
   }
+
+  /**
+    Affichage de la semaine suivante
+  **/
   static showNext(){
     var index = this.current.index + 1
     var annee = this.current.annee
@@ -83,6 +88,8 @@ class SemaineLogic {
   }
 
   /**
+    Affichage de la semaine définie par +data+
+    ------------------------------------------
     Méthode générique qui affiche la semaine définie par les
     données +data+
     +Params+::
