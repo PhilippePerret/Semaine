@@ -183,13 +183,16 @@ class CommonElementListing {
 
   // Sélection courante
   get selected(){return this._selected || undefined}
-  set selected(v){
+  set selected(item){
     if (this._selected ) this.deselect(this.selected)
-    this._selected = v
-    this.liFor(v).classList.add('selected')
+    this._selected = item
+    this.liFor(item).classList.add('selected')
   }
   deselect(item){
-    this.liFor(item).classList.remove('selected')
+    this.liFor(item) && this.liFor(item).classList.remove('selected')
+    if ( this.selected && item.id === this.selected.id ){
+      delete this._selected
+    }
   }
 
   /**
@@ -215,9 +218,9 @@ class CommonElementListing {
   // Quand on clique sur le bouton '-'
   async onMoins(ev){
     if (this.selected){
-      let question = `Est-vous sûr de vouloir détruire l'élément “${this.selected.name}” ?`
-      var choix = await confirmer(question)
-      choix && this.selected.smartRemove()
+      const item = this.selected
+      this.deselect(item)
+      item.smartRemove()
     } else {
       console.log("Aucune sélection de type " + this.masterClass.name+ " à supprimer")
     }

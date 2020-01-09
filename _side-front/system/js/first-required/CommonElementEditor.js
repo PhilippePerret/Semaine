@@ -433,7 +433,7 @@ class CommonElementEditor {
         DCreate('BUTTON', {class:'button-choose', 'data-type':classe, inner:'Choisir…'})
       , DCreate('LABEL', {inner: `${realClass.humanName} : `})
       , DCreate('SPAN', {id:`${this.idFor(classe.toLowerCase())}-name`, inner: '...'})
-      , DCreate('SPAN', {inner:'x', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
+      , DCreate('SPAN', {inner:'×', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
       , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${classe.toLowerCase()}Id`)}`})
       ]
     })
