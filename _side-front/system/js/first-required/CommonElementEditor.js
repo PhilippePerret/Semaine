@@ -100,7 +100,13 @@ class CommonElementEditor {
   }
 
   hide(){
+    console.error("OBSOLÈTE : il faut toujours détruire la fenêtre maintenant")
     this.form.classList.add('noDisplay')
+  }
+  
+  remove(){
+    this.form.remove()
+    delete this.owner.editor
   }
 
   /**
@@ -312,7 +318,7 @@ class CommonElementEditor {
       // Il faut le retirer de la liste des items
       delete this.constructor.masterClass.items[this.id]
     }
-    this.hide()
+    this.remove()
   }
 
   /**
@@ -324,7 +330,7 @@ class CommonElementEditor {
     var newDataAreOk = await this.validateFormValues(newData)
     if ( newDataAreOk ){
       this.owner.dispatch(newData)
-      this.hide()
+      this.remove()
     }
   }
 

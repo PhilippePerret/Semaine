@@ -317,7 +317,7 @@ class CommonElement {
     delete this.constructor.items[this.id]
     this.constructor.save()
     this.removeDisplay instanceof Function && this.removeDisplay()
-    this.edited && this.editor.updateInnerForm()
+    this.editor && this.editor.updateInnerForm()
     this.removeInListing()
   }
   /**
@@ -334,7 +334,8 @@ class CommonElement {
       // Actualisation particulière
       this.rebuild()
     }
-    this.edited && this.editor.updateInnerForm()
+    // On actualise dans l'éditeur seulement si l'éditeur existe
+    this.editor && this.editor.updateInnerForm()
     // Actualiser dans les listings éventuels
     // TODO
   }
