@@ -39,6 +39,15 @@
   float:right
 }
 
+.common-editor div.row.external-type span.button-unlink {
+  border:1px solid;
+  color:#FF7777;
+  border-radius:5px;
+  padding:0px 3px;
+  margin-left:8px;
+  cursor:pointer;
+}
+
 .common-editor div.row.row-color {
 
 }

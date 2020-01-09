@@ -274,6 +274,17 @@ class CommonElement {
   }
 
   /**
+    Permet définir la valeur dans l'instance et dans son _data
+    +Params+::
+      +prop+::[String]  Nom de la propriété de l'élément (pe 'name')
+      +value+::[Any]    Valeur à donner à l'élément, ou undefined
+  **/
+  set(prop, value){
+    this[`_${prop}`] = value // peut être undefined
+    this._data[prop] = value
+  }
+
+  /**
     Édition de l'élément, quel que soit son type (sa classe)
 
     +Params+::

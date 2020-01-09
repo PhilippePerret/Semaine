@@ -235,12 +235,6 @@ class CommonElementListing {
     if ( this.selected ){
       // Le mettre dans l'éditeur seulement
       this.owner.owner.editor.setLinkTo(this.masterClass, this.selected)
-      // var prop = `${this.owner.owner.ref}-${this.masterClass.minName}Id`
-      // var propName = `${this.owner.owner.ref}-${this.masterClass.minName}-name`
-      // this.owner.form.querySelector(`#${prop}`).value = this.selected.id
-      // this.owner.form.querySelector(`#${propName}`).innerHTML = this.selected.name
-      // this.owner.form.querySelector(`.unlink-${prop}`).classList.remove('hidden')
-      // Cf. la méthode `CommonElementEditor#onUnlinkType` qui fait le contraire
     } else {
       alert("Il faut choisir l'élément à associer.")
     }

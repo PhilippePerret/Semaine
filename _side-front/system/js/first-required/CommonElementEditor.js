@@ -136,7 +136,7 @@ class CommonElementEditor {
           if ( DGet(`#${fieldNameId}`) ) {
             var isDefined = !!this.owner[typeMin]
             DGet(`#${fieldNameId}`).innerHTML = isDefined ? this.owner[typeMin].name : '---' ;
-            isDefined && DGet(`.unlink-${prop}`, ).classList.remove('hidden')
+            isDefined && DGet(`.unlink-${dataProp.type}`).classList.remove('hidden')
           }
           // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
       }
@@ -343,8 +343,8 @@ class CommonElementEditor {
   **/
   onUnlinkType(classe){
     const prop = `${classe.toLowerCase()}Id`
-    this.owner.unlinkTo(classe)
-    delete this.owner[prop]
+    this.unsetLinkTo(classe)
+    this.owner.set(prop) // undefined
   }
 
   setLinkTo(classe, objet){
@@ -366,9 +366,9 @@ class CommonElementEditor {
     var propId = `${this.owner.ref}-${realClass.minName}Id`
     console.log("propId (utilisation the this.owner.owner): ", propId)
     var propNameId = `${this.owner.ref}-${realClass.minName}-name`
-    this.owner.form.querySelector(`#${prop}`).value = objet ? objet.id : '' ;
-    this.owner.form.querySelector(`#${propName}`).innerHTML = objet ? objet.name : '---'
-    this.owner.form.querySelector(`.unlink-${classe}`).classList[objet?'remove':'add']('hidden')
+    this.form.querySelector(`#${propId}`).value = objet ? objet.id : '' ;
+    this.form.querySelector(`#${propNameId}`).innerHTML = objet ? objet.name : '---'
+    this.form.querySelector(`.unlink-${classe}`).classList[objet?'remove':'add']('hidden')
   }
 
   /**
@@ -432,8 +432,8 @@ class CommonElementEditor {
     , inner:[
         DCreate('BUTTON', {class:'button-choose', 'data-type':classe, inner:'Choisir…'})
       , DCreate('LABEL', {inner: `${realClass.humanName} : `})
-      , DCreate('SPAN', {inner:'x', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
       , DCreate('SPAN', {id:`${this.idFor(classe.toLowerCase())}-name`, inner: '...'})
+      , DCreate('SPAN', {inner:'x', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
       , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${classe.toLowerCase()}Id`)}`})
       ]
     })
