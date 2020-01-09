@@ -4,6 +4,8 @@
   *   ---------------
   *   Gestion intelligente des jours
 
+  # version: 0.1.0
+
   NOTE
     Définition de TODAY en bas de ce module
 

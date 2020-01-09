@@ -125,20 +125,45 @@ class CommonElementEditor {
           domProp = 'checked'
           break;
         default:
-          /* Un type propre à l'application */
+          /* Un type propre à l'application
+            P.e. pour l'application Semaine, la Catégorie pour un travail,
+            donc typeMin = 'categorie'
+            */
           var typeMin = dataProp.type.toLowerCase()
           // Champ id contenant l'identifiant de l'élément
+          /*
+            L'identifiant du champ (identifiant qui permettra de nommer les
+            éléments)
+            P.e., pour Semaine, "travail-12-categorie"
+           */
           var fieldId = this.idFor(prop)
-          // Si la valeur est défini pour le propriétaire, il faut
-          // aussi indiquer le nom et il faut faire apparaitre le petit 'x' pour
-          // délier.
+          /*
+            Si la valeur est défini pour le propriétaire, il faut
+            aussi indiquer le nom et il faut faire apparaitre le petit 'x' pour
+            délier.
+            Par exemple pour Semaine, fieldNameId peut être :
+              travail-12-categorieId-name
+           */
           var fieldNameId = this.idFor(`${typeMin}-name`)
+          /*
+            Le champ pour le nom de l'élément parent
+           */
+          var nameField = DGet(`#${fieldNameId}`)
+
           if ( DGet(`#${fieldNameId}`) ) {
             var isDefined = !!this.owner[typeMin]
-            DGet(`#${fieldNameId}`).innerHTML = isDefined ? this.owner[typeMin].name : '---' ;
-            isDefined && DGet(`.unlink-${dataProp.type}`).classList.remove('hidden')
+            var isHerited = !!this.owner[`${typeMin}_herited`]
+            var displayedName;
+            if ( isDefined ) {
+              displayedName = this.owner[typeMin].name ;
+              DGet(`.unlink-${dataProp.type}`).classList.remove('hidden')
+            } else if ( isHerited ) {
+              displayedName = `<span class="discret italic">${this.owner[`${typeMin}_herited`].name}</span>`
+            }
+            displayedName && ( nameField.innerHTML = displayedName )
           }
-          // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
+
+
       }
       // console.log("")
       let obj = DGet(`#${fieldId}`)

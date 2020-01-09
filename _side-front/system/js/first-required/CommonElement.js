@@ -422,26 +422,29 @@ class CommonElement {
   get firstInheritedClass(){ return this.constructor.firstInheritedClass}
 
 
-  getColorHeritee(){
+  /**
+    Méthode qui retourne la valeur de +prop+ prise dans un parent.
+    Par exemple, si on chercher la catégorie (categorie) d'un travail (Travail)
+    on peut le trouver dans le projet (Projet) du travail, dans le domaine du
+    travail ou encore dans le domaine du projet du travail
+  **/
+  getValueInheritedFromParent(prop){
     const nombreParents = HIERARCHIE_PARENTS.length
     const firstParent = HIERARCHIE_PARENTS.indexOf(this.firstInheritedClass)
+    // On répète pour chaque parent
     for(var iparent = firstParent; iparent < nombreParents; ++iparent){
       var classMinParent = HIERARCHIE_PARENTS[iparent]
-      if ( this[`${classMinParent}Id`] ) {
-        if ( this[classMinParent] ) {
-          return this[classMinParent].f_color
-        } else {
-          // On se trouve en présence d'un élément qui possède un ID
-          // défini pour un élément parent, avec cet élément qui est
-          // inexistant, parce qu'il a peut-être été supprimé. Il faut
-          // signaler une erreur.
-          console.error("Problème avec l'élément '%s'", this.ref)
-          console.error("L'ID #%d de classe %s est défini mais ne renvoie aucun élément…", this[`${classMinParent}Id`], classMinParent)
-          message("Une erreur est survenue. Consulter la console.")
-        }
+      if ( undefined === this[`${classMinParent}Id`] ) continue ;
+      if ( undefined === this[classMinParent] ) {
+        console.error("Problème avec l'élément '%s'", this.ref)
+        console.error("L'ID #%d de classe %s est défini mais ne renvoie aucun élément…", this[`${classMinParent}Id`], classMinParent)
+        error("Une erreur est survenue. Consulter la console.")
       }
+      return this[classMinParent][prop] || this[classMinParent][`${prop}_herited`]
     }
-    return ; // pas de couleur trouvée
+  }
+  getColorHeritee(){
+    return this.getValueInheritedFromParent('f_color')
   }
 
   /**
@@ -463,6 +466,18 @@ class CommonElement {
     return this._categorie || (this._categorie = Categorie.get(this.categorieId))
   }
   get categorieId(){ return this._categorieId }
+
+  get categorie_herited(){
+    if ( undefined === this._categorie_herited) {
+      this._categorie_herited = this.getValueInheritedFromParent('categorie')
+    } return this._categorie_herited
+  }
+
+  get associatecolor_herited(){
+    if ( undefined === this._associatecolor_herited) {
+      this._associatecolor_herited = this.getValueInheritedFromParent('associatecolor')
+    } return this._associatecolor_herited
+  }
 
   // Domaine (cf. N0002)
   get domaine(){
