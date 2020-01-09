@@ -138,7 +138,8 @@ class CommonElementListing {
   }
 
   /**
-   * Actualisation de l'item
+    Actualisation de l'item
+    ------------------------
    * Pour le moment, on part du principe qu'il n'y a que le .name à modifier
    * Plus tard, s'il s'avère que le LI d'un item doit être plus complexe,
    * il faudra revoir sa copie et faire plutôt une reconstruction-remplacement
@@ -222,16 +223,24 @@ class CommonElementListing {
     }
   }
 
-  // Quand on clique sur le bouton choisir
+  /**
+    Quand on clique sur le bouton CHOISIR
+    Cela affecte l'élément à l'objet (par exemple la couleur à la catégorie,
+    le domaine au travail, etc.)
+    Pour le moment, en tout cas, ça le définit dans la boite d'édition.
+  **/
   onChoisir(){
     // console.log("-> onChoisir / selected = ", this.selected)
     this.hide()
     if ( this.selected ){
-      // Pour essayer de le mettre simplement dans l'éditeur
-      var prop = `${this.owner.owner.ref}-${this.masterClass.minName}Id`
-      var propName = `${this.owner.owner.ref}-${this.masterClass.minName}-name`
-      this.owner.form.querySelector(`#${prop}`).value = this.selected.id
-      this.owner.form.querySelector(`#${propName}`).innerHTML = this.selected.name
+      // Le mettre dans l'éditeur seulement
+      this.owner.owner.editor.setLinkTo(this.masterClass, this.selected)
+      // var prop = `${this.owner.owner.ref}-${this.masterClass.minName}Id`
+      // var propName = `${this.owner.owner.ref}-${this.masterClass.minName}-name`
+      // this.owner.form.querySelector(`#${prop}`).value = this.selected.id
+      // this.owner.form.querySelector(`#${propName}`).innerHTML = this.selected.name
+      // this.owner.form.querySelector(`.unlink-${prop}`).classList.remove('hidden')
+      // Cf. la méthode `CommonElementEditor#onUnlinkType` qui fait le contraire
     } else {
       alert("Il faut choisir l'élément à associer.")
     }

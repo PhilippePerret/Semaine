@@ -130,16 +130,19 @@ class CommonElementEditor {
           // Champ id contenant l'identifiant de l'élément
           var fieldId = this.idFor(prop)
           // Si la valeur est défini pour le propriétaire, il faut
-          // aussi indiquer le nom
+          // aussi indiquer le nom et il faut faire apparaitre le petit 'x' pour
+          // délier.
           var fieldNameId = this.idFor(`${typeMin}-name`)
           if ( DGet(`#${fieldNameId}`) ) {
-            DGet(`#${fieldNameId}`).innerHTML = this.owner[typeMin] ? this.owner[typeMin].name : '---'
+            var isDefined = !!this.owner[typeMin]
+            DGet(`#${fieldNameId}`).innerHTML = isDefined ? this.owner[typeMin].name : '---' ;
+            isDefined && DGet(`.unlink-${prop}`, ).classList.remove('hidden')
           }
           // console.error("Je ne sais pas encore traiter le type '%s'", dataProp.type)
       }
       // console.log("")
       let obj = DGet(`#${fieldId}`)
-      if (obj) {
+      if ( obj && value ) {
         obj[domProp/*p.e. 'value' ou 'checked'*/] = value
       }
     }
@@ -294,7 +297,6 @@ class CommonElementEditor {
   async onOk(){
     var newData = this.getFormValues()
     var newDataAreOk = await this.validateFormValues(newData)
-    console.log("newDataAreOk = ", newDataAreOk)
     if ( newDataAreOk ){
       this.owner.dispatch(newData)
       this.hide()
@@ -329,6 +331,44 @@ class CommonElementEditor {
    */
   onChooseType(classe){
     eval(`${classe}Listing`).chooseFor(this, this.form)
+  }
+
+  /**
+    Méthode appelée quand on clique sur le bouton 'x' pour supprimer
+    le lien avec une catégorie, une couleur, etc.
+
+    +Params+::
+      +class+::[String] La classe de l'élément associé, par exemple 'Categorie',
+                        'AssociateColor' ou 'Domaine'
+  **/
+  onUnlinkType(classe){
+    const prop = `${classe.toLowerCase()}Id`
+    this.owner.unlinkTo(classe)
+    delete this.owner[prop]
+  }
+
+  setLinkTo(classe, objet){
+    this.defineLinkTo(classe, objet)
+  }
+  unsetLinkTo(classe) {
+    this.defineLinkTo(classe, undefined)
+  }
+  defineLinkTo(classe, objet){
+    // var propId = `${this.owner.owner.ref}-${this.masterClass.minName}Id`
+    let realClass ;
+    if('string' === typeof classe){
+      realClass = eval(classe)
+    } else {
+      realClass = classe
+      classe = String(realClass.name)
+    }
+    console.log("-> defineLinkTo (classe,objet=)", classe, objet)
+    var propId = `${this.owner.ref}-${realClass.minName}Id`
+    console.log("propId (utilisation the this.owner.owner): ", propId)
+    var propNameId = `${this.owner.ref}-${realClass.minName}-name`
+    this.owner.form.querySelector(`#${prop}`).value = objet ? objet.id : '' ;
+    this.owner.form.querySelector(`#${propName}`).innerHTML = objet ? objet.name : '---'
+    this.owner.form.querySelector(`.unlink-${classe}`).classList[objet?'remove':'add']('hidden')
   }
 
   /**
@@ -377,7 +417,7 @@ class CommonElementEditor {
 
   /**
    * Retourne une rangée pour le type `classe` défini dans les
-   * propriété du propriétaire
+   * properties du propriétaire. Par exemple categorieId, etc.
    */
   rowFormForType(classe) {
     var realClass
@@ -392,6 +432,7 @@ class CommonElementEditor {
     , inner:[
         DCreate('BUTTON', {class:'button-choose', 'data-type':classe, inner:'Choisir…'})
       , DCreate('LABEL', {inner: `${realClass.humanName} : `})
+      , DCreate('SPAN', {inner:'x', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
       , DCreate('SPAN', {id:`${this.idFor(classe.toLowerCase())}-name`, inner: '...'})
       , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${classe.toLowerCase()}Id`)}`})
       ]
@@ -485,6 +526,10 @@ class CommonElementEditor {
     this.form.querySelectorAll('.button-choose').forEach(button => {
       var classe = button.getAttribute('data-type')
       button.addEventListener('click', my.onChooseType.bind(my, classe))
+    })
+    this.form.querySelectorAll('.button-unlink').forEach(button => {
+      var classe = button.getAttribute('data-type')
+      button.addEventListener('click', my.onUnlinkType.bind(my, classe))
     })
 
     this.form.querySelectorAll('.acolorpicker-button').forEach(button => {
