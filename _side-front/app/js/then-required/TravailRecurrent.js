@@ -4,29 +4,6 @@
   ----------------------
   Gestion des travaux récurrents
 
-  QUESTION
-    Doit-il hériter de la classe Travail ? au lieu d'hériter seulement
-    de CommonElement
-    -> OUT
-  QUESTION
-    Quelles méthodes sont à revoir par rapport à la récurrence ?
-    -> TODO
-  QUESTION
-    Quand faut-il l'enregistrer et le retirer des travaux normaux ?
-    (car pour le moment, un travail récurrent est créé à partir de
-    la création d'un travail normal dont on case la coche "récurrent")
-    On gère ça après l'enregistrement de l'édition d'un travail. Si la
-    case "travail récurrent" a été cochée, on doit le supprimer des
-    travaux normaux (remove) et l'ajouter aux travaux récurrents.
-    -> POURSUIVRE (TOTO)
-  QUESTION
-    Comment définir la propriété 'recurrence' qui définit (en string)
-    la récurrence.
-    Valeurs possibles :
-      jour        Répétition tous les jours
-      hebdo       Répétition toutes les semaines (défaut)
-      cf. les valeurs dans TravailRecurrentEditor
-
 */
 class TravailRecurrent extends Travail {
 
@@ -110,6 +87,31 @@ class TravailRecurrent extends Travail {
   static get editorClass(){return TravailRecurrentEditor}
   static get listingClass(){return TravailRecurrentListing}
 
+
+
+  /**
+   * Méthode appelée quand on sélectionne un travail récurrent
+   *
+   Les méthodes sont propres aux travaux récurrents qui peuvent posséder
+   plusieurs objets dans la semaine affichée.
+   */
+  static select(item, njour){
+    if ( isNaN(njour) ) return
+    if ( this.selected ) {
+      this.deselect()
+    }
+    this.selected = item
+    this.selected.select(true, njour)
+  }
+  static deselect(item, njour){
+    if ( isNaN(njour) ) return
+    if (undefined === item) { // => c'est la sélection courante
+      item = this.selected
+      delete this.selected
+    }
+    item.select(false, njour)
+  }
+
   /** ---------------------------------------------------------------------
     *   INSTANCE
     *
@@ -121,24 +123,28 @@ class TravailRecurrent extends Travail {
 
   /**
     Méthode qui regarde si le travail récurrent doit être construit
-    et le construit le cas échéant.
+    et le construire le cas échéant.
+    Pour ce faire, on étudie seulement les 7 jours affichés. Si un travail
+    doit être actif le jour étudié, on le construit pour ce jour.
   **/
   buildIfNecessary(){
-    /**
-      Méthode : faut-il passer en revue chaque jour (les 7) et voir
-      s'il faut ajouter ce travail à ce jour ?
-      Par exemple, on teste le 7 janvier 2020
-        - si récurrence tous les jours (jour) => oui
-        - si récurrence seulement les jours (jours) et que ce jour est du
-          même nombre (wDay) => oui
-        - si une fois par semaine
-    **/
     SemaineLogic.forEachJour(jour => {
-      // console.log("jour = ", jour)
       if ( ! this.isActiveOn(jour) ) return ;
       this.build(jour.njour)
     })
   }
+
+
+  /**
+    Méthodes d'état
+  **/
+  // Sélection ou désélection de l'objet du travail récurrent
+  get selected() { return this._selected}
+  select(v, njour){
+    this._selected = v
+    this.objs[njour].classList[v?'add':'remove']('selected')
+  }
+
 
   /**
     Retourne true si le travail courant est active le jour +jour+ {Jour}
@@ -281,18 +287,6 @@ class TravailRecurrent extends Travail {
     })
   }
 
-  /**
-    Retourne true si le travail récurrent est actif
-    Rappel : normalement, il suffit de vérifier la date de démarrage, car
-    si un travail récurrent est "dépassé", il n'est plus enregistré
-  **/
-  get isActive(){
-    return this.realStartAt < TODAY.time
-  }
-  get realStartAt(){
-    return ((this.startAt && SmartDay.parseDDMMYY(this.startAt))||TODAY.from(-7)).time
-  }
-
   // // Construction du travail récurrent dans le container
   // // +container+
   // // TODO Si la construction est la même que pour les travaux non récurrents,
@@ -330,8 +324,8 @@ class TravailRecurrent extends Travail {
     njour = njour || this.njour
     const overlap = this.checkOverlap(njour)
     if (overlap < 3) {
-      this.buildIn(SemaineLogic.jours[njour].objTravaux, overlap)
-      this.observe()
+      this.buildIn(SemaineLogic.jours[njour].objTravaux, overlap, njour)
+      this.observe(njour)
     }
   }
 
@@ -340,9 +334,17 @@ class TravailRecurrent extends Travail {
    */
   rebuild(njour){
     njour = njour || this.njour
-    this.unobserve()
-    this.obj.remove()
+    this.unobserve(njour)
+    this.objs[njour].remove()
     this.build(njour)
+  }
+
+  markOverlaped(){
+    console.error("Pour marquer un travail récurrent overlappé, il faut étudier mieux")
+    // TODO Rappel : un travail récurrent ne possède pas de this.obj mais des this.objs
+  }
+  unmarkOverLaped(){
+    console.error("Pour démarquer un travail récurrent overlappé, il faut étudier mieux")
   }
 
   /**
@@ -353,14 +355,13 @@ class TravailRecurrent extends Travail {
    * occurence passera par là.
    */
   removeDisplay(){
-    raise("TravailRecurrent#removeDisplay doit être implémenté")
-    this.obj && this.obj.remove()
+    this.objs.forEach(obj => obj.remove())
   }
 
-  unobserve(){
+  unobserve(njour){
     const my = this
-    this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
-    this.obj.removeEventListener('click', my.onClick.bind(my))
+    this.objs[njour].removeEventListener('dblclick', my.onDblClick.bind(my))
+    this.objs[njour].removeEventListener('click', my.onClick.bind(my))
   }
 
   /**
@@ -374,6 +375,13 @@ class TravailRecurrent extends Travail {
   /**
     Méthodes d'évènement
   **/
+
+  onClick(ev){
+    // console.log("ev = ", ev)
+    const obj = ev.target
+    this.constructor.select(this, Number(obj.getAttribute('data-njour')))
+    return stopEvent(ev)
+  }
 
   /**
    * States

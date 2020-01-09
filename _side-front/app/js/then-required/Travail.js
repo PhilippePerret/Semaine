@@ -57,6 +57,8 @@ class Travail extends CommonElement {
   /**
     Méthodes d'état
   **/
+
+  // Sélection ou désélection de l'objet
   get selected() { return this._selected}
   set selected(v){
     this._selected = v
@@ -65,10 +67,20 @@ class Travail extends CommonElement {
 
   /**
     Méthodes de construction
+
+    +Params+::
+      +container+:: [DOMElement] Le container DOM dans lequel placer l'objet
+      +overlap+::   [Number]      Niveau de chevauchement. 0=pas de chevauche-
+                                  ment, 1=petit chevauchement non fatal
+      +njour+::     [Number]      Seulement pour les travaux récurrent, l'index
+                                  du jour traité. 1 pour lundi.
   **/
-  buildIn(container, overlap){
+  buildIn(container, overlap, njour){
     var classCss = ['travail'] ;
-    this.isRecurrent && classCss.push('recurrent')
+    var dataNjour = njour
+    if ( this.isRecurrent ) {
+      classCss.push('recurrent')
+    }
     overlap > 0 && classCss.push('overlap')
     this.selected && classCss.push('selected')
     var styles = []
@@ -78,20 +90,35 @@ class Travail extends CommonElement {
     }
 
     // L'objet du travail
-    this.obj = DCreate('DIV',{
+    // ------------------
+    // On ne le met pas tout de suite dans 'this.obj' car pour les travaux
+    // récurrents, qui peuvent avoir plusieurs objets dans la semaine courante
+    // il faut utiliser this.obj[njour]
+    let objAttrs = {
         class:classCss.join(' ')
       , inner:[
           DCreate('SPAN', {class:'tache', inner:this.formated_tache })
         , DCreate('SPAN', {class:'infos', inner:this.formated_infos })
         ]
       , style:styles.join(';')
-      })
+      }
+    if ( this.isRecurrent ) {
+      Object.assign(objAttrs,{'data-njour': njour})
+    }
+    const obj = DCreate('DIV', objAttrs)
 
-    container.append(this.obj)
+    container.append(obj)
     // On place correctement l'objet (noter que top et height ont pu être
-    // rectifiés suivant les chevauchements)
-    this.obj.style.top    = `${this.top}px`
-    this.obj.style.height = `${this.height}px`
+    // rectifiés par l'étude des chevauchements)
+    obj.style.top    = `${this.top}px`
+    obj.style.height = `${this.height}px`
+
+    if ( this.isRecurrent ) {
+      this.objs = this.objs || {}
+      Object.assign(this.objs, {[njour]: obj})
+    } else {
+      this.obj = obj
+    }
   }
 
   /**
@@ -159,7 +186,7 @@ class Travail extends CommonElement {
    */
   build(){
     const overlap = this.checkOverlap()
-    console.log("overlap=",overlap)
+    // console.log("overlap=",overlap)
     if ( overlap < 3 ) {
       this.buildIn(this.jour.objTravaux, overlap)
       this.observe()
@@ -168,6 +195,7 @@ class Travail extends CommonElement {
 
   /**
    * Reconstruction du travail après modification
+  Les travaux récurrents ont leur propre méthode
    */
   rebuild(){
     this.unobserve()
@@ -181,15 +209,25 @@ class Travail extends CommonElement {
     Ici, on doit aussi ajouter un "trigger" pour le travail s'il appartient
     au jour courant et qu'il n'est pas encore passé
   **/
-  observe(){
+  observe(njour){
+    njour = njour || this.njour
     const my = this
-    this.obj.addEventListener('dblclick', my.onDblClick.bind(my))
-    this.obj.addEventListener('click', my.onClick.bind(my))
+    var objList = []
+    if ( this.isRecurrent ) {
+      objList = Object.values(this.objs)
+    } else {
+      objList = [this.obj]
+    }
+    for(var obj of objList) {
+      obj.addEventListener('dblclick', my.onDblClick.bind(my))
+      obj.addEventListener('click', my.onClick.bind(my))
+    }
+
     // SI
     //    - le travail appartient au jour courant,
     //    - et son heure est inférieure au temps courant
     // ALORS il faut ajouter un trigger
-    if ( this.njour == TODAY.wDay && this.heure > Horloge.currentHour) {
+    if ( njour == TODAY.wDay && this.heure > Horloge.currentHour) {
       Cursor.current.addTrigger(this)
     } else {
       // Pour être tranquille, mais problème si on passe minuit.
@@ -228,6 +266,9 @@ class Travail extends CommonElement {
     this.obj && this.obj.remove()
   }
 
+  /**
+    Les travaux récurrents ont leur propre méthode
+  **/
   unobserve(){
     const my = this
     this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
@@ -257,6 +298,8 @@ class Travail extends CommonElement {
 
   /**
    * CLic sur un travail => le sélectionner
+
+   Les travaux récurrents possèdent leur propre méthode
    */
   onClick(ev){
     this.constructor.select(this)

@@ -134,8 +134,8 @@ class CommonElement {
   **/
   static async onClickMoinsButton(ev){
     if ( this.selected ) {
-      var choix = await confirmer(`Dois-je vraiment détruire l’élément “${this.selected.name}” ?`)
-      choix && this.remove(this.selected)
+      // On ne demande plus
+      this.remove(this.selected)
     } else {
       return message(`Merci de sélectionner l'élément ${this.name} à supprimer.`)
     }
