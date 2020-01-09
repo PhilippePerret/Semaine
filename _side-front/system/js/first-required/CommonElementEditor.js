@@ -229,9 +229,10 @@ class CommonElementEditor {
         minLength   Si défini, doit donner la longueur minimale de value
         maxLength   Si défini, doit donner la longueur maximale de value
   **/
-  validateFormValues(data){
+  async validateFormValues(data){
     for(var prop in data){
-      if ( !this.validateFormValue(prop, data[prop], data) ) return false
+      var propIsOk = await this.validateFormValue(prop, data[prop], data)
+      if ( !propIsOk ) return false
     }
     return true ;// tout est OK
   }
@@ -250,7 +251,7 @@ class CommonElementEditor {
         vd.minLength && value.length < vd.minLength && raise(`doit faire au moins ${vd.minLength} caractères.`)
         vd.maxLength && value.length > vd.maxLength && raise(`ne doit pas faire plus de ${vd.maxLength} caractères.`)
       }
-
+      return true
     } catch (e) {
       const dataProp = this.constructor.properties[prop]
       let Le;
@@ -261,8 +262,9 @@ class CommonElementEditor {
   }
   findSameAs(prop,value){
     var found = undefined ;
+    value = value.toLowerCase()
     this.constructor.masterClass.forEach( item => {
-      if ( item[prop] == value && item.id != this.owner.id ) {
+      if ( item[prop].toLowerCase() == value && item.id != this.owner.id ) {
         found = item
         return false
       }
@@ -289,9 +291,11 @@ class CommonElementEditor {
    * Méthode qui enregistrer les nouvelles données
    * Peut-être que l'élément doit être créé.
    */
-  onOk(){
+  async onOk(){
     var newData = this.getFormValues()
-    if ( this.validateFormValues(newData) ){
+    var newDataAreOk = await this.validateFormValues(newData)
+    console.log("newDataAreOk = ", newDataAreOk)
+    if ( newDataAreOk ){
       this.owner.dispatch(newData)
       this.hide()
     }
