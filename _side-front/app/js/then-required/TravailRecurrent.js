@@ -123,27 +123,17 @@ class TravailRecurrent extends Travail {
   **/
 
   /**
-    Méthode qui regarde si le travail récurrent doit être construit
-    et le construire le cas échéant.
-    Pour ce faire, on étudie seulement les 7 jours affichés. Si un travail
-    doit être actif le jour étudié, on le construit pour ce jour.
+    Méthode qui regarde si le travail récurrent doit être construit pour
+    cette semaine.
+    Cela revient à définir les `cards` du travail courant.
   **/
   buildIfNecessary(){
     SemaineLogic.forEachJour(jour => {
-      if ( ! this.isActiveOn(jour) ) return ;
-      this.build(jour.njour)
+      if ( ! this.isActiveOn(jour) ) {
+        this.cards[jour.njour] = new TravailCard(this,{njour:jour.njour})
+      }
     })
-  }
-
-
-  /**
-    Méthodes d'état
-  **/
-  // Sélection ou désélection de l'objet du travail récurrent
-  get selected() { return this._selected}
-  select(v, njour){
-    this._selected = v
-    this.objs[njour].classList[v?'add':'remove']('selected')
+    this.build()
   }
 
 
@@ -304,83 +294,6 @@ class TravailRecurrent extends Travail {
 
   }
 
-  // // Construction du travail récurrent dans le container
-  // // +container+
-  // // TODO Si la construction est la même que pour les travaux non récurrents,
-  // // il faudra peut-être supprimer cette méthode propre. NOTE Seule la classe
-  // // change ?
-  // buildIn(container){
-  //   var classCss = ['travail recurrent']
-  //   this.selected && classCss.push('selected')
-  //   var styles = []
-  //   if ( this.f_color ) {
-  //     styles.push(`background-color:${this.f_color.bgcolor}`)
-  //     styles.push(`color:${this.f_color.ftcolor}`)
-  //   }
-  //   this.obj = DCreate('DIV',{
-  //       class:classCss.join(' ')
-  //     , inner:[
-  //         DCreate('SPAN', {class:'tache', inner:`${this.formated_tache}` })
-  //       ]
-  //     , style:styles.join(';')
-  //     })
-  //   container.append(this.obj)
-  //   this.obj.style.top = ((this.heure - HEURE_START) * HEURE_HEIGHT) +'px'
-  //   if (this.duree){
-  //     this.obj.style.height = (this.duree * HEURE_HEIGHT) + 'px'
-  //   }
-  // }
-
-  /**
-   * Demande de construction du travail
-   *
-   * On doit créer toutes les occurences de la semaine, si c'est
-   * un travail quotidien par exemple
-   */
-  build(njour){
-    njour = njour || this.njour
-    const overlap = this.checkOverlap(njour)
-    if (overlap < 3) {
-      this.buildIn(SemaineLogic.jours[njour].objTravaux, overlap, njour)
-      this.observe(njour)
-    }
-  }
-
-  /**
-   * Reconstruction du travail après modification
-   */
-  rebuild(njour){
-    njour = njour || this.njour
-    this.unobserve(njour)
-    this.objs[njour].remove()
-    this.build(njour)
-  }
-
-  markOverlaped(){
-    console.error("Pour marquer un travail récurrent overlappé, il faut étudier mieux")
-    // TODO Rappel : un travail récurrent ne possède pas de this.obj mais des this.objs
-  }
-  unmarkOverLaped(){
-    console.error("Pour démarquer un travail récurrent overlappé, il faut étudier mieux")
-  }
-
-  /**
-   * Pour détruire le travail dans la semaine
-   * (quand on le supprime)
-   * noter que si la récurrence supra-hebdomadaire est gérée
-   * plus haut, il est inutile de le faire ici puisque chaque
-   * occurence passera par là.
-   */
-  removeDisplay(){
-    this.objs.forEach(obj => obj.remove())
-  }
-
-  unobserve(njour){
-    const my = this
-    this.objs[njour].removeEventListener('dblclick', my.onDblClick.bind(my))
-    this.objs[njour].removeEventListener('click', my.onClick.bind(my))
-  }
-
   /**
    * Envoi la notification du travail
    */
@@ -389,16 +302,6 @@ class TravailRecurrent extends Travail {
     this.notified = true
   }
 
-  /**
-    Méthodes d'évènement
-  **/
-
-  onClick(ev){
-    // console.log("ev = ", ev)
-    const obj = ev.target
-    this.constructor.select(this, Number(obj.getAttribute('data-njour')))
-    return stopEvent(ev)
-  }
 
   /**
    * States

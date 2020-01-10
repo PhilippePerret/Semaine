@@ -70,179 +70,42 @@ class Travail extends CommonElement {
   get selected() { return this._selected}
   set selected(v){
     this._selected = v
-    this.obj.classList[v?'add':'remove']('selected')
+    this.forEachCard('select')
   }
 
   /**
-    Méthodes de construction
-
+    Pour exécuter une boucle sur toutes les cartes (définies) du travail
+    ou du travail courant.
     +Params+::
-      +container+:: [DOMElement] Le container DOM dans lequel placer l'objet
-      +overlap+::   [Number]      Niveau de chevauchement. 0=pas de chevauche-
-                                  ment, 1=petit chevauchement non fatal
-      +njour+::     [Number]      Seulement pour les travaux récurrent, l'index
-                                  du jour traité. 1 pour lundi.
+      +method+:: [String|Function] Méthode à jouer sur chaque carte définie.
   **/
-  buildIn(container, overlap, njour){
-    var classCss = ['travail'] ;
-    var dataNjour = njour
-    if ( this.isRecurrent ) {
-      classCss.push('recurrent')
-    }
-    overlap > 0 && classCss.push('overlap')
-    this.selected && classCss.push('selected')
-    var styles = []
-    if ( this.f_color ) {
-      styles.push(`background-color:${this.f_color.bgcolor}`)
-      styles.push(`color:${this.f_color.ftcolor}`)
-    }
-
-    // L'objet du travail
-    // ------------------
-    // On ne le met pas tout de suite dans 'this.obj' car pour les travaux
-    // récurrents, qui peuvent avoir plusieurs objets dans la semaine courante
-    // il faut utiliser this.obj[njour]
-    let objAttrs = {
-        class:classCss.join(' ')
-      , inner:[
-          DCreate('SPAN', {class:'tache', inner:this.formated_tache })
-        , DCreate('SPAN', {class:'infos', inner:this.formated_infos })
-        ]
-      , style:styles.join(';')
-      }
-    if ( this.isRecurrent ) {
-      Object.assign(objAttrs,{'data-njour': njour})
-    }
-    const obj = DCreate('DIV', objAttrs)
-
-    container.append(obj)
-    // On place correctement l'objet (noter que top et height ont pu être
-    // rectifiés par l'étude des chevauchements)
-    obj.style.top    = `${this.top}px`
-    obj.style.height = `${this.height}px`
-
-    if ( this.isRecurrent ) {
-      this.objs = this.objs || {}
-      Object.assign(this.objs, {[njour]: obj})
-    } else {
-      this.obj = obj
+  forEachCard(method){
+    const isFunction = method instanceof Function
+    for(var card of this.cards) {
+      // console.log("method: %s sur card = ", method, card)
+      if ( !card ) continue ;
+      const res = isFunction ? method(car) : card[method].call(card) ;
+      if ( false === res ) break ;
     }
   }
 
-  /**
-    Méthode qui check les éventuels chevauchement avec un autre travail déjà
-    inscrit dans l'agenda.
-
-    La méthode retourne
-      3   En cas d'erreur fatale => le travail ne sera pas écrit
-      1   En cas d'erreur non fatale => le travail sera écrit mais marqué
-      0   Aucun problème de chevauchement
-  **/
-  checkOverlap(njour){
-    njour = njour || this.njour
-    const top = this.top = (this.heure - HEURE_START) * HEURE_HEIGHT ;
-    this.height = this.duree * HEURE_HEIGHT ;
-    const bottom  = Number(this.top + this.height) ;
-    // var plages = SemaineLogic.jours[this.njour]
-    var err = null
-    var fatalError = false
-    const jour = SemaineLogic.jours[njour]
-    var plages = jour.plages.slice()
-    var newPlages = []
-    for(var plage of plages){
-      // Si le travail qu'on étudie est celui qu'on checke, on passe (cela
-      // arrive lorsque l'on reconstruit un travail)
-      if (plage.travail.id == this.id){
-        continue ; // donc on ne le prend pas
-      } else {
-        newPlages.push(plage)
-      }
-      if ( plage.start == top ){
-        // => IMPOSSIBLE (les deux travaux commencent en même temps)
-        err = `le travail “${this.name}” et le travail “${plage.travail.name}” ne peuvent pas commencer en même temps !`
-        fatalError = true
-      } else if ( plage.start < top && plage.end > top) {
-        err = `le travail “${this.name}” est chevauché par le travail “${plage.travail.name}”`
-        this.top = plage.end // on repousse la hauteur
-        this.height = bottom - this.top
-        plage.travail.markOverlaped()
-      } else if ( plage.start > top && plage.end < bottom) {
-        err = `le travail “${this.name}” chevauche le travail “${plage.travail.name}”`
-        this.height = plage.end - top // on réduit la hauteur du travail courant
-      } else {
-        // <= Aucun chevauchement
-      }
-    }
-    if ( fatalError ) {
-      return 3
-    } else {
-      newPlages.push({start:this.top, end:this.top + this.height, travail:this})
-      jour.plages = newPlages
-      err && error(`${jour.jname}, ${err}`)
-      return err ? 1 : 0
-    }
-  }
-
-  markOverlaped(){
-    this.obj.classList.add('overlap')
-  }
-  unmarkOverLaped(){
-    this.obj.classList.remove('overlap')
-  }
   /**
    * Demande de construction du travail
+   Construire un travail consiste à construire toutes ses cartes. Une seule
+   si c'est un travail ponctuel, possiblement plusieurs si c'est un travail
+   récurrent
    */
-  build(){
-    const overlap = this.checkOverlap()
-    // console.log("overlap=",overlap)
-    if ( overlap < 3 ) {
-      this.buildIn(this.jour.objTravaux, overlap)
-      this.observe()
-    }
-  }
-
-  /**
-   * Reconstruction du travail après modification
-  Les travaux récurrents ont leur propre méthode
-   */
+  build(){ this.forEachCard('build') }
+  // Reconstruction (après modification)
   rebuild(){
-    this.unobserve()
-    this.obj.remove()
-    this.build()
+    console.log('-> rebuild')
+    this.forEachCard('rebuild')
   }
 
   /**
-    Observation de l'objet
-    ----------------------
-    Ici, on doit aussi ajouter un "trigger" pour le travail s'il appartient
-    au jour courant et qu'il n'est pas encore passé
+    Méthode appelée avant le dispatch des nouvelles valeurs dans le
+    travail.
   **/
-  observe(njour){
-    njour = njour || this.njour
-    const my = this
-    var objList = []
-    if ( this.isRecurrent ) {
-      objList = Object.values(this.objs)
-    } else {
-      objList = [this.obj]
-    }
-    for(var obj of objList) {
-      obj.addEventListener('dblclick', my.onDblClick.bind(my))
-      obj.addEventListener('click', my.onClick.bind(my))
-    }
-
-    // SI
-    //    - le travail appartient au jour courant,
-    //    - et son heure est inférieure au temps courant
-    // ALORS il faut ajouter un trigger
-    if ( njour == TODAY.wDay && this.heure > Horloge.currentHour) {
-      Cursor.current.addTrigger(this)
-    } else {
-      // Pour être tranquille, mais problème si on passe minuit.
-      this.notified = true
-    }
-  }
-
   async beforeDispatch(newData){
     return newData ;
   }
@@ -264,19 +127,33 @@ class Travail extends CommonElement {
 
   /**
    * Pour détruire le travail dans la semaine
-   * (quand on le supprime)
+   * (quand on le supprime, la méthode est appelée par smartRemove et doit
+   * donc être conservée ici)
    */
-  removeDisplay(){
-    this.obj && this.obj.remove()
-  }
+  removeDisplay(){ this.forEachCard('remove') }
+
 
   /**
-    Les travaux récurrents ont leur propre méthode
+    Toutes les cartes du travail ou du travail récurrent sur l'agenda
+    Noter que Travail et TravailRecurrent ont tous les deux cette liste, même
+    si le travail n'en a qu'une, au jour this.njour.
+    Noter que this.cards contient toujours 7 éléments, le premier sera toujours
+    null et les autres correspondent au 6 `njour` possible (lundi = cards[1],
+    mardi = cards[2], etc.).
+    Il faut en tenir compte pour les boucles. Pour ne pas avoir de problèmes,
+    le mieux est d'utiliser this.forEachCard(method) qui n'appelle la méthode
+    que sur des cartes existantes.
   **/
-  unobserve(){
-    const my = this
-    this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
-    this.obj.removeEventListener('click', my.onClick.bind(my))
+  get cards(){
+    if ( undefined === this._cards ) {
+      this._cards = []
+      var c = undefined ;
+      for(var i = 0 ; i < 7 ; ++i ) {
+        c = undefined ;
+        if ( !this.isRecurrent && this.njour == i) c = new TravailCard(this, {njour: this.njour})
+        this._cards.push(c)
+      }
+    } return this._cards ;
   }
 
   /**
@@ -285,29 +162,6 @@ class Travail extends CommonElement {
   notify(){
     new Notification(this.tache, {body:`Commence à ${this.hstart} et finit à ${this.hend}.`, icon:ICON_PATH})
     this.notified = true
-  }
-
-  /**
-    Méthodes d'évènement
-  **/
-
-  /**
-   * Un double-clic sur un travail le met en édition
-   */
-  onDblClick(ev){
-    // console.log("Double clic sur le travail")
-    this.edit(ev)
-    return stopEvent(ev) // pour ne pas déclencher le jour
-  }
-
-  /**
-   * CLic sur un travail => le sélectionner
-
-   Les travaux récurrents possèdent leur propre méthode
-   */
-  onClick(ev){
-    this.constructor.select(this)
-    return stopEvent(ev)
   }
 
   /**
@@ -390,6 +244,9 @@ class Travail extends CommonElement {
 
   /**
     Jour du travail
+    Noter que même les travaux récurrents définissent cette donnée, qui
+    correspond alors au jour où le travail a été créé, mais n'est pas utilisé
+    dans les méthodes.
   **/
   get njour(){ return this._njour }
 
