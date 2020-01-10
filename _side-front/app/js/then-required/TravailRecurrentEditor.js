@@ -26,6 +26,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
       , categorieId:      {hname: 'Catégorie',  type: 'Categorie'}
       , domaineId:        {hname: 'Domaine',    type: 'Domaine'}
       , associatecolorId: {hname:'Couleur',     type: 'AssociateColor'}
+      , recurrent:        {hname: 'Récurrent',  type: 'boolean'}
 
     }
   }
@@ -41,7 +42,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
     var OptionsRecurrence = []
     for(var rec in DATA_RECURRENCES){
       var dataRec = DATA_RECURRENCES[rec]
-      OptionsRecurrence.push(DCreate('OPTION', {inner:dataRec.hname, value:rec}))
+      OptionsRecurrence.push(DCreate('OPTION', {inner:dataRec.hname||loc(`recur.${rec}.hname`), value:rec}))
     }
 
     return [
@@ -67,6 +68,10 @@ class TravailRecurrentEditor extends CommonElementEditor {
       , this.rowFormForType('Categorie')
       , this.rowFormForType('Domaine')
       , this.rowFormForType('AssociateColor')
+      , DCreate('DIV',{class:'row', inner:[
+          DCreate('INPUT',{type:'checkbox', id:this.idFor('recurrent')})
+        , DCreate('LABEL', {for:this.idFor('recurrent'), inner: 'Travail récurrent'})
+      ]})
       ]
   }
 
@@ -87,10 +92,10 @@ class TravailRecurrentEditor extends CommonElementEditor {
     const recExpli = DGet(`#${this.idFor('recurrence_explication')}`)
     const recSupValeu = DGet(`#${this.idFor('recurrenceValue')}`)
     const recValue = recMenu.value
-    console.log("Valeur de récurrence :", recValue)
+    // console.log("Valeur de récurrence :", recValue)
     const recData = DATA_RECURRENCES[recValue]
     recSupValeu.classList[recData.definable?'remove':'add']('noDisplay')
-    recExpli.innerHTML = recData.explication.replace(/\$\{([a-zA-Z]+)\}/g, (tout,prop) => {return this.owner[`f_${prop}`]})
+    recExpli.innerHTML = loc(recData.explication||`recur.${recValue}.ex`).replace(/\$\{([a-zA-Z]+)\}/g, (tout,prop) => {return this.owner[`f_${prop}`]})
     return stopEvent(ev)
   }
 

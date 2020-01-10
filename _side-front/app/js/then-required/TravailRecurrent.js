@@ -36,6 +36,7 @@ class TravailRecurrent extends Travail {
     Travail)
   **/
   static createFromTravail(travail){
+    // console.log('-> TravailRecurrent::createFromTravail')
     // On commence par prendre les valeurs de toutes les propriétés que
     // les deux classes partagent.
     var cwData = {isNew: true}
@@ -59,7 +60,7 @@ class TravailRecurrent extends Travail {
       }
     }
 
-    // console.log("Propriétés à conserver :", cwData)
+    console.log("Propriétés à conserver :", cwData)
     let recWork = new this(cwData)
     recWork.build()
     recWork.edit()
@@ -245,6 +246,8 @@ class TravailRecurrent extends Travail {
     faudrait plutôt que ce soit une méthode séparée.
   **/
   beforeDispatch(newData){
+    // Faut-il retransformer le travail récurrent en travail normal ?
+    if ( !newData.recurrent ) return newData ;
     return new Promise((ok,ko) => {
       const recval = newData.recurrenceValue
       let v = null, s = null
@@ -281,10 +284,24 @@ class TravailRecurrent extends Travail {
         // console.log("startAt mis à ", s)
         newData.startAt = s
       }
-
       // console.log("newData après rectification pour travail récurrent", newData)
       ok(newData)
     })
+  }
+
+  /**
+    Méthode appelée après la méthode de dispatch commune
+    C'est cette méthode, pour TravailRecurrent, qui va permettre de savoir
+    s'il faut transformer le travailRecurrent en travail normal
+  **/
+  afterDispatch(){
+    if ( this.isRecurrent ) return
+    // La récurrence doit être prise en compte. Cela consiste à :
+    //  - supprimer le travail récurrent de cette semaine
+    //  - l'ajouter à la liste des travaux
+    Travail.createFromTravailRecurrent(this)
+    TravailRecurrent.remove(this)
+
   }
 
   // // Construction du travail récurrent dans le container
@@ -414,12 +431,23 @@ class TravailRecurrent extends Travail {
   get startAt(){return this._startAt}
   get endAt(){return this._endAt}
 
+  get f_startAt(){
+    return SmartDay.parseDDMMYY(this.startAt).asLong
+  }
+
   // Retourne la définition de la récurrence du travail
   get recurrence(){ return this._recurrence }
 
   // Retourne la valeur personnalisée pour la récurrence, si c'est
   // nécessaire
   get recurrenceValue(){return this._recurrenceValue}
+
+  /**
+    La propriété, dans la boite d'édition, permet de repasser en travail
+    normal. Ne pas la confondre avec isRecurrent qui sera toujours vraie pour
+    un travail récurrent et toujours false pour un travail ponctuel.
+  **/
+  get recurrent(){return !!this._recurrent}
 
   /**
     Jour du travail

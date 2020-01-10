@@ -30,6 +30,14 @@ class Travail extends CommonElement {
   }
 
   /**
+    Retransforme le travail récurrent +rtravail+ [TravailRecurrent] en
+    travail normal.
+  **/
+  createFromTravailRecurrent(rtravail){
+    console.error("Cette méthode doit être implémentée")
+  }
+
+  /**
     Initialisation de la classe
     Surclasse la méthode abstraite (pour ne pas charger tout de suite
     les données, qui ont besoin de connaitre la semaine à afficher)
@@ -236,15 +244,7 @@ class Travail extends CommonElement {
   }
 
   async beforeDispatch(newData){
-    if ( ! newData.recurrent ) return newData ;
-    // On passe ici si c'est un travail récurrent
-    console.log("locale('travail.ask-make-recurrent') = ", locale('travail.ask-make-recurrent'))
-    var choix = await confirmer(locale('travail.ask-make-recurrent'))
-    if ( choix ) {
-      return newData
-    } else {
-      return Object.assign(newData, {recurrent: false})
-    }
+    return newData ;
   }
 
   /**
@@ -253,7 +253,7 @@ class Travail extends CommonElement {
     s'il faut transformer le travail en travail récurrent
   **/
   afterDispatch(){
-    if ( !this.isRecurrent ) return
+    if ( !this._recurrent ) return
     // La récurrence doit être prise en compte. Cela consiste à :
     //  - supprimer le travail de cette semaine
     //  - l'ajouter à la liste des travaux récurrents
@@ -396,5 +396,12 @@ class Travail extends CommonElement {
   get jour(){
     return this._jour || ( this._jour = Jour.get(this.njour) )
   }
+
+  /**
+    Ne pas confondre cette propriété avec isRecurrent qui est toujours false
+    pour une instance de ce type. Ici, la propriété peut être vraie quand on
+    revient de l'édition.
+  **/
+  get recurrent(){ return this._recurrent }
 
 }// /Travail
