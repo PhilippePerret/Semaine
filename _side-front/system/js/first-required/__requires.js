@@ -4,6 +4,7 @@ const path      = require('path')
     , fs        = require('fs')
     , {remote}  = require('electron')
 
+const YAML = require('js-yaml')
 
 window.onerror = function(err, url, line){
   alert("Une erreur est survenue : " + err + "\n\nConsulter la console (ALT+CMD+i) pour le détail.")

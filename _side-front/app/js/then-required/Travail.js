@@ -238,9 +238,13 @@ class Travail extends CommonElement {
   async beforeDispatch(newData){
     if ( ! newData.recurrent ) return newData ;
     // On passe ici si c'est un travail récurrent
-    var choix = await confirmer("Voulez-vous vraiment faire de ce travail un travail récurrent ?")
-    if ( choix ) { return newData }
-    else { return Object.assign(newData, {recurrent: false}) }
+    console.log("locale('travail.ask-make-recurrent') = ", locale('travail.ask-make-recurrent'))
+    var choix = await confirmer(locale('travail.ask-make-recurrent'))
+    if ( choix ) {
+      return newData
+    } else {
+      return Object.assign(newData, {recurrent: false})
+    }
   }
 
   /**

@@ -1,7 +1,4 @@
 'use strict'
-
-const YAML = require('js-yaml')
-
 const ICON_PATH = '/Users/philippeperret/Programmation/Semaine/icons/app2.icns';
 
 class Semaine {
