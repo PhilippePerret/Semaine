@@ -98,7 +98,6 @@ class Travail extends CommonElement {
   build(){ this.forEachCard('build') }
   // Reconstruction (après modification)
   rebuild(){
-    console.log('-> rebuild')
     this.forEachCard('rebuild')
   }
 
@@ -122,7 +121,6 @@ class Travail extends CommonElement {
     //  - l'ajouter à la liste des travaux récurrents
     TravailRecurrent.createFromTravail(this)
     Travail.remove(this)
-
   }
 
   /**

@@ -19,7 +19,7 @@ class TravailRecurrent extends Travail {
   **/
   static build(){
     // console.log("items de TravailRecurrent : ", this.items)
-    Object.values(this.items).forEach(item => item.buildIfNecessary())
+    Object.values(this.items).forEach(item => item.prepareCards().build())
   }
 
   // Le nom humain propre à cette classe
@@ -62,8 +62,7 @@ class TravailRecurrent extends Travail {
 
     console.log("Propriétés à conserver :", cwData)
     let recWork = new this(cwData)
-    recWork.build()
-    recWork.edit()
+    recWork.prepareCards().edit()
   }
 
   /**
@@ -127,13 +126,13 @@ class TravailRecurrent extends Travail {
     cette semaine.
     Cela revient à définir les `cards` du travail courant.
   **/
-  buildIfNecessary(){
+  prepareCards(){
     SemaineLogic.forEachJour(jour => {
-      if ( ! this.isActiveOn(jour) ) {
+      if ( !this.isActiveOn(jour) ) {
         this.cards[jour.njour] = new TravailCard(this,{njour:jour.njour})
       }
     })
-    this.build()
+    return this //chainage
   }
 
 

@@ -59,8 +59,10 @@ class TravailCard {
     + le retire de la liste des plages du jour
   **/
   remove(){
-    this.obj.remove()
-    this.removeFromPlage()
+    if (this.obj) {
+      this.obj.remove()
+      this.removeFromPlage()
+    }
   }
 
   /**
@@ -102,8 +104,10 @@ class TravailCard {
   **/
   unobserve(){
     const my = this ;
-    this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
-    this.obj.removeEventListener('click', my.onClick.bind(my))
+    if (this.obj) {
+      this.obj.removeEventListener('dblclick', my.onDblClick.bind(my))
+      this.obj.removeEventListener('click', my.onClick.bind(my))
+    }
   }
 
   /**
