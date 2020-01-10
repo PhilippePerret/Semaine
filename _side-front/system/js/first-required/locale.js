@@ -7,7 +7,7 @@
     ./_site-front/app/locales/$LANG/data.yaml
 
 **/
-function locale(message_id, params) {
+function loc(message_id, params) {
   var dmessage = message_id.split('.')
   var message = TEXT
   var dom ;
