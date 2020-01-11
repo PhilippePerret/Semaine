@@ -22,9 +22,21 @@ class TravailRecurrent extends Travail {
     Object.values(this.items).forEach(item => item.build())
   }
 
+  static get humanData(){
+    return this._humandata || (this._humandata = {
+        name:       'Travail récurrent'
+      , nameMin:    'travail récurrent'
+      , plurial:    'Travaux récurrents'
+      , plurialMin: 'travaux récurrent'
+    })
+  }
+
   // Le nom humain propre à cette classe
   static get humanName(){
     return 'Travail récurrent'
+  }
+  static get humanPlurialName(){
+
   }
 
   // Nom minuscule obligatoire, sinon il est calculé d'après Travail

@@ -74,7 +74,7 @@ class CommonElementListing {
     var row_header = DCreate('DIV',{
         class: 'header'
       , inner: [
-          DCreate('SPAN',{class:'title', inner: `Listing des ${this.masterClass.minName}s`})
+          DCreate('SPAN',{class:'title', inner: `Listing des ${this.masterClass.humanData.plurialMin}`})
         ]
     })
     // Pour les Items

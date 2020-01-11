@@ -164,13 +164,6 @@ class CommonElement {
   }
 
   /**
-   * Nom de class minuscule
-   */
-  static get minName(){
-    return this._minname || (this._minname = this.name.toLowerCase())
-  }
-
-  /**
    * La classe éditeur de cet élément
    * Noter qu'elle n'existe pas forcément.
    */
@@ -188,6 +181,19 @@ class CommonElement {
   **/
   static get humanName(){ return this.name }
 
+  /**
+   * Nom de class minuscule
+   */
+  static get minName(){
+    return this._minname || (this._minname = this.name.toLowerCase())
+  }
+
+  static get humanData(){return this._humandata ||(this._humandata = {
+      name:       this.name
+    , nameMin:    this.name.toLowerCase()
+    , plurial:    `${this.name}s`
+    , plurialMin: `${this.name.toLowerCase()}s`
+  })}
   /**
     Retourne la première classe héritée dans la suite :
     Travail, Projet, Catégorie, Domaine

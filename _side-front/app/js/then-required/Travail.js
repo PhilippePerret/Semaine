@@ -47,6 +47,14 @@ class Travail extends CommonElement {
     this.items  = {}
   }
 
+  static get humanData(){
+    return this._humandata || (this._humandata = {
+        name:       'Travail'
+      , nameMin:    'travail' // ne pas confontre avec this.minName
+      , plurial:    'Travaux'
+      , plurialMin: 'travaux'
+    })
+  }
   // Le path des travaux, doit maintenant être défini par la semaine
   // courante
   static get path(){

@@ -410,14 +410,14 @@ class CommonElementEditor {
   **/
 
   get ownerHumanName(){
-    return this.owner.constructor.humanName || this.owner.constructor.name
+    return this.owner.constructor.humanData.name || this.owner.constructor.name
   }
 
   build(){
     let row_header  = DCreate('DIV',{
       class: 'header'
     , inner: [
-        DCreate('DIV', {inner: `Éditeur ${this.owner.constructor.name} #${this.owner.id}`})
+        DCreate('DIV', {inner: `Éditeur ${this.ownerHumanName} #${this.owner.id}`})
       , DCreate('INPUT',{type:'hidden', id:this.idFor('id'), value: this.owner.id})
       ]
     })
@@ -465,7 +465,7 @@ class CommonElementEditor {
       class:'external-type row'
     , inner:[
         DCreate('BUTTON', {class:'button-choose', 'data-type':classe, inner:'Choisir…'})
-      , DCreate('LABEL', {inner: `${realClass.humanName} : `})
+      , DCreate('LABEL', {inner: `${realClass.humanData.name} : `})
       , DCreate('SPAN', {id:`${this.idFor(classe.toLowerCase())}-name`, inner: '...'})
       , DCreate('SPAN', {inner:'×', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
       , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${classe.toLowerCase()}Id`)}`})
