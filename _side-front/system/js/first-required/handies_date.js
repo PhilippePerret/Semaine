@@ -1,5 +1,14 @@
 'use strict'
+/**
+  Méthodes utiles pour les dates
+  Note : il vaut quand même mieux utiliser la classe SmartDay
 
+  # version 0.1.1
+    Rapatriement dans un fichier isolé
+    
+  Historique
+  ----------
+**/
 /**
   Retourne la date et l'heure, très précise
   Note : il vaut mieux utiliser TODAY
