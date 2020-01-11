@@ -177,7 +177,7 @@ class TravailCard {
    Les travaux récurrents possèdent leur propre méthode
    */
   onClick(ev){
-    this.owner.constructor.select(this)
+    this.owner.constructor.select(this.owner)
     return stopEvent(ev)
   }
 

@@ -18,7 +18,6 @@ class TravailRecurrent extends Travail {
     afficher les travaux récurrents.
   **/
   static build(){
-    // console.log("items de TravailRecurrent : ", this.items)
     X(2,'-> TravailRecurrent::build')
     Object.values(this.items).forEach(item => item.build())
   }
@@ -88,30 +87,6 @@ class TravailRecurrent extends Travail {
   static get editorClass(){return TravailRecurrentEditor}
   static get listingClass(){return TravailRecurrentListing}
 
-
-
-  /**
-   * Méthode appelée quand on sélectionne un travail récurrent
-   *
-   Les méthodes sont propres aux travaux récurrents qui peuvent posséder
-   plusieurs objets dans la semaine affichée.
-   */
-  static select(item, njour){
-    if ( isNaN(njour) ) return
-    if ( this.selected ) {
-      this.deselect()
-    }
-    this.selected = item
-    this.selected.select(true, njour)
-  }
-  static deselect(item, njour){
-    if ( isNaN(njour) ) return
-    if (undefined === item) { // => c'est la sélection courante
-      item = this.selected
-      delete this.selected
-    }
-    item.select(false, njour)
-  }
 
   /** ---------------------------------------------------------------------
     *   INSTANCE

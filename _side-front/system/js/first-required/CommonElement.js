@@ -58,18 +58,21 @@ class CommonElement {
    * d'instance `selected` qui traite la sélection (set selected(v){...})
    */
   static select(item){
-    if ( this.selected ) {
-      this.deselect()
-    }
-    this.selected = item
-    this.selected.selected = true
+    X(2,'-> CommonElement::select', {this:`<class ${this.name}>`, item:item})
+    const sameAsSelected = this.selected && this.selected.id == item.id
+    this.selected && this.deselect()
+    unless(sameAsSelected, () => {
+      this.selected = item
+      this.selected.select()
+    })
   }
   static deselect(item){
+    X(2,'-> CommonElement::deselect', {this:`<class ${this.name}>`, item:item})
     if (undefined === item) { // => c'est la sélection courante
       item = this.selected
       delete this.selected
     }
-    item.selected = false
+    item.deselect()
   }
 
   /**
@@ -354,6 +357,17 @@ class CommonElement {
     return this.selected === true
     // return this.constructor.selected && this.constructor.selected.id == this.id
   }
+
+  select(){
+    X(2,'-> CommonElement#select', this)
+    this.selected = true
+    if ( this.afterSelect instanceof Function ) this.afterSelect.call(this)
+  }
+  deselect(){
+    X(2,'-> CommonElement#deselect', this)
+    this.selected = false
+    if ( this.afterDeselect instanceof Function ) this.afterDeselect.call(this)
+}
 
   /**
     Méthode d'évènements

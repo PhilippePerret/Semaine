@@ -10,3 +10,8 @@ function stopEvent(ev){
   ev.stopPropagation()
   return false
 }
+
+function unless(condition, fnc){
+  if ( condition ) return ;
+  return fnc.call()
+}

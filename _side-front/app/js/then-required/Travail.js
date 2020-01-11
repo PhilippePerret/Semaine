@@ -66,11 +66,12 @@ class Travail extends CommonElement {
     Méthodes d'état
   **/
 
-  // Sélection ou désélection de l'objet
-  get selected() { return this._selected}
-  set selected(v){
-    this._selected = v
-    this.forEachCard('select')
+  afterSelect(){
+    X(2,'-> Travail#afterSelect', this)
+    this.forEachCard('select') }
+  afterDeselect(){
+    X(2,'-> Travail#afterDeselect', this)
+    this.forEachCard('deselect')
   }
 
   /**
