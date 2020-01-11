@@ -133,6 +133,8 @@ class TravailRecurrent extends Travail {
       if ( this.isActiveOn(jour) ) {
         X(3, `Travail actif pour le jour ${jour.njour}`, this)
         this.cards[jour.njour] = new TravailCard(this,{njour:jour.njour})
+      } else {
+        this.cards[jour.njour] = undefined
       }
     })
     return this //chainage
