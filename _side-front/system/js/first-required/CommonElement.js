@@ -137,10 +137,9 @@ class CommonElement {
   **/
   static async onClickMoinsButton(ev){
     if ( this.selected ) {
-      // On ne demande plus
-      this.remove(this.selected)
+      this.remove(this.selected) // On ne demande pas
     } else {
-      return message(`Merci de sélectionner l'élément ${this.name} à supprimer.`)
+      return message(`Merci de sélectionner l'élément '${this.name}' à supprimer.`)
     }
     return stopEvent(ev)
   }
@@ -153,8 +152,11 @@ class CommonElement {
     charge de tout.
   **/
   static remove(item){
+    X(2,'-> CommonElement::remove', {this:this.refDebug, item:item})
     item.smartRemove()
   }
+
+  static get refDebug(){return `<class ${this.name}>`}
 
   /**
     Retourne un identifiant libre
@@ -323,6 +325,7 @@ class CommonElement {
    *
    */
   smartRemove() {
+    X(2,'-> CommonElement#smartRemove', this)
     this.isSelection && this.constructor.deselect()
     delete this.constructor.items[this.id]
     this.constructor.save()

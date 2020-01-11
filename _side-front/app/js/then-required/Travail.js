@@ -38,6 +38,23 @@ class Travail extends CommonElement {
   }
 
   /**
+    Méthode appelée quand on clique un bouton '-' qui permet
+    de supprimer un élément de type Travail ou TravailRecurrent
+    (méthode commune mais propre ici à Travail, car il doit traiter les
+     deux classes)
+  **/
+  static async onClickMoinsButton(ev){
+    if ( this.selected ) {
+      this.remove(this.selected) // On ne demande pas
+    } else if ( TravailRecurrent.selected ) {
+      TravailRecurrent.remove(TravailRecurrent.selected)
+    } else {
+      return message(`Merci de sélectionner l'élément '${this.name}' à supprimer.`)
+    }
+    return stopEvent(ev)
+  }
+
+  /**
     Initialisation de la classe
     Surclasse la méthode abstraite (pour ne pas charger tout de suite
     les données, qui ont besoin de connaitre la semaine à afficher)
