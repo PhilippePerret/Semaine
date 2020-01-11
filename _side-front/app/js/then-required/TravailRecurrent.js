@@ -19,7 +19,8 @@ class TravailRecurrent extends Travail {
   **/
   static build(){
     // console.log("items de TravailRecurrent : ", this.items)
-    Object.values(this.items).forEach(item => item.prepareCards().build())
+    X(2,'-> TravailRecurrent::build')
+    Object.values(this.items).forEach(item => item.build())
   }
 
   // Le nom humain propre à cette classe
@@ -60,9 +61,9 @@ class TravailRecurrent extends Travail {
       }
     }
 
-    console.log("Propriétés à conserver :", cwData)
+    // console.log("Propriétés à conserver :", cwData)
     let recWork = new this(cwData)
-    recWork.prepareCards().edit()
+    recWork.edit()
   }
 
   /**
@@ -127,17 +128,20 @@ class TravailRecurrent extends Travail {
     Cela revient à définir les `cards` du travail courant.
   **/
   prepareCards(){
+    X(2,'-> TravailRecurrent#prepareCards')
     SemaineLogic.forEachJour(jour => {
-      if ( !this.isActiveOn(jour) ) {
+      if ( this.isActiveOn(jour) ) {
+        X(3, `Travail actif pour le jour ${jour.njour}`, this)
         this.cards[jour.njour] = new TravailCard(this,{njour:jour.njour})
       }
     })
     return this //chainage
   }
 
-
   /**
-    Retourne true si le travail courant est active le jour +jour+ {Jour}
+    Retourne true si le travail récurrent courant est actif le jour +jour+
+    {Jour} de la semaine affichée et donc s'il faut qu'une carte soit
+    construite pour lui.
 
     Note : c'est la propriété `recurrence` qui va déterminer en premier
     lieu si le travail doit être affiché.
@@ -155,10 +159,18 @@ class TravailRecurrent extends Travail {
 
     // Dans tous les cas, si on se trouve avant la date de départ,
     // on ne doit pas afficher le travail
-    if ( jourDay.time < startDay.time ) return false ;
+    if ( jourDay.time < startDay.time ){
+      X(5, `Le jour ${jour.njour} se trouve avant la date de départ du travail récurrent => pas de carte de travail (jourDay.time < startDay.time => ${jourDay.time} < ${startDay.time})`)
+      return false ;
+    }
     // Dans tous les cas, si on se trouve après la date de fin, on
     // ne doit pas afficher le travail (et il pourra être détruit)
-    if ( this.endAt && jourDay.time > endDay.time ) return false ;
+    if ( this.endAt && jourDay.time > endDay.time ){
+      X(5, `Le jour ${jour.njour} se trouve après la date de fin du travail récurrent => pas de carte de travail (jourDay.time > endDay.time => ${jourDay.time} > ${endDay.time})`)
+      return false ;
+    }
+
+    X(5, `Le jour ${jour.njour} se trouve entre les date de départ et de fin du travail récurrent (startAt:${startDay.time}, endAt:${endDay?endDay.time:'non défini'}, jour:${jourDay.time})`)
 
     switch(this.recurrence){
       case 'none'   : return false ;
@@ -235,6 +247,7 @@ class TravailRecurrent extends Travail {
     faudrait plutôt que ce soit une méthode séparée.
   **/
   beforeDispatch(newData){
+    X(2,'-> TravailRecurrent#beforeDispatch', this)
     // Faut-il retransformer le travail récurrent en travail normal ?
     if ( !newData.recurrent ) return newData ;
     return new Promise((ok,ko) => {
@@ -284,6 +297,7 @@ class TravailRecurrent extends Travail {
     s'il faut transformer le travailRecurrent en travail normal
   **/
   afterDispatch(){
+    X(2,'-> TravailRecurrent#afterDispatch', this)
     if ( this.isRecurrent ) return
     // La récurrence doit être prise en compte. Cela consiste à :
     //  - supprimer le travail récurrent de cette semaine
@@ -356,5 +370,14 @@ class TravailRecurrent extends Travail {
   **/
   get jours(){ return this._jours }
 
+
+  /**
+    La référence à l'élément, pour Debug/X
+  **/
+  get refDebug(){
+    return this._refdebug || (
+      this._refdebug = `<TravailRecurrent#${this.id} "${this.name}">`
+    )
+  }
 
 }// /TravailRecurrent

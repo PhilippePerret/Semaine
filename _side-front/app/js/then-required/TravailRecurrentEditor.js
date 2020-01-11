@@ -16,8 +16,8 @@ class TravailRecurrentEditor extends CommonElementEditor {
         id:               {hname: 'ID',         type: 'number', hidden: true}
       , tache:            {hname: 'Tâche',      type: 'string'}
       , njour:            {hname: 'Jour',       type: 'number'}
-      , recurrence:       {hname: 'Récurrence', type: 'string', default: 'none'}
-      , recurrenceValue: {hname: 'Valeur de récurrence', type:'string', default:''}
+      , recurrence:       {hname: 'Récurrence', type: 'string', default: 'none', validator:{required:true, not:'none'}}
+      , recurrenceValue:  {hname: 'Valeur de récurrence', type:'string', default:''}
       , startAt:          {hname: 'Commence le',type: 'string', default: TODAY.asJJMMAA(' ')}
       , endAt:            {hname: 'Fini le',    type: 'string', default: ''}
       , heure:            {hname: 'Heure',      type: 'float'}

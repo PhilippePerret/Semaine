@@ -27,6 +27,7 @@ class TravailCard {
     Méthode pour construire la carte du travail
   **/
   build(){
+    X(4,'-> TravailCard#build', {travail:this.owner, njour:this.njour})
     const overlap = this.checkOverlap()
     // console.log("overlap dans build=",overlap)
     if ( overlap < 3 ) {
@@ -40,6 +41,7 @@ class TravailCard {
   Les travaux récurrents ont leur propre méthode
    */
   rebuild(){
+    X(4,'-> TravailCard#rebuild', {travail:this.owner, njour:this.njour})
     this.reset()
     this.unobserve()
     this.remove()

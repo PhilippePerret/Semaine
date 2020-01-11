@@ -103,7 +103,7 @@ class CommonElementEditor {
     console.error("OBSOLÈTE : il faut toujours détruire la fenêtre maintenant")
     this.form.classList.add('noDisplay')
   }
-  
+
   remove(){
     this.form.remove()
     delete this.owner.editor
@@ -262,6 +262,8 @@ class CommonElementEditor {
         uniq        Si true, la valeur doit être unique
         minLength   Si défini, doit donner la longueur minimale de value
         maxLength   Si défini, doit donner la longueur maximale de value
+        not         Si défini, ne doit pas être cette valeur (utile pour éviter
+                    par exemple la première valeur d'un menu)
   **/
   async validateFormValues(data){
     for(var prop in data){
@@ -279,11 +281,12 @@ class CommonElementEditor {
         // => C'est une méthode propre qu'il faut appeler pour valider
         this[vd].call(this,value,data)
       } else {
-        (vd.required && undefined !== value) || raise("doit absolument être définie.")
+        (vd.required  && undefined !== value) || raise("doit absolument être définie.")
         const same = this.findSameAs(prop,value)
-        vd.uniq && same && raise(`doit être unique (l'élément #${same.id} possède cette valeur).`)
-        vd.minLength && value.length < vd.minLength && raise(`doit faire au moins ${vd.minLength} caractères.`)
-        vd.maxLength && value.length > vd.maxLength && raise(`ne doit pas faire plus de ${vd.maxLength} caractères.`)
+        vd.uniq       && same && raise(`doit être unique (l'élément #${same.id} possède cette valeur).`)
+        vd.minLength  && value.length < vd.minLength && raise(`doit faire au moins ${vd.minLength} caractères.`)
+        vd.maxLength  && value.length > vd.maxLength && raise(`ne doit pas faire plus de ${vd.maxLength} caractères.`)
+        vd.not        && value == vd.not && raise(`ne doit pas avoir la valeur '${vd.not}'`)
       }
       return true
     } catch (e) {

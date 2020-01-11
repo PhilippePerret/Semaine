@@ -222,6 +222,7 @@ class CommonElement {
 
   // Les dispatchs suivant, avec d'autres valeurs éditées ou créées
   async dispatch(newData){
+    X(2,'-> CommonElement#dispatch', {objet:this.refDebug,data:newData})
     // console.log("Nouvelles données : ", newData)
     // console.log("this.data au début du dispatch : ", JSON.stringify(this._data))
 

@@ -80,6 +80,7 @@ class Travail extends CommonElement {
       +method+:: [String|Function] Méthode à jouer sur chaque carte définie.
   **/
   forEachCard(method){
+    X(2,'-> Travail#forEachCard', this)
     const isFunction = method instanceof Function
     for(var card of this.cards) {
       // console.log("method: %s sur card = ", method, card)
@@ -95,9 +96,15 @@ class Travail extends CommonElement {
    si c'est un travail ponctuel, possiblement plusieurs si c'est un travail
    récurrent
    */
-  build(){ this.forEachCard('build') }
+  build(){
+    X(2,'-> Travail#build', this)
+    this.isRecurrent && this.prepareCards()
+    this.forEachCard('build')
+  }
   // Reconstruction (après modification)
   rebuild(){
+    X(2,'-> Travail#rebuild', this)
+    this.isRecurrent && this.prepareCards()
     this.forEachCard('rebuild')
   }
 
@@ -106,6 +113,7 @@ class Travail extends CommonElement {
     travail.
   **/
   async beforeDispatch(newData){
+    X(2,'-> Travail#beforeDispatch', this)
     return newData ;
   }
 
@@ -115,6 +123,7 @@ class Travail extends CommonElement {
     s'il faut transformer le travail en travail récurrent
   **/
   afterDispatch(){
+    X(2,'-> Travail#afterDispatch', this)
     if ( !this._recurrent ) return
     // La récurrence doit être prise en compte. Cela consiste à :
     //  - supprimer le travail de cette semaine
@@ -128,7 +137,10 @@ class Travail extends CommonElement {
    * (quand on le supprime, la méthode est appelée par smartRemove et doit
    * donc être conservée ici)
    */
-  removeDisplay(){ this.forEachCard('remove') }
+  removeDisplay(){
+    X(2,'-> Travail#removeDisplay', this)
+    this.forEachCard('remove')
+  }
 
 
   /**
@@ -258,5 +270,17 @@ class Travail extends CommonElement {
     revient de l'édition.
   **/
   get recurrent(){ return this._recurrent }
+
+  /**
+    La référence à l'élément, pour Debug/X
+    Permet d'écrire :
+      X(4, "Le message de débug", this)
+      où le `this` sera remplacé par cette référence précisant l'élément
+  **/
+  get refDebug(){
+    return this._refdebug || (
+      this._refdebug = `<Travail#${this.id} "${this.name}">`
+    )
+  }
 
 }// /Travail
