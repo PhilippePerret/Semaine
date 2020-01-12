@@ -21,7 +21,6 @@ class AssociateColor extends CommonElement {
     return this._path || (this._path = path.join(App.userDataFolder,'associate_colors.json'))
   }
 
-  static get humanName(){ return 'Couleur associée' }
   static get humanData(){return this._humandata || (this._humandata = {
       name:       'Couleur'
     , nameMin:    'couleur'

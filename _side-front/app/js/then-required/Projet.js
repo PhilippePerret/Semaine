@@ -14,11 +14,6 @@ class Projet extends CommonElement {
 
 
   /**
-    Les projets héritent des catégories
-  **/
-  static get firstInheritedClass(){return 'categorie'}
-
-  /**
     Retourne le path des données des projets courants
   **/
   static get path(){

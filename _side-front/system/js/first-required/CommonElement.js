@@ -200,26 +200,6 @@ class CommonElement {
     , plurial:    `${this.name}s`
     , plurialMin: `${this.name.toLowerCase()}s`
   })}
-  // /**
-  //   Retourne la première classe héritée dans la suite :
-  //   Travail, Projet, Catégorie, Domaine
-  //   Note : ce n'est pas une suite stricte dans le sens où un travail peut
-  //   directement avoir un Domaine, sans passer par le projet. Mais en terme
-  //   général, un travail (corriger le texte) appartient à un Projet (le roman),
-  //   qui a une Catégorie (Mes romans) qui appartient à un Domaine (l'écriture).
-  // **/
-  // static get firstInheritedClass(){
-  //   if (undefined === this._firstinheritedclass) {
-  //     this._firstinheritedclass = HIERARCHIE_PARENTS.indexOf(this.constructor.minClass)
-  //     console.log("this._firstinheritedclass = ", this._firstinheritedclass)
-  //     if ( this._firstinheritedclass > -1 ) {
-  //       this._firstinheritedclass += 1
-  //     } else {
-  //       this._firstinheritedclass = null
-  //     }
-  //   } return this._firstinheritedclass
-  // }
-
 
   /** ---------------------------------------------------------------------
     *   INSTANCE
@@ -309,7 +289,8 @@ class CommonElement {
                       l'édition
   **/
   edit(ev, audessusDe){
-    this.editor || (this.editor = new this.editorClass(this))
+    X(2,'-> CommonElement#edit', {this:this})
+    this.editor = new this.editorClass(this)
     this.editor.show(ev)
     if (audessusDe) {
       var zindex = Number(audessusDe.style.zIndex)
@@ -388,13 +369,6 @@ class CommonElement {
   **/
 
   /**
-    Propriété volatile
-  **/
-  get associateColor(){
-    return this._associatecolor || (this._associatecolor = AssociateColor.get(this.associatecolorId))
-  }
-
-  /**
     Propriétés fixes (enregistrées)
     que possède tout type d'éléments
   **/
@@ -441,20 +415,10 @@ class CommonElement {
       return this.associateColor ;
     } else {
       // On va essayer de la trouver dans un parent
-      return this.getColorHeritee()
+      return this.associatecolor_herited
     }
   }
-  // L'ID de la couleur si elle est définie pour cette élément
-  get associatecolorId() { return this._associatecolorId }
 
-  // Le premier parent de l'élément dans la suite des parents
-  // possible
-  get firstInheritedClass(){ return this.constructor.firstInheritedClass}
-
-
-  getColorHeritee(){
-    return this.getHeritedIdFor('f_color')
-  }
 
   /**
     Pour faire référence à l'élément
@@ -467,13 +431,19 @@ class CommonElement {
     N0002
     Ces méthodes sont communes à tous les éléments-commun, mais
     c'est juste pour ne pas répéter les méthodes. En réalité, ils
-    ne sont pas tous pertinent. Par exemple, projetId n'a aucun
+    ne sont pas tous pertinents. Par exemple, projetId n'a aucun
     sens pour un Domaine, qui est une classe hiérarchiquement supérieure.
   **/
-
+  /**
+    Propriétés volatiles
+  **/
+  get associateColor(){
+    return this._associatecolor || (this._associatecolor = AssociateColor.get(this.associatecolorId))
+  }
+  get associatecolorId() { return this._associatecolorId }
   get associatecolor_herited(){
     if ( undefined === this._associatecolor_herited) {
-      this._associatecolor_herited = this.getHeritedIdFor(AssociateColor) || null
+      this._associatecolor_herited = this.getHeritedValueFor(AssociateColor) || null
     } return this._associatecolor_herited
   }
 
@@ -507,7 +477,9 @@ class CommonElement {
   get projetId(){ return this._projetId }
 
   /**
-    Retourne la valeur (ID) héritée pour +prop+, de classe de nom +classStr+
+    Retourne la valeur (ID) héritée pour l'élément de classe +classe+. Par
+    exemplement le categorieId d'un travail, lorsqu'il n'est pas explicitement
+    défini par ce travail, mais par le projet auquel appartient le travail.
 
     Par exemple, retourne l'identifiant pour la propriété +categorieId+ de la
     classe +Categorie+.
@@ -536,26 +508,26 @@ class CommonElement {
       Un "sur-élément", c'est l'élément supérieur de l'élément, par exemple
       le Projet du Travail, la Catégorie du Travail ou du Projet etc.
   **/
-  getHeritedIdFor(prop /* pe. 'categorieId' */){
-                                              // --- PAR EXEMPLE ---
-                                              // prop = 'associatecolorId'
-                                              // classStr = 'AssociateColor'
-    var classe, parent, surElement, checkedSurElement ;
-    classe = this.constructor.name                //  'TravailRecurrent'
+  getHeritedIdFor(classe /* pe. classe AssociateColor */){
+    X(6,'-> CommentElement#getHeritedIdFor', {this:this, classe:classe.name})
+                                                    // --- PAR EXEMPLE ---
+    const prop = `${classe.minName}Id`              // 'associatecolorId'
+    var elementClass, parent, surElement, checkedSurElement ;
     // Le premier "sur-élément" [N2]
-    surElement = this
-    while (parent = HIERARCHIE_PARENTS[classe]) { //  'Projet'
-      surElement = surElement.getValueFor(parent, true /* par héritage */)
+    elementClass  = this.constructor.name                  //  'TravailRecurrent'
+    surElement    = this
+    while (parent = HIERARCHIE_PARENTS[elementClass]) { //  'Projet'
+      surElement = surElement.getValueFor(parent, parent != 'Domaine' /* par héritage */)
       // Si le Travail a un projet, surElement sera l'instance de ce projet
       // Dans ce cas, on regardera si ce projet contient
-      X(9,'Recherche de valeur dans parent', {classe:classe, parent:parent, surElement:surElement})
+      X(9,'Recherche de valeur dans parent', {elementClass:elementClass, parent:parent, surElement:surElement})
       if ( surElement && surElement[prop]) {
         // <= Le sur-élément existe (par exemple le projet du travail) et il
         // définit la propriété recherchée (p.e. la couleur ou le domaine)
         // => On retourne cette valeur
         return surElement[prop]
       }
-      classe = parent
+      elementClass = parent
     }
     return undefined ;
   }
@@ -566,7 +538,7 @@ class CommonElement {
   **/
   getHeritedValueFor(classe/* pe class Categorie */){
     if ('string' === typeof classe) classe = eval(classe)
-    var inheritedValue = this.getHeritedIdFor(`${classe.minName}Id`)
+    var inheritedValue = this.getHeritedIdFor(classe)
     return classe.get(inheritedValue)
   }
 
@@ -591,12 +563,19 @@ class CommonElement {
     if (inst) return DCreate('SPAN', {inner:inst.name, 'data-classe':classe.name, 'data-id':inst.id, 'watched-element':true})
     else return undefined
   }
+
+  /**
+    Renvoie l'instance de classe +classe+ [String|Any] pour l'élément
+    courant. Si +parHeritage+ est vrai, on cherche aussi par héritage.
+  **/
   getValueFor(classe, parHeritage = false){
-    if ('string' === typeof classe) classe = eval(classe)
+    if ('string' == typeof classe) classe = eval(classe)
+    X(9,'CommonElement#getValueFor',{this:this, classe:classe.name, parHeritage:parHeritage})
     const thisValue = this[`${classe.minName}Id`]
     if ( thisValue ) {
       return classe.get(thisValue)
     } else if ( parHeritage ) {
+      console.log("Je cherche la valeur '%s' pour cette instance '%s' avec getHeritedValueFor", classe.name, this.constructor.name)
       return this.getHeritedValueFor(classe)
     } else {
       return undefined

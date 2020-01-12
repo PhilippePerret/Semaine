@@ -20,9 +20,12 @@ class Categorie extends CommonElement {
     return this._path || (this._path = path.join(App.userDataFolder,'categories.json'))
   }
 
-  static get firstInheritedClass(){return 'domaine'}
-
-  static get humanName(){ return 'Catégorie' }
+  static get humanData(){return this._humandata || (this._humandata = {
+      name:       'Catégorie'
+    , nameMin:    'catégorie'
+    , plurial:    'Catégories'
+    , plurialMin: 'catégories'
+  })}
 
   /** ---------------------------------------------------------------------
     *   INSTANCE

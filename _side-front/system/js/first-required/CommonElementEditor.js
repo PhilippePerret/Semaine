@@ -120,8 +120,10 @@ class CommonElementEditor {
     Met les valeurs du propriétaire dans les champs
   **/
   setFormValues(){
+    X(2,'-> CommonElementEditor#setFormValues', {this:this})
     X().setMaxLevel(9)
     for(var prop in this.constructor.properties){
+      X(5, `[setFormValues] Traitement de la propriété ${prop}`)
       let dataProp = this.constructor.properties[prop]
       var domProp = 'value'
       var fieldId = this.idFor(prop)
@@ -155,21 +157,24 @@ class CommonElementEditor {
 
           // Mise en forme différente suivant qu'il s'agisse d'une propriété
           // héritée ou non
-          if ( this.owner.isHeritedFor(classe) ) {
-            displayedName = DCreate('SPAN',{class:'discret italic',inner:[displayedName]})
-          } else {
-            // Il faut mettre un bouton pour supprimer le lien
+          if ( displayedName ) {
+            if ( this.owner.isHeritedFor(classe) ) {
+              displayedName = DCreate('SPAN',{class:'discret italic',inner:[displayedName]})
+            } else {
+              // Il faut mettre un bouton pour supprimer le lien
 
-          }
+            }
+
+            // On opère que s'il y a un champ pour le nom
+            // DGet(`#${fieldNameId}`) && displayedName && ( nameField.innerHTML = displayedName )
+            if (DGet(`#${fieldNameId}`)) {
+              nameField.innerHTML = '';
+              nameField.append(displayedName)
+            }
+          } // fin de s'il y a un nom à afficher
 
           X(8,"setFormValues (pour classe propre)", {this:this, prop:prop, value:value, displayedName:displayedName, classMin:classMin, fieldId:fieldId, fieldNameId:fieldNameId, nameField:nameField})
 
-          // On opère que s'il y a un champ pour le nom
-          // DGet(`#${fieldNameId}`) && displayedName && ( nameField.innerHTML = displayedName )
-          if (DGet(`#${fieldNameId}`) && displayedName) {
-            nameField.innerHTML = '';
-            nameField.append(displayedName)
-          }
       }
       let obj = DGet(`#${fieldId}`)
       obj && value && (obj[domProp /* 'value' ou 'checked' */] = value)

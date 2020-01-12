@@ -5,6 +5,7 @@ const HIERARCHIE_PARENTS = {
   , 'TravailRecurrent': 'Projet'
   , 'Projet':           'Categorie'
   , 'Categorie':        'Domaine'
+  , 'Domaine':          null
 }
 
 const HEURE_START   = 6 ;
