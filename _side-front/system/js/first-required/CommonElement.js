@@ -527,15 +527,34 @@ class CommonElement {
         value = value || this.getHeritedIdFor('domaineId', 'Domaine')
     On commence par étudier le parent
     Si ce parent définit la propriété recherchée, on renvoie la valeur
+
+    [N1]
+      La hiérarchie n'est pas rigoureuse : un Travail peut définir un
+      Domaine sans passer par la catétorie et le projet intermédiaire. C'est
+      la raison pour laquelle il faut boucler sur chaque classe d'élément.
+    [N2]
+      Un "sur-élément", c'est l'élément supérieur de l'élément, par exemple
+      le Projet du Travail, la Catégorie du Travail ou du Projet etc.
   **/
   getHeritedIdFor(prop /* pe. 'categorieId' */){
                                               // --- PAR EXEMPLE ---
                                               // prop = 'associatecolorId'
                                               // classStr = 'AssociateColor'
-    var classe, parent ;
+    var classe, parent, surElement, checkedSurElement ;
     classe = this.constructor.name                //  'TravailRecurrent'
+    // Le premier "sur-élément" [N2]
+    surElement = this
     while (parent = HIERARCHIE_PARENTS[classe]) { //  'Projet'
-      if ( parent[prop] ) return parent[prop]     //  'Projet[associatecolorId]'
+      surElement = surElement.getValueFor(parent, true /* par héritage */)
+      // Si le Travail a un projet, surElement sera l'instance de ce projet
+      // Dans ce cas, on regardera si ce projet contient
+      X(9,'Recherche de valeur dans parent', {classe:classe, parent:parent, surElement:surElement})
+      if ( surElement && surElement[prop]) {
+        // <= Le sur-élément existe (par exemple le projet du travail) et il
+        // définit la propriété recherchée (p.e. la couleur ou le domaine)
+        // => On retourne cette valeur
+        return surElement[prop]
+      }
       classe = parent
     }
     return undefined ;
@@ -557,9 +576,42 @@ class CommonElement {
     if ( value ) return value.name
     else return undefined
   }
-  getNameOf(classe){
+  getNameFor(classe, parHeritage = false){
+    const instance = this.getValueFor(classe, parHeritage)
+    if (instance) return instance.name
+    else return undefined
+  }
+  /**
+    Retourne l'élément pour un affichage du nom qui sera cliquo-éditable
+    Mais attention, il faut observer ce span.
+  **/
+  geWatchedNameFor(classe, parHeritage = false) {
+    if ('string' == typeof classe) classe = eval(classe)
+    const inst = this.getValueFor(classe, parHeritage)
+    if (inst) return DCreate('SPAN', {inner:inst.name, 'data-classe':classe.name, 'data-id':inst.id, 'watched-element':true})
+    else return undefined
+  }
+  getValueFor(classe, parHeritage = false){
     if ('string' === typeof classe) classe = eval(classe)
-    return classe.get(this[`${classe.minName}Id`]).name
+    const thisValue = this[`${classe.minName}Id`]
+    if ( thisValue ) {
+      return classe.get(thisValue)
+    } else if ( parHeritage ) {
+      return this.getHeritedValueFor(classe)
+    } else {
+      return undefined
+    }
+  }
+
+  /**
+    Retourne true si la propriété de classe +classe+ est une propriété
+    héritée.
+    En fait, si la valeur est définie, on sait que c'est une valeur héritée
+    si elle n'est pas définie pour cette instance.
+  **/
+  isHeritedFor(classe){
+    if ('string' === typeof classe) classe = eval(classe)
+    return undefined === this[`${classe.minName}Id`]
   }
 
 }

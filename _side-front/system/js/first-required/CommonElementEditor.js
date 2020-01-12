@@ -88,7 +88,7 @@ class CommonElementEditor {
   }
 
   show(options){
-    this.built || this.build()
+    this.build()
     this.form.classList.remove('noDisplay')
     // On le place à l'endroit voulu si défini
     if (options && (options.x || options.left)) {
@@ -97,6 +97,9 @@ class CommonElementEditor {
     }
     // On charge les valeurs
     if (!(options && options.dontFill)) this.setFormValues()
+    // On observe le formulaire seulement ici, car on peut observer des
+    // valeurs comme par exemple les noms des catégories, couleurs, etc.
+    this.__observe()
   }
 
   hide(){
@@ -145,24 +148,31 @@ class CommonElementEditor {
           const nameField = DGet(`#${fieldNameId}`)
 
           // Nom à afficher
-          var displayedName ;
-          if ( value ) {
-            // <= Une valeur est explicitement définie pour l'objet
-            // => On l'enregistre dans le champ hidden
-            displayedName = this.owner.getNameOf(classe)
+          // Le second argument de `getNameFor` indique qu'on peut utiliser
+          // une valeur héritée
+          let displayedName = this.owner.geWatchedNameFor(classe, true) ;
+          // const displayedName = this.owner.getNameFor(classe, true) ;
+
+          // Mise en forme différente suivant qu'il s'agisse d'une propriété
+          // héritée ou non
+          if ( this.owner.isHeritedFor(classe) ) {
+            displayedName = DCreate('SPAN',{class:'discret italic',inner:[displayedName]})
           } else {
-            // <= La valeur n'est pour cet élément n'est pas explicitement définie
-            // => On doit la chercher dans une valeur héritée.
-            displayedName = this.owner.getHeritedNameFor(classe)
+            // Il faut mettre un bouton pour supprimer le lien
+
           }
 
           X(8,"setFormValues (pour classe propre)", {this:this, prop:prop, value:value, displayedName:displayedName, classMin:classMin, fieldId:fieldId, fieldNameId:fieldNameId, nameField:nameField})
 
           // On opère que s'il y a un champ pour le nom
-          DGet(`#${fieldNameId}`) && displayedName && ( nameField.innerHTML = displayedName )
+          // DGet(`#${fieldNameId}`) && displayedName && ( nameField.innerHTML = displayedName )
+          if (DGet(`#${fieldNameId}`) && displayedName) {
+            nameField.innerHTML = '';
+            nameField.append(displayedName)
+          }
       }
       let obj = DGet(`#${fieldId}`)
-      obj && value && (obj[domProp/* 'value' ou 'checked' */] = value)
+      obj && value && (obj[domProp /* 'value' ou 'checked' */] = value)
     } // Fin de la boucle for
 
     X().unsetMaxLevel()
@@ -435,8 +445,6 @@ class CommonElementEditor {
     })
     document.body.append(this.form)
     this.built = true
-    this.__observe()
-    if ( this.observe instanceof Function) this.observe.call(this)
   }
 
   /**
@@ -559,6 +567,17 @@ class CommonElementEditor {
     this.form.querySelectorAll('.acolorpicker-button').forEach(button => {
       button.addEventListener('click', UI.pickColorFor.bind(UI, button))
     })
+
+    // Les "names watchés"
+    this.form.querySelectorAll('span[watched-element="true"]').forEach(span=>{
+      var classe = span.getAttribute('data-classe')
+      var id = span.getAttribute('data-id')
+      var element = eval(classe).get(id)
+      span.addEventListener('click', element.edit.bind(element))
+    })
+
+    // Si la classe héritée possède une méthode d'observation, on l'appelle
+    if ( this.observe instanceof Function) this.observe.call(this)
 
   }
 
