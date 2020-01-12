@@ -1,3 +1,8 @@
 span[watched-element="true"] {
   cursor:pointer
 }
+
+.common-editor,
+.common-editor * {
+  -webkit-user-select:none;
+}

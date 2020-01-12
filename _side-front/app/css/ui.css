@@ -1,0 +1,5 @@
+.footer-buttons,
+.footer-buttons *
+{
+  -webkit-user-select:none;
+}

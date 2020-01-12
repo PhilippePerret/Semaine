@@ -11,12 +11,15 @@ div.travail {
   border-left: 2px solid transparent;
   padding-left:4px;
 }
+div.travail, div.travail * {
+  -webkit-user-select:none;
+}
 div.travail span.tache {
   padding: 0.2
 }
 
 div.travail.selected {
-  background-color:red;
+  background-color:red !important;
   z-index: 21;
 }
 div.travail:not(.selected) {

@@ -121,7 +121,6 @@ class CommonElementEditor {
   **/
   setFormValues(){
     X(2,'-> CommonElementEditor#setFormValues', {this:this})
-    X().setMaxLevel(9)
     for(var prop in this.constructor.properties){
       X(5, `[setFormValues] Traitement de la propriété ${prop}`)
       let dataProp = this.constructor.properties[prop]

@@ -7,6 +7,11 @@ div.semaine {
   position:relative;
 }
 
+div.semaine,
+div.semaine * {
+  -webkit-user-select:none;
+}
+
 div.semaine.courante {
   opacity:1;
 }
