@@ -117,6 +117,7 @@ class CommonElementEditor {
     Met les valeurs du propriétaire dans les champs
   **/
   setFormValues(){
+    X().setMaxLevel(9)
     for(var prop in this.constructor.properties){
       let dataProp = this.constructor.properties[prop]
       var domProp = 'value'
@@ -131,53 +132,42 @@ class CommonElementEditor {
           domProp = 'checked'
           break;
         default:
-          /* Un type propre à l'application
-            P.e. pour l'application Semaine, la Catégorie pour un travail,
-            donc typeMin = 'categorie'
-            */
-          var typeMin = dataProp.type.toLowerCase()
-          // Champ id contenant l'identifiant de l'élément
-          /*
-            L'identifiant du champ (identifiant qui permettra de nommer les
-            éléments)
-            P.e., pour Semaine, "travail-12-categorie"
-           */
-          var fieldId = this.idFor(prop)
-          /*
-            Si la valeur est défini pour le propriétaire, il faut
-            aussi indiquer le nom et il faut faire apparaitre le petit 'x' pour
-            délier.
-            Par exemple pour Semaine, fieldNameId peut être :
-              travail-12-categorieId-name
-           */
-          var fieldNameId = this.idFor(`${typeMin}-name`)
-          /*
-            Le champ pour le nom de l'élément parent
-           */
-          var nameField = DGet(`#${fieldNameId}`)
+          // Les valeurs qui seront utiles
+          // -----------------------------
+          const classe = eval(dataProp.type)
+          /* pe. 'categorie' */
+          const classMin = classe.minName
+          // L'identifiant du champ, p.e. "travail-12-categorie"
+          fieldId = this.idFor(prop)
+          // ID du champ pour le Nom (valeur affichée) pe 'travail-12-categorie-name'
+          const fieldNameId = this.idFor(`${classMin}-name`)
+          // Champ pour le nom affiché
+          const nameField = DGet(`#${fieldNameId}`)
 
-          if ( DGet(`#${fieldNameId}`) ) {
-            var isDefined = !!this.owner[typeMin]
-            var isHerited = !!this.owner[`${typeMin}_herited`]
-            var displayedName;
-            if ( isDefined ) {
-              displayedName = this.owner[typeMin].name ;
-              DGet(`.unlink-${dataProp.type}`).classList.remove('hidden')
-            } else if ( isHerited ) {
-              displayedName = `<span class="discret italic">${this.owner[`${typeMin}_herited`].name}</span>`
-            }
-            displayedName && ( nameField.innerHTML = displayedName )
+          // Nom à afficher
+          var displayedName ;
+          if ( value ) {
+            // <= Une valeur est explicitement définie pour l'objet
+            // => On l'enregistre dans le champ hidden
+            displayedName = this.owner.getNameOf(classe)
+          } else {
+            // <= La valeur n'est pour cet élément n'est pas explicitement définie
+            // => On doit la chercher dans une valeur héritée.
+            displayedName = this.owner.getHeritedNameFor(classe)
           }
 
+          X(8,"setFormValues (pour classe propre)", {this:this, prop:prop, value:value, displayedName:displayedName, classMin:classMin, fieldId:fieldId, fieldNameId:fieldNameId, nameField:nameField})
 
+          // On opère que s'il y a un champ pour le nom
+          DGet(`#${fieldNameId}`) && displayedName && ( nameField.innerHTML = displayedName )
       }
-      // console.log("")
       let obj = DGet(`#${fieldId}`)
-      if ( obj && value ) {
-        obj[domProp/*p.e. 'value' ou 'checked'*/] = value
-      }
-    }
+      obj && value && (obj[domProp/* 'value' ou 'checked' */] = value)
+    } // Fin de la boucle for
+
+    X().unsetMaxLevel()
   }
+
 
   /**
    * Récupère les valeurs du proprétaire dans les champs

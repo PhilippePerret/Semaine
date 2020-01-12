@@ -12,6 +12,11 @@ class Domaine extends CommonElement{
   }
 
   /**
+    Un domaine n'hérite de rien ni personne
+  **/
+  static get firstInheritedClass(){return undefined}
+
+  /**
     Retourne le path des données des projets courants
   **/
   static get path(){

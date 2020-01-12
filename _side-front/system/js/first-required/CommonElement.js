@@ -59,7 +59,11 @@ class CommonElement {
    */
   static select(item){
     X(2,'-> CommonElement::select', {this:`<class ${this.name}>`, item:item})
-    const sameAsSelected = this.selected && this.selected.id == item.id
+    const sameAsSelected = false // this.selected && this.selected.id == item.id
+    // Pour le moment, on n'utilise pas ça car ça poserait problème pour les
+    // double-click. Il faudrait gérer une temporisation pour savoir si c'est
+    // un click ou un double-click. Ou alors recevoir ici l'évènement et voir
+    // le laps de temps entre la sélection et cette nouvelle sélection.
     this.selected && this.deselect()
     unless(sameAsSelected, () => {
       this.selected = item
@@ -196,24 +200,25 @@ class CommonElement {
     , plurial:    `${this.name}s`
     , plurialMin: `${this.name.toLowerCase()}s`
   })}
-  /**
-    Retourne la première classe héritée dans la suite :
-    Travail, Projet, Catégorie, Domaine
-    Note : ce n'est pas une suite stricte dans le sens où un travail peut
-    directement avoir un Domaine, sans passer par le projet. Mais en terme
-    général, un travail (corriger le texte) appartient à un Projet (le roman),
-    qui a une Catégorie (Mes romans) qui appartient à un Domaine (l'écriture).
-  **/
-  static get firstInheritedClass(){
-    if (undefined === this._firstinheritedclass) {
-      this._firstinheritedclass = HIERARCHIE_PARENTS.indexOf(this.constructor.minClass)
-      if ( this._firstinheritedclass > -1 ) {
-        this._firstinheritedclass += 1
-      } else {
-        this._firstinheritedclass = null
-      }
-    } return this._firstinheritedclass
-  }
+  // /**
+  //   Retourne la première classe héritée dans la suite :
+  //   Travail, Projet, Catégorie, Domaine
+  //   Note : ce n'est pas une suite stricte dans le sens où un travail peut
+  //   directement avoir un Domaine, sans passer par le projet. Mais en terme
+  //   général, un travail (corriger le texte) appartient à un Projet (le roman),
+  //   qui a une Catégorie (Mes romans) qui appartient à un Domaine (l'écriture).
+  // **/
+  // static get firstInheritedClass(){
+  //   if (undefined === this._firstinheritedclass) {
+  //     this._firstinheritedclass = HIERARCHIE_PARENTS.indexOf(this.constructor.minClass)
+  //     console.log("this._firstinheritedclass = ", this._firstinheritedclass)
+  //     if ( this._firstinheritedclass > -1 ) {
+  //       this._firstinheritedclass += 1
+  //     } else {
+  //       this._firstinheritedclass = null
+  //     }
+  //   } return this._firstinheritedclass
+  // }
 
 
   /** ---------------------------------------------------------------------
@@ -447,29 +452,8 @@ class CommonElement {
   get firstInheritedClass(){ return this.constructor.firstInheritedClass}
 
 
-  /**
-    Méthode qui retourne la valeur de +prop+ prise dans un parent.
-    Par exemple, si on chercher la catégorie (categorie) d'un travail (Travail)
-    on peut le trouver dans le projet (Projet) du travail, dans le domaine du
-    travail ou encore dans le domaine du projet du travail
-  **/
-  getValueInheritedFromParent(prop){
-    const nombreParents = HIERARCHIE_PARENTS.length
-    const firstParent = HIERARCHIE_PARENTS.indexOf(this.firstInheritedClass)
-    // On répète pour chaque parent
-    for(var iparent = firstParent; iparent < nombreParents; ++iparent){
-      var classMinParent = HIERARCHIE_PARENTS[iparent]
-      if ( undefined === this[`${classMinParent}Id`] ) continue ;
-      if ( undefined === this[classMinParent] ) {
-        console.error("Problème avec l'élément '%s'", this.ref)
-        console.error("L'ID #%d de classe %s est défini mais ne renvoie aucun élément…", this[`${classMinParent}Id`], classMinParent)
-        error("Une erreur est survenue. Consulter la console.")
-      }
-      return this[classMinParent][prop] || this[classMinParent][`${prop}_herited`]
-    }
-  }
   getColorHeritee(){
-    return this.getValueInheritedFromParent('f_color')
+    return this.getHeritedIdFor('f_color')
   }
 
   /**
@@ -486,6 +470,13 @@ class CommonElement {
     ne sont pas tous pertinent. Par exemple, projetId n'a aucun
     sens pour un Domaine, qui est une classe hiérarchiquement supérieure.
   **/
+
+  get associatecolor_herited(){
+    if ( undefined === this._associatecolor_herited) {
+      this._associatecolor_herited = this.getHeritedIdFor(AssociateColor) || null
+    } return this._associatecolor_herited
+  }
+
   // Catégorie (cf. N0002)
   get categorie(){
     return this._categorie || (this._categorie = Categorie.get(this.categorieId))
@@ -494,14 +485,8 @@ class CommonElement {
 
   get categorie_herited(){
     if ( undefined === this._categorie_herited) {
-      this._categorie_herited = this.getValueInheritedFromParent('categorie')
+      this._categorie_herited = this.getHeritedValueFor(Categorie) || null
     } return this._categorie_herited
-  }
-
-  get associatecolor_herited(){
-    if ( undefined === this._associatecolor_herited) {
-      this._associatecolor_herited = this.getValueInheritedFromParent('associatecolor')
-    } return this._associatecolor_herited
   }
 
   // Domaine (cf. N0002)
@@ -509,11 +494,72 @@ class CommonElement {
     return this._domaine || (this._domaine = Domaine.get(this.domaineId))
   }
   get domaineId(){return this._domaineId}
+  get domaine_herited(){
+    if ( undefined === this._domaine_herited) {
+      this._domaine_herited = this.getHeritedValueFor(Domaine) || null
+    } return this._domaine_herited
+  }
 
   // Projet (cf. N0002)
   get projet(){
     return this._projet || (this._projet = Projet.get(this.projetId))
   }
   get projetId(){ return this._projetId }
+
+  /**
+    Retourne la valeur (ID) héritée pour +prop+, de classe de nom +classStr+
+
+    Par exemple, retourne l'identifiant pour la propriété +categorieId+ de la
+    classe +Categorie+.
+    Cette valeur ne sert que pour l'affichage, pour dire la valeur qui sera
+    utilisée pour l'élément.
+
+    Prenons par exemple un travail. Son domaine peut être explicitement défini
+    pour lui, mais il peut également découler de son projet défini, par sa
+    catégorie.
+          Travail -> Projet <- Catégorie <- Domaine
+      =>  Travail <- Domaine
+
+    L'algorithme de recherche est donc celui-là :
+
+    Si la valeur est définie explicitement pour l'élément courant, on ne
+    passe pas par là :
+        value = value || this.getHeritedIdFor('domaineId', 'Domaine')
+    On commence par étudier le parent
+    Si ce parent définit la propriété recherchée, on renvoie la valeur
+  **/
+  getHeritedIdFor(prop /* pe. 'categorieId' */){
+                                              // --- PAR EXEMPLE ---
+                                              // prop = 'associatecolorId'
+                                              // classStr = 'AssociateColor'
+    var classe, parent ;
+    classe = this.constructor.name                //  'TravailRecurrent'
+    while (parent = HIERARCHIE_PARENTS[classe]) { //  'Projet'
+      if ( parent[prop] ) return parent[prop]     //  'Projet[associatecolorId]'
+      classe = parent
+    }
+    return undefined ;
+  }
+
+  /**
+    Retourne la valeur (pas l'identifiant) pour la propriété de classe
+    +classe+
+  **/
+  getHeritedValueFor(classe/* pe class Categorie */){
+    if ('string' === typeof classe) classe = eval(classe)
+    var inheritedValue = this.getHeritedIdFor(`${classe.minName}Id`)
+    return classe.get(inheritedValue)
+  }
+
+  getHeritedNameFor(classe /* pe class Categorie */){
+    if ('string' === typeof classe) classe = eval(classe)
+    const value = this.getHeritedValueFor(classe)
+    if ( value ) return value.name
+    else return undefined
+  }
+  getNameOf(classe){
+    if ('string' === typeof classe) classe = eval(classe)
+    return classe.get(this[`${classe.minName}Id`]).name
+  }
 
 }

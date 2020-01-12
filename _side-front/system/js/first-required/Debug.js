@@ -10,11 +10,22 @@
 
   Pour définir le niveau minimal de débug :
 
-    Debug.maxLevel = <valeur de 0 — aucun message - à 9 - tous les messages>
+    X().maxLevel = <valeur de 0 — aucun message - à 9 - tous les messages>
+    ou  Debug.maxLevel = <valeur>
     Valeur par défaut : 3
 
-  Debug.on()    réactive le débuggage après un arrêt par X.off() ou X.stop()
-  Debug.start() idem
+  X().on()    ou Debug.on()    réactive le débuggage après un arrêt par X.off() ou X.stop()
+  X().start() ou Debug.start() idem
+  X().off()   ou Debug.off()    Arrêtet le debuggage
+  X().stop()  ou Debug.stop()
+
+  Pour modifier localement le niveau max, afin que les messages de détail
+  s'affiche, on peut mettre le code entre :
+
+      X().setMaxLevel(<niveau)  ou    Debug.setMaxLevel(<niveau>)
+      ... code ...
+      X().unsetMaxLevel()       ou    Debug.unsetMaxLevel()
+      // Remet au niveau précédent
 
 *** --------------------------------------------------------------------- */
 class Debug {
@@ -45,8 +56,8 @@ class Debug {
 
   **/
   static debug(level, message, owner){
-    if (this.off) return ;
-    if ( level > this.maxLevel ) return ;
+    if (this.off || (!level && !message)) return this ;
+    if ( level > this.maxLevel ) return this ;
     if ( owner && owner.refDebug ){
       message += `\n\t[${owner.refDebug}]`
     }
@@ -58,8 +69,18 @@ class Debug {
         this.log(level, `\t[${k}] = `, owner[k])
       }
     }
+    return this
   }
 
+
+  static setMaxLevel(niv){
+    this.oldMaxLevel = Number(Debug.maxLevel)
+    this.maxLevel = niv
+  }
+
+  static unsetMaxLevel(){
+    this.maxLevel = Number(this.oldMaxLevel)
+  }
 
   static log(level, message, data){
     if ( data ) {

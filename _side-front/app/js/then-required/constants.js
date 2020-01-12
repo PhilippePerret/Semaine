@@ -1,6 +1,11 @@
 'use strict'
 
-const HIERARCHIE_PARENTS = ['travail','projet','categorie','domaine']
+const HIERARCHIE_PARENTS = {
+    'Travail':          'Projet'
+  , 'TravailRecurrent': 'Projet'
+  , 'Projet':           'Categorie'
+  , 'Categorie':        'Domaine'
+}
 
 const HEURE_START   = 6 ;
 const HEURE_END     = 18 ;

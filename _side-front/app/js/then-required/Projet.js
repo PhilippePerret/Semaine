@@ -12,12 +12,11 @@ class Projet extends CommonElement {
     *
   *** --------------------------------------------------------------------- */
 
-  // static buildDefaultValues(){
-  //   new this({id:1, name:'Projet Tueuses vertes'})
-  //   new this({id:2, name:'Programme Film Analyzor'})
-  //   new this({id:3, name:'Commentaires Icare'})
-  //   this.save()
-  // }
+
+  /**
+    Les projets héritent des catégories
+  **/
+  static get firstInheritedClass(){return 'categorie'}
 
   /**
     Retourne le path des données des projets courants

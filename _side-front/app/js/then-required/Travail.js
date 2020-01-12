@@ -33,7 +33,7 @@ class Travail extends CommonElement {
     Retransforme le travail récurrent +rtravail+ [TravailRecurrent] en
     travail normal.
   **/
-  createFromTravailRecurrent(rtravail){
+  static createFromTravailRecurrent(rtravail){
     console.error("Cette méthode doit être implémentée")
   }
 
@@ -72,6 +72,12 @@ class Travail extends CommonElement {
       , plurialMin: 'travaux'
     })
   }
+
+  /**
+    Le travail (ou le travail récurrent) hérite d'un projet
+  **/
+  static get firstInheritedClass(){return 'projet'}
+
   // Le path des travaux, doit maintenant être défini par la semaine
   // courante
   static get path(){
