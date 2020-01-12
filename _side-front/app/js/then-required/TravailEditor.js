@@ -25,6 +25,7 @@ class TravailEditor extends CommonElementEditor {
       , recurrent:    {hname: 'Récurrent',  type: 'boolean'}
       , projetId:     {hname: 'Projet',     type: 'Projet'}
       , categorieId:  {hname: 'Catégorie',  type: 'Categorie'}
+      , domaineId:    {hname: 'Domaine',    type: 'Domaine'}
       , associatecolorId: {hname:'Couleur', type: 'AssociateColor'}
 
     }

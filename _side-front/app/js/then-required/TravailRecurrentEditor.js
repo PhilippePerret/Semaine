@@ -13,20 +13,20 @@ class TravailRecurrentEditor extends CommonElementEditor {
   *** --------------------------------------------------------------------- */
   static get properties(){
     return {
-        id:               {hname: 'ID',         type: 'number', hidden: true}
-      , tache:            {hname: 'Tâche',      type: 'string'}
-      , njour:            {hname: 'Jour',       type: 'number'}
-      , recurrence:       {hname: 'Récurrence', type: 'string', default: 'none', validator:{required:true, not:'none'}}
-      , recurrenceValue:  {hname: 'Valeur de récurrence', type:'string', default:''}
-      , startAt:          {hname: 'Commence le',type: 'string', default: TODAY.asJJMMAA(' ')}
-      , endAt:            {hname: 'Fini le',    type: 'string', default: ''}
-      , heure:            {hname: 'Heure',      type: 'float'}
-      , duree:            {hname: 'Durée',      type: 'float'}
-      , projetId:         {hname: 'Projet',     type: 'Projet'}
-      , categorieId:      {hname: 'Catégorie',  type: 'Categorie'}
-      , domaineId:        {hname: 'Domaine',    type: 'Domaine'}
-      , associatecolorId: {hname:'Couleur',     type: 'AssociateColor'}
-      , recurrent:        {hname: 'Récurrent',  type: 'boolean'}
+        id:               {hname:'ID',         type:'number', hidden: true}
+      , tache:            {hname:'Tâche',      type:'string'}
+      , njour:            {hname:'Jour',       type:'number'}
+      , recurrence:       {hname:'Récurrence', type:'string', default: 'none', validator:{required:true, not:'none'}}
+      , recurrenceValue:  {hname:'Valeur de récurrence', type:'string', default:''}
+      , startAt:          {hname:'Commence le',type:'string', default: TODAY.asJJMMAA(' ')}
+      , endAt:            {hname:'Fini le',    type:'string', default: ''}
+      , heure:            {hname:'Heure',      type:'float'}
+      , duree:            {hname:'Durée',      type:'float'}
+      , projetId:         {hname:'Projet',     type:'Projet'}
+      , categorieId:      {hname:'Catégorie',  type:'Categorie'}
+      , domaineId:        {hname:'Domaine',    type:'Domaine'}
+      , associatecolorId: {hname:'Couleur',    type:'AssociateColor'}
+      , recurrent:        {hname:'Récurrent',  type:'boolean'}
 
     }
   }

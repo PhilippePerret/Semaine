@@ -475,85 +475,96 @@ class CommonElement {
     return this._projet || (this._projet = Projet.get(this.projetId))
   }
   get projetId(){ return this._projetId }
+  get projet_herited(){
+    if (undefined === this._projetherited){
+      this._projetherited = getValueFor(Projet) || null
+    } return this._projetherited
+  }
 
   /**
-    Retourne la valeur (ID) héritée pour l'élément de classe +classe+. Par
-    exemplement le categorieId d'un travail, lorsqu'il n'est pas explicitement
-    défini par ce travail, mais par le projet auquel appartient le travail.
-
-    Par exemple, retourne l'identifiant pour la propriété +categorieId+ de la
-    classe +Categorie+.
-    Cette valeur ne sert que pour l'affichage, pour dire la valeur qui sera
-    utilisée pour l'élément.
-
-    Prenons par exemple un travail. Son domaine peut être explicitement défini
-    pour lui, mais il peut également découler de son projet défini, par sa
-    catégorie.
-          Travail -> Projet <- Catégorie <- Domaine
-      =>  Travail <- Domaine
-
-    L'algorithme de recherche est donc celui-là :
-
-      SOIT
-        Un Travail dont on veut obtenir la couleur
+    Je dois repenser l'algorithme pour trouver une valeur héritée
+    Exemple avec un Travail dont on veut le Domaine
+    SI
+      <travail>[domaineId] est défini
+    ALORS
+      On retourne <travail>[domaineId]
+    SINON
       SI
-        Travail définit explicitement sa couleur, on la retourne
+        le Projet existe
+      ALORS
+        On cherche le domaineId du projet
+        SI
+          Le domaineId du Projet est défini
+        ALORS
+          On retourne <Projet>[domaineId]
+        SINON
+          On recherche dans la Catégorie du Projet
+          SI
+            La Catégorie du projet existe
+          ALORS
+            On doit regarder si la catégorie définie domaineId
+          SINON
+            On continue de chercher ailleurs (avec la catégorie)
       SINON
-        On passe en revue les éléments supérieurs jusqu'à en trouver
-        un qui définissent la couleur (ou pas) :
-        Travail -> Projet -> Couleur ?
-        OUI => on la renvoie
-        NON
-          Travail -> Projet -> Domaine -> Couleur ?
-        OUI => on la renvoie
-        NON
-          Travail -> Domaine -> Couleur
-        OUI => on la renvoie
-        NON
-          On renvoie undefined, pas de couleur
+        SI
+          la catégorie existe
+        ALORS
+          On cherche le domaineId de la catégorie
+        SINON
+          On ne renvoie rien
 
-    Si la valeur est définie explicitement pour l'élément courant, on ne
-    passe pas par là :
-        value = value || this.getHeritedIdFor('domaineId', 'Domaine')
-    On commence par étudier le parent
-    Si ce parent définit la propriété recherchée, on renvoie la valeur
-
-    [N1]
-      La hiérarchie n'est pas rigoureuse : un Travail peut définir un
-      Domaine sans passer par la catétorie et le projet intermédiaire. C'est
-      la raison pour laquelle il faut boucler sur chaque classe d'élément.
-    [N2]
-      Un "sur-élément", c'est l'élément supérieur de l'élément, par exemple
-      le Projet du Travail, la Catégorie du Travail ou du Projet etc.
-    [N3]
-      On doit fonctionner comme ça car c'est une méthode "auto-appelée"
+    +Params+::
+      +wantedClasse+::[Any]   La classe de l'élément dont on veut l'identifiant
+                        par exemple 'Domaine' (ou la classe) pour obtenir
+                        le domaineId réel ou hérité de l'élément.
+      +parHeritage+::[Boolean]  Si true (par défaut), on recherche la valeur
+                                par héritage.
   **/
-  getHeritedIdFor(classe /* pe. classe AssociateColor */){
-    X(6,'-> CommentElement#getHeritedIdFor', {this:this, classe:classe.name})
-                                                    // --- PAR EXEMPLE ---
-    const prop = `${classe.minName}Id`              // 'associatecolorId'
-    var parentClass, parent, surElement, checkedSurElement ;
-
-    // cf. [N3]
-    // La valeur existe pour l'instance courante, on peut la renvoyer
-    if ( this[prop] ) return this[prop] ;
-    // Si la valeur n'existe pas pour l'instance courante, on prend sa
-    // classe parent et on recherche une valeur dedans.
-
-    parent = this.constructor.name
-    // Le premier "sur-élément" [N2]
-    surElement    = this
-    while (parent = HIERARCHIE_PARENTS[parent]) { //  'Projet'
-      X(9,'Recherche de valeur dans parent', {parent:parent, surElement:surElement})
-      parentClass = eval(parent)
-      surElement = this[parentClass.minName]
-      // Si l'élément ne définit pas de surElement, inutile de poursuivre. On
-      // va passer au parent pour voir si on obtient plus de succès.
-      if ( !surElement ) continue
-      var idValue = surElement.getValueFor(parent, true)
-      if ( idValue ) return idValue
+  getIdFor(wantedClasse, parHeritage = true) {
+    // raise_backtrace("Arrivée dans getIdFor")
+    if ('string' == typeof wantedClasse) wantedClasse = eval(wantedClasse)
+    const propName = `${wantedClasse.minName}Id` // p.e. 'domaineId'
+    // Pour mettre l'ID qui sera trouvé
+    let foundId ;
+    // Si l'instance définit explicitement cette valeur, on la renvoie
+    // console.log("[getIdFor] this[propName] = this[%s] = ", propName, this[propName], this)
+    if ( foundId = this[propName] ) return foundId ;
+    // Si on ne doit pas chercher par héritage, tant pis, on s'en
+    // retourne sans valeur
+    if ( false === parHeritage )  return undefined ;
+    // Sinon, on va la chercher dans son élément supérieur. Par exemple, si
+    // `this` est un travail, on cherche dans l'élément supérieur `Projet`
+    let supElementName = HIERARCHIE_PARENTS[this.constructor.name]
+    // Si la classe supérieur est égale à la classe qu'on cherche, on peut
+    // la passer puisqu'un projet, par exemple, ne peut pas définir un projet.
+    // Donc on va passer tout de suite à la classe supérieure
+    if ( supElementName == wantedClasse.name ) {
+      supElementName = HIERARCHIE_PARENTS[supElementName]
+      // console.log("[getIdFor] Classe recherchée = classe fouillée => impossible => on prend la classe supérieure : '%s'", supElementName)
     }
-    return undefined ;
+    // console.log("[getIdFor] On va rechercher dans la classe supérieure '%s'", supElementName)
+    // Si l'élément supérieur n'existe pas dans l'absolus (c'est le cas pour
+    // et seulement pour les {Domaine}s et les {AssociateColor}s), alors on
+    // doit s'en retourner les mains vides.
+    if ( !supElementName ) return undefined
+    while ( supElementName ) {
+      // console.log("Recherche de '%s' avec l'élément supérieur '%s'", propName, supElementName)
+      let supElementClass = eval(supElementName) // par exemple 'Projet'
+      // Si l'élément supérieur existe dans l'absolu, existe-t-il pour
+      // l'instance courante ?
+      if ( this[`${supElementClass.minName}Id`] && this[supElementClass.minName]){
+        // si oui, on va regarder s'il définit la propriété recherchée
+        foundId = this[supElementClass.minName].getIdFor(wantedClasse)
+        // S'il la définit explicitement ou par héritable, on la renvoie
+        if ( foundId ) return foundId
+      } else {
+        // L'instance supérieur qui existe dans l'absolu (pe Categorie) n'existe
+        // par pour l'instance courante.
+        // => Il faut prendre l'élément supérieur
+      }
+      supElementName = HIERARCHIE_PARENTS[supElementName]
+    }
+    return undefined
   }
 
   /**
@@ -562,7 +573,7 @@ class CommonElement {
   **/
   getHeritedValueFor(classe/* pe class Categorie */){
     if ('string' === typeof classe) classe = eval(classe)
-    var inheritedValue = this.getHeritedIdFor(classe)
+    var inheritedValue = this.getIdFor(classe)
     return classe.get(inheritedValue)
   }
 
@@ -573,7 +584,7 @@ class CommonElement {
     else return undefined
   }
   getNameFor(classe, parHeritage = false){
-    const instance = this.getValueFor(classe, parHeritage)
+    const instance = this.getHeritedValueFor(classe)
     if (instance) return instance.name
     else return undefined
   }
@@ -591,19 +602,14 @@ class CommonElement {
   /**
     Renvoie l'instance de classe +classe+ [String|Any] pour l'élément
     courant. Si +parHeritage+ est vrai, on cherche aussi par héritage.
+    [1]
+      Noter que this.getIdFor peut retourner undefined mais que la
+      méthode get en tiendra compte et retourne undefined aussi.
   **/
   getValueFor(classe, parHeritage = false){
     if ('string' == typeof classe) classe = eval(classe)
     X(9,'CommonElement#getValueFor',{this:this, classe:classe.name, parHeritage:parHeritage})
-    const thisValue = this[`${classe.minName}Id`]
-    if ( thisValue ) {
-      return classe.get(thisValue)
-    } else if ( parHeritage ) {
-      // console.log("Je cherche la valeur '%s' pour cette instance '%s' avec getHeritedValueFor", classe.name, this.constructor.name)
-      return this.getHeritedValueFor(classe)
-    } else {
-      return undefined
-    }
+    return classe.get(this.getIdFor(classe, parHeritage)) // [1]
   }
 
   /**
