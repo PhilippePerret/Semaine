@@ -494,6 +494,24 @@ class CommonElement {
 
     L'algorithme de recherche est donc celui-là :
 
+      SOIT
+        Un Travail dont on veut obtenir la couleur
+      SI
+        Travail définit explicitement sa couleur, on la retourne
+      SINON
+        On passe en revue les éléments supérieurs jusqu'à en trouver
+        un qui définissent la couleur (ou pas) :
+        Travail -> Projet -> Couleur ?
+        OUI => on la renvoie
+        NON
+          Travail -> Projet -> Domaine -> Couleur ?
+        OUI => on la renvoie
+        NON
+          Travail -> Domaine -> Couleur
+        OUI => on la renvoie
+        NON
+          On renvoie undefined, pas de couleur
+
     Si la valeur est définie explicitement pour l'élément courant, on ne
     passe pas par là :
         value = value || this.getHeritedIdFor('domaineId', 'Domaine')
@@ -507,27 +525,33 @@ class CommonElement {
     [N2]
       Un "sur-élément", c'est l'élément supérieur de l'élément, par exemple
       le Projet du Travail, la Catégorie du Travail ou du Projet etc.
+    [N3]
+      On doit fonctionner comme ça car c'est une méthode "auto-appelée"
   **/
   getHeritedIdFor(classe /* pe. classe AssociateColor */){
     X(6,'-> CommentElement#getHeritedIdFor', {this:this, classe:classe.name})
                                                     // --- PAR EXEMPLE ---
     const prop = `${classe.minName}Id`              // 'associatecolorId'
-    var elementClass, parent, surElement, checkedSurElement ;
+    var parentClass, parent, surElement, checkedSurElement ;
+
+    // cf. [N3]
+    // La valeur existe pour l'instance courante, on peut la renvoyer
+    if ( this[prop] ) return this[prop] ;
+    // Si la valeur n'existe pas pour l'instance courante, on prend sa
+    // classe parent et on recherche une valeur dedans.
+
+    parent = this.constructor.name
     // Le premier "sur-élément" [N2]
-    elementClass  = this.constructor.name                  //  'TravailRecurrent'
     surElement    = this
-    while (parent = HIERARCHIE_PARENTS[elementClass]) { //  'Projet'
-      surElement = surElement.getValueFor(parent, parent != 'Domaine' /* par héritage */)
-      // Si le Travail a un projet, surElement sera l'instance de ce projet
-      // Dans ce cas, on regardera si ce projet contient
-      X(9,'Recherche de valeur dans parent', {elementClass:elementClass, parent:parent, surElement:surElement})
-      if ( surElement && surElement[prop]) {
-        // <= Le sur-élément existe (par exemple le projet du travail) et il
-        // définit la propriété recherchée (p.e. la couleur ou le domaine)
-        // => On retourne cette valeur
-        return surElement[prop]
-      }
-      elementClass = parent
+    while (parent = HIERARCHIE_PARENTS[parent]) { //  'Projet'
+      X(9,'Recherche de valeur dans parent', {parent:parent, surElement:surElement})
+      parentClass = eval(parent)
+      surElement = this[parentClass.minName]
+      // Si l'élément ne définit pas de surElement, inutile de poursuivre. On
+      // va passer au parent pour voir si on obtient plus de succès.
+      if ( !surElement ) continue
+      var idValue = surElement.getValueFor(parent, true)
+      if ( idValue ) return idValue
     }
     return undefined ;
   }
@@ -575,7 +599,7 @@ class CommonElement {
     if ( thisValue ) {
       return classe.get(thisValue)
     } else if ( parHeritage ) {
-      console.log("Je cherche la valeur '%s' pour cette instance '%s' avec getHeritedValueFor", classe.name, this.constructor.name)
+      // console.log("Je cherche la valeur '%s' pour cette instance '%s' avec getHeritedValueFor", classe.name, this.constructor.name)
       return this.getHeritedValueFor(classe)
     } else {
       return undefined
