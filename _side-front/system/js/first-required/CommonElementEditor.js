@@ -353,9 +353,9 @@ class CommonElementEditor {
   // au listing NOTE : mais que faire si on ne vient pas du listing ?
   get isNew(){
     if (this.owner.isNew) {
-      console.log("NOUVEL ÉLÉMENT")
+      return true
     } else {
-      console.log("PAS NOUVEAU")
+      return false
     }
   }
 
