@@ -297,6 +297,12 @@ class CommonElementEditor {
       return false
     }
   }
+
+  /**
+    - méthode de validation -
+    Retourne false si on a pas trouver la valeur +value+ pour la propriété
+    +prop+ ou l'instance dans le cas contraire.
+  **/
   findSameAs(prop,value){
     var found = undefined ;
     value = value.toLowerCase()
@@ -396,9 +402,7 @@ class CommonElementEditor {
       realClass = classe
       classe = String(realClass.name)
     }
-    console.log("-> defineLinkTo (classe,objet=)", classe, objet)
     var propId = `${this.owner.ref}-${realClass.minName}Id`
-    console.log("propId (utilisation the this.owner.owner): ", propId)
     var propNameId = `${this.owner.ref}-${realClass.minName}-name`
     this.form.querySelector(`#${propId}`).value = objet ? objet.id : '' ;
     this.form.querySelector(`#${propNameId}`).innerHTML = objet ? objet.name : '---'

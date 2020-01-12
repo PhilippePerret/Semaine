@@ -22,6 +22,12 @@ class AssociateColor extends CommonElement {
   }
 
   static get humanName(){ return 'Couleur associée' }
+  static get humanData(){return this._humandata || (this._humandata = {
+      name:       'Couleur'
+    , nameMin:    'couleur'
+    , plurial:    'Couleurs'
+    , plurialMin: 'couleurs'
+  })}
 
 
   /** ---------------------------------------------------------------------
