@@ -7,6 +7,35 @@ class Travail extends CommonElement {
     *
   *** --------------------------------------------------------------------- */
 
+
+  /**
+   * Méthode appelée quand on sélectionne un item
+   *
+   * Pour fonctionner, la classe concrète doit avoir une propriété
+   * d'instance `selected` qui traite la sélection (set selected(v){...})
+   */
+  static select(item){
+    X(2,'-> CommonElement::select', {this:`<class ${this.name}>`, item:item})
+    const sameAsSelected = false // this.selected && this.selected.id == item.id
+    // Pour le moment, on n'utilise pas ça car ça poserait problème pour les
+    // double-click. Il faudrait gérer une temporisation pour savoir si c'est
+    // un click ou un double-click. Ou alors recevoir ici l'évènement et voir
+    // le laps de temps entre la sélection et cette nouvelle sélection.
+    this.selected && Travail.deselect()
+    unless(sameAsSelected, () => {
+      Travail.selected = item
+      Travail.selected.select()
+    })
+  }
+  static deselect(item){
+    X(2,'-> CommonElement::deselect', {this:`<class ${this.name}>`, item:item})
+    if (undefined === item) { // => c'est la sélection courante
+      item = Travail.selected
+      delete Travail.selected
+    }
+    item.deselect()
+  }
+
   /**
     Pour créer un nouveau travail
     +Params+::
