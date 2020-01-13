@@ -349,7 +349,7 @@ class CommonElementEditor {
   }
 
   /**
-   * Méthode qui enregistrer les nouvelles données
+   * Méthode qui enregistre les nouvelles données
    * Peut-être que l'élément doit être créé.
    */
   async onOk(){

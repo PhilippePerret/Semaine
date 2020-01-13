@@ -13,6 +13,7 @@ class ProjetEditor extends CommonElementEditor {
       , categorieId:      {feminin:true, hname:'Catégorie', type:'Categorie'}
       , associatecolorId: {feminin:true, hname:'Couleur',   type:'AssociateColor'}
       , projectopener:    {hname: 'Ouverture', type:'string'}
+      , worktime:         {hname: 'Temps de travail', type:'number'}
     }
   }
 

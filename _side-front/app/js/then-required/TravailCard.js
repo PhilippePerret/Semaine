@@ -243,12 +243,9 @@ class TravailCard {
   onToggleTime(tool, ev){
     stopEvent(ev)
     if ( this.timeRunning ) {
-      tool.innerHTML = "Démarrer le temps" // TODO Localisé
-      clearInterval(this.horlogeTimer)
-      delete this.horlogeTimer
+      this.stopHorloge(tool)
     } else {
       this.startHorloge()
-      // TODO On remplace le menu par une horloge qui tourne
     }
     this.timeRunning = !this.timeRunning
     return false
@@ -267,8 +264,21 @@ class TravailCard {
   }
   setHorlogeTime(){
     var now = new Date().getTime()
-    var diff = parseInt((now - this.startTime)/1000,10)
-    this.objHorloge.innerHTML = Horloge.s2h(diff)
+    this.workingTime = parseInt((now - this.startTime)/1000,10)
+    this.objHorloge.innerHTML = Horloge.s2h(this.workingTime)
+  }
+
+  async stopHorloge(tool){
+    tool.innerHTML = "Démarrer le temps" // TODO Localisé
+    clearInterval(this.horlogeTimer)
+    delete this.horlogeTimer
+    if ( this.workingTime > 30) {
+      const saveTime = await confirmer(loc('travail.ask-save-time'))
+      if (saveTime) {
+        this.owner.addWorktime(this.workingTime)
+        this.owner.projet && this.owner.projet.addWorktime(this.workingTime)
+      }
+    }
   }
 
   /**

@@ -235,7 +235,7 @@ class CommonElement {
       // console.log("k:'%s', value:'%s'", k, newData[k])
       if ( keysNewData.indexOf(k) > -1 ) {
         if ( this.data[k] != newData[k] ) {
-          this._data[k] = this[`_${k}`] = newData[k]
+          this.set(k, newData[k])
           Object.assign(realNewData, {[k]: newData[k]})
         } else {
           // console.log("Valeur de clé '%s' n'a pas changé (dans this.data:'%s', dans newData:'%s')", k, this.data[k], newData[k])
@@ -279,6 +279,18 @@ class CommonElement {
   set(prop, value){
     this[`_${prop}`] = value // peut être undefined
     this._data[prop] = value
+  }
+
+  /**
+    Définir des valeurs et enregistrer toutes les données
+  **/
+  setAndSave(table){
+    for(var prop in table) {
+      const value = table[prop]
+      this[`_${prop}`] = value
+      this._data[prop] = value
+    }
+    this.constructor.save()
   }
 
   /**
@@ -337,6 +349,7 @@ class CommonElement {
     this.editor && this.editor.updateInnerForm()
     // Actualiser dans les listings éventuels
     // TODO
+    // Actualiser à l'affichage
   }
 
   get editorClass(){ return this.constructor.editorClass }

@@ -42,4 +42,18 @@ class Projet extends CommonElement {
     }
     return this._opener
   }
+
+  /**
+    Ajouter +time+ secondes au temps de travail
+  **/
+  addWorktime(time){
+    this.setAndSave({worktime: this.worktime + time})
+  }
+
+
+  /**
+    Temps de travail sur le travail (ou le travail récurrent)
+  **/
+  get worktime(){ return this._worktime || 0}
+
 }

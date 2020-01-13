@@ -22,12 +22,12 @@ class TravailEditor extends CommonElementEditor {
       // tion.
       , heure:        {feminin:true, le:'l’', hname: 'Heure', type: 'float'}
       , duree:        {feminin:true, hname: 'Durée', type: 'float'}
-      , recurrent:    {hname: 'Récurrent',  type: 'boolean'}
-      , projetId:     {hname: 'Projet',     type: 'Projet'}
-      , categorieId:  {hname: 'Catégorie',  type: 'Categorie'}
-      , domaineId:    {hname: 'Domaine',    type: 'Domaine'}
-      , associatecolorId: {hname:'Couleur', type: 'AssociateColor'}
-
+      , recurrent:    {hname: 'Récurrent',        type: 'boolean'}
+      , projetId:     {hname: 'Projet',           type: 'Projet'}
+      , categorieId:  {hname: 'Catégorie',        type: 'Categorie'}
+      , domaineId:    {hname: 'Domaine',          type: 'Domaine'}
+      , associatecolorId: {hname:'Couleur',       type: 'AssociateColor'}
+      , worktime:     {hname: 'Temps de travail', type:'number'}
     }
   }
 

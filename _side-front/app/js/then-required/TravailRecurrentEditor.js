@@ -27,7 +27,7 @@ class TravailRecurrentEditor extends CommonElementEditor {
       , domaineId:        {hname:'Domaine',    type:'Domaine'}
       , associatecolorId: {hname:'Couleur',    type:'AssociateColor'}
       , recurrent:        {hname:'Récurrent',  type:'boolean'}
-
+      , worktime:         {hname: 'Temps de travail', type:'number'}
     }
   }
 

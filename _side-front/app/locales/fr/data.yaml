@@ -3,6 +3,7 @@ verbe:
   choose: Choisir
 travail:
   ask-make-recurrent: "Voulez-vous vraiment faire de ce travail un travail récurrent ?"
+  ask-save-time: "Dois-je ajouter ce temps au projet et au travail ?"
 
 recur:
   none:

@@ -198,6 +198,12 @@ class Travail extends CommonElement {
     this.forEachCard('remove')
   }
 
+  /**
+    Ajouter +time+ secondes au temps de travail
+  **/
+  addWorktime(time){
+    this.setAndSave({worktime: this.worktime + time})
+  }
 
   /**
     Toutes les cartes du travail ou du travail récurrent sur l'agenda
@@ -307,6 +313,11 @@ class Travail extends CommonElement {
     Durée
   **/
   get duree(){ return this._duree }
+
+  /**
+    Temps de travail sur le travail (ou le travail récurrent)
+  **/
+  get worktime(){ return this._worktime || 0}
 
   /**
     Jour du travail
