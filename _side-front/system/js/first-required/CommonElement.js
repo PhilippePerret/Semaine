@@ -592,7 +592,7 @@ class CommonElement {
     Retourne l'élément pour un affichage du nom qui sera cliquo-éditable
     Mais attention, il faut observer ce span.
   **/
-  geWatchedNameFor(classe, parHeritage = false) {
+  getWatchedNameFor(classe, parHeritage = false) {
     if ('string' == typeof classe) classe = eval(classe)
     const inst = this.getValueFor(classe, parHeritage)
     if (inst) return DCreate('SPAN', {inner:inst.name, 'data-classe':classe.name, 'data-id':inst.id, 'watched-element':true})

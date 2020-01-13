@@ -1,6 +1,17 @@
 'use strict'
-
 /**
+  Méthodes utiles
+  ---------------
+
+  ### Version 0.1.2
+
+  # Version 0.1.2
+    + méthode DSetValue
+
+  # Version 0.1.1
+    + méthode DGetValue
+
+
   Pour requérir un module en ayant un backtrace en cas d'erreur.
 
   Le mieux est de toujours envoyé `__dirname` en second argument et de définir
@@ -290,6 +301,20 @@ function valOrNull(value, options){
 function DGet(selector, container){
   if (undefined === container) container = document
   return container.querySelector(selector)
+}
+/**
+  Retourne la valeur de +selector+ dans +container+ mais retourne undefined
+  si la valeur est vide (string vide)
+**/
+function DGetValue(selector,container){
+  const dom = DGet(selector,container)
+  var value ;
+  if (dom) { return nullIfEmpty(dom.value) }
+  else return undefined ;
+}
+function DSetValue(selector,container,value){
+  const dom = DGet(selector,container)
+  dom.value = value // Plus tard, on pourra checker le genre (cb etc.)
 }
 function DGetAll(selector, container){
   if (undefined === container) container = document

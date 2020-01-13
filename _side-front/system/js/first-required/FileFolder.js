@@ -58,13 +58,13 @@ const chooseFile = function(params){
 }
 
 const chooseFolders = function(params){
-  if(undefined===params)params={}
+  params = params || {}
   params.properties || Object.assign(params,{properties:[]})
   params.properties.push('multiSelections')
   return chooseFolder(params)
 }
 const chooseFolder = function(params){
-  if(undefined===params)params={}
+  params = params || {}
   params.message  || Object.assign(params,{message:"Choisir le dossier…"})
   params.title    || Object.assign(params,{title:""})
   params.folder   && Object.assign(params,{defaultPath:params.folder})

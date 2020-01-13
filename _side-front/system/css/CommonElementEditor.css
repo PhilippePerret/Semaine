@@ -9,11 +9,18 @@
   z-index: 500; /* au-dessus de presque tout */
 }
 
+.common-editor,
+.common-editor * {
+  -webkit-user-select:none;
+}
+
 .common-editor input[type="text"],
 .common-editor textarea
 {
   width: 94%
 }
+
+
 
 .common-editor div.header {
   font-size:1.4em;
@@ -21,8 +28,22 @@
   font-weight: bold;
 }
 
+span[watched-element="true"] {
+  cursor:pointer
+}
+
+
+.common-editor button.small {
+  font-size: 9pt;
+}
+
 .common-editor div.row.buttons {
   margin-top: 2em !important;
+  text-align: right;
+}
+
+.common-editor div.row button {
+  margin: 0px 0.4em;
 }
 
 .common-editor div.row.external-type {
@@ -35,8 +56,7 @@
   content: "Nom : ";
 }
 .common-editor div.row.external-type button.button-choose {
-  font-size: 9pt;
-  float:right
+  float:right;
 }
 
 .common-editor div.row.external-type span.button-unlink {

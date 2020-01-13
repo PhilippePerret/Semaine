@@ -127,6 +127,14 @@ class CommonElementEditor {
       var domProp = 'value'
       var fieldId = this.idFor(prop)
       var value   = this.owner[prop]
+      var f_value = this.owner[`f_${prop}`] // peut-être une valeur formatée
+
+      // Valeurs qui seront rectifiées si c'est une propriété externe
+      // ID du champ pour le Nom (valeur affichée) pe 'travail-12-categorie-name'
+      let fieldNameId = this.idFor(`${prop}-name`)
+      // Champ pour le nom affiché (if any)
+      let nameField = DGet(`#${fieldNameId}`)
+
       switch (dataProp.type) {
         case 'string':
         case 'number':
@@ -138,43 +146,48 @@ class CommonElementEditor {
         default:
           // Les valeurs qui seront utiles
           // -----------------------------
-          const classe = eval(dataProp.type)
+
+          let classe = eval(dataProp.type)
           /* pe. 'categorie' */
-          const classMin = classe.minName
-          // L'identifiant du champ, p.e. "travail-12-categorie"
-          fieldId = this.idFor(prop)
+          let classMin = classe.minName
           // ID du champ pour le Nom (valeur affichée) pe 'travail-12-categorie-name'
-          const fieldNameId = this.idFor(`${classMin}-name`)
-          // Champ pour le nom affiché
-          const nameField = DGet(`#${fieldNameId}`)
+          fieldNameId = this.idFor(`${classMin}-name`)
+          // Champ pour le nom affiché (if any)
+          nameField = DGet(`#${fieldNameId}`)
+
 
           // Nom à afficher
           // Le second argument de `getNameFor` indique qu'on peut utiliser
           // une valeur héritée
-          let displayedName = this.owner.geWatchedNameFor(classe, true) ;
-          // const displayedName = this.owner.getNameFor(classe, true) ;
+          f_value = this.owner.getWatchedNameFor(classe, true) ;
+          // const f_value = this.owner.getNameFor(classe, true) ;
 
           // Mise en forme différente suivant qu'il s'agisse d'une propriété
           // héritée ou non
-          if ( displayedName ) {
+          if ( f_value ) {
             if ( this.owner.isHeritedFor(classe) ) {
-              displayedName = DCreate('SPAN',{class:'discret italic',inner:[displayedName]})
+              f_value = DCreate('SPAN',{class:'discret italic',inner:[f_value]})
             } else {
               // Il faut mettre un bouton pour supprimer le lien
 
             }
-
-            // On opère que s'il y a un champ pour le nom
-            // DGet(`#${fieldNameId}`) && displayedName && ( nameField.innerHTML = displayedName )
-            if (DGet(`#${fieldNameId}`)) {
-              nameField.innerHTML = '';
-              nameField.append(displayedName)
-            }
           } // fin de s'il y a un nom à afficher
 
-          X(8,"setFormValues (pour classe propre)", {this:this, prop:prop, value:value, displayedName:displayedName, classMin:classMin, fieldId:fieldId, fieldNameId:fieldNameId, nameField:nameField})
+          X(8,"setFormValues (pour classe propre)", {this:this, prop:prop, value:value, f_value:f_value, classMin:classMin, fieldId:fieldId, fieldNameId:fieldNameId, nameField:nameField})
 
       }
+
+      // On n'opère que s'il y a un champ pour le nom
+      // DGet(`#${fieldNameId}`) && f_value && ( nameField.innerHTML = f_value )
+      if (DGet(`#${fieldNameId}`)) {
+        if ( 'string' == typeof f_value ) {
+          nameField.innerHTML = f_value;
+        } else {
+          nameField.innerHTML = '';
+          nameField.append(f_value)
+        }
+      }
+
       let obj = DGet(`#${fieldId}`)
       obj && value && (obj[domProp /* 'value' ou 'checked' */] = value)
     } // Fin de la boucle for
@@ -246,6 +259,7 @@ class CommonElementEditor {
 
       Object.assign(newValues, {[prop]: value})
     }
+    // console.log("newValues = ", newValues)
     return newValues
   }
 
@@ -378,6 +392,14 @@ class CommonElementEditor {
   }
 
   /**
+   * Méthode appelée quand on clique sur un bouton "Définir…" utilisée
+   * par une classe qui n'utilise pas les CommonElement(s).
+   */
+  onDefine(classe){
+    eval(classe).defineFor(this)
+  }
+
+  /**
     Méthode appelée quand on clique sur le bouton 'x' pour supprimer
     le lien avec une catégorie, une couleur, etc.
 
@@ -408,6 +430,7 @@ class CommonElementEditor {
     }
     var propId = `${this.owner.ref}-${realClass.minName}Id`
     var propNameId = `${this.owner.ref}-${realClass.minName}-name`
+    console.log("propId=",propId)
     this.form.querySelector(`#${propId}`).value = objet ? objet.id : '' ;
     this.form.querySelector(`#${propNameId}`).innerHTML = objet ? objet.name : '---'
     this.form.querySelector(`.unlink-${classe}`).classList[objet?'remove':'add']('hidden')
@@ -470,12 +493,40 @@ class CommonElementEditor {
     return DCreate('DIV',{
       class:'external-type row'
     , inner:[
-        DCreate('BUTTON', {class:'button-choose', 'data-type':classe, inner:'Choisir…'})
+        DCreate('BUTTON', {class:'button-choose small', 'data-type':classe, inner:'Choisir…'})
       , DCreate('LABEL', {inner: `${realClass.humanData.name} : `})
-      , DCreate('SPAN', {id:`${this.idFor(classe.toLowerCase())}-name`, inner: '...'})
+      , DCreate('SPAN', {id:`${this.idFor(realClass.minName)}-name`, inner: '...'})
       , DCreate('SPAN', {inner:'×', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
-      , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${classe.toLowerCase()}Id`)}`})
+      , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${realClass.minName}Id`)}`})
       ]
+    })
+  }
+
+  /**
+    Retourne une rangée pour le type `classe` qui n'est pas un type
+    qui hérite des classes CommonElement
+
+    Requis
+    ------
+      (la classe n'héritant pas des classes CommonElement, il lui faut définir
+       ces propriétés et méthode)
+      static minName    (le nom de la classe en minuscule)
+      static humanData (cf. CommonElement)
+      static defineFor(this) qui va permettre de définir la valeur pour this
+        this.form   contient le formulaire
+        this.owner  définit le propriétaire
+
+  **/
+  rowFormForClass(classe){
+    if ('string' === typeof classe) classe = eval(classe)
+    return DCreate('DIV', {
+        class: `external-type row ${classe.minName}`
+      , inner:[
+          DCreate('BUTTON', {class:'button-define small fright', 'data-type':classe.name, inner:'Definir…'})
+        , DCreate('LABEL',  {inner:`${classe.humanData.name} : `})
+        , DCreate('SPAN',   {id:`${this.idFor(classe.minName)}-name`})
+        , DCreate('INPUT',  {type:'hidden', id:`${this.idFor(classe.minName)}`})
+        ]
     })
   }
 
@@ -567,6 +618,11 @@ class CommonElementEditor {
       var classe = button.getAttribute('data-type')
       button.addEventListener('click', my.onChooseType.bind(my, classe))
     })
+    this.form.querySelectorAll('.button-define').forEach(button => {
+      var classe = button.getAttribute('data-type')
+      button.addEventListener('click', my.onDefine.bind(my, classe))
+    })
+
     this.form.querySelectorAll('.button-unlink').forEach(button => {
       var classe = button.getAttribute('data-type')
       button.addEventListener('click', my.onUnlinkType.bind(my, classe))

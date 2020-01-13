@@ -12,6 +12,7 @@ class ProjetEditor extends CommonElementEditor {
       , name:             {hname: 'Titre',    type:'string',  validator:{required:true, minLength:3, maxLength:0, uniq:true}}
       , categorieId:      {feminin:true, hname:'Catégorie', type:'Categorie'}
       , associatecolorId: {feminin:true, hname:'Couleur',   type:'AssociateColor'}
+      , projectopener:    {hname: 'Ouverture', type:'string'}
     }
   }
 
@@ -24,6 +25,7 @@ class ProjetEditor extends CommonElementEditor {
       DCreate('INPUT',{type:'text', id:this.idFor('name')})
     , this.rowFormForType(Categorie)
     , this.rowFormForType(AssociateColor)
+    , this.rowFormForClass(ProjectOpener)
     ]
   }
 }

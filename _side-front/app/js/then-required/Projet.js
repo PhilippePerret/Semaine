@@ -29,5 +29,14 @@ class Projet extends CommonElement {
     super(data)
   }
 
+  get projectopener(){ return this._projectopener }
 
+  get f_projectopener(){
+    let openingData = JSON.parse(this.projectopener || "{}")
+    let str = []
+    openingData.fichier && str.push('fichier')
+    openingData.dossier && str.push('dossier')
+    openingData.code    && str.push('code')
+    return str.join(' + ')
+  }
 }
