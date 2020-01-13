@@ -102,6 +102,9 @@ class TravailCard {
       openCodeTools && openCodeTools.addEventListener('click', my.openCode.bind(my))
     }
 
+    let toggleTimeTools = DGet('.tools-toggle-time', this.obj)
+    toggleTimeTools.addEventListener('click',my.onToggleTime.bind(my, toggleTimeTools))
+
 
     /**
       SI
@@ -232,6 +235,40 @@ class TravailCard {
     stopEvent(ev)
     this.owner.projet.opener.openCode()
     return false
+  }
+
+  /**
+    Pour mettre en route ou arrêter le chronomètre
+  **/
+  onToggleTime(tool, ev){
+    stopEvent(ev)
+    if ( this.timeRunning ) {
+      tool.innerHTML = "Démarrer le temps" // TODO Localisé
+      clearInterval(this.horlogeTimer)
+      delete this.horlogeTimer
+    } else {
+      this.startHorloge()
+      // TODO On remplace le menu par une horloge qui tourne
+    }
+    this.timeRunning = !this.timeRunning
+    return false
+  }
+
+  /**
+    Appelée pour mettre en route le temps, c'est-à-dire jouer l'horloge
+    et l'inscrire dans la carte
+  **/
+  startHorloge(){
+    const my = this
+    this.startTime = new Date().getTime()
+    this.objHorloge = DGet('.tools-toggle-time', this.obj)
+    my.setHorlogeTime.call(my)
+    this.horlogeTimer = setInterval(my.setHorlogeTime.bind(my), 1000)
+  }
+  setHorlogeTime(){
+    var now = new Date().getTime()
+    var diff = parseInt((now - this.startTime)/1000,10)
+    this.objHorloge.innerHTML = Horloge.s2h(diff)
   }
 
   /**

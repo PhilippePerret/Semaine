@@ -10,7 +10,13 @@ const Horloge = {
    * retourne une horloge, complète (0:00:12) ou partielle (0:12)
    */
 , s2h(secs, options){
-
+    let hrs = Math.floor(secs / 3600)
+    let reste = secs % 3600
+    let mns = Math.floor(reste / 60)
+    let scs = reste % 60
+    scs = String(scs).padStart(2,'0')
+    mns = String(mns).padStart(2,'0')
+    return `${hrs}:${mns}:${scs}`
   }
 
   /**
@@ -28,6 +34,8 @@ const Horloge = {
 }
 
 Object.defineProperties(Horloge,{
+
+  // Heure courante
   currentHour:{get(){
     var hrs = new Date().getHours();
     var mns = new Date().getMinutes();
