@@ -40,6 +40,13 @@ recur:
     hname:  'un par an (aka "anniversaire")'
     ex:     "Le travail ne sera répété qu'une fois par an, précisément le jour spécifié (en prenant en compte la semaine) à compter du ${startAt}."
 
+projet:
+  open:
+    fichier-undefined: "Le fichier à ouvrir n'est pas défini !"
+    dossier-undefined: "Le dossier à ouvrir n'est pas défini !"
+    code-undefined: "Le code à jouer à l’ouverture n'est pas défini !"
+    code-error: "Une erreur est survenue en jouant le code. Consulter la console pour le détail (⌘⌥i)"
+
 long-texts:
   recur:
     cron:

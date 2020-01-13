@@ -26,3 +26,25 @@ Il existe de nombreux moyens de définir la récurrence d’un travail récurren
 #### Définir comme un cron-job
 
 La valeur de récurrence « comme un cron-job » permet, comme son nom l’indique, de définir la récurrence comme dans la cronTab, c’est-à-dire avec six valeurs qui peuvent être soit une étoile soit une valeur précise. Quand on choisit cette valeur, un texte explique le sens de chaque valeur.
+
+
+
+## Création d’un projet
+
+Pour le moment, on crée un projet pour une tâche particulière. On ne peut pas le créer en soit. Mais une fois qu’il est créé, on peut évidemment l’utiliser pour n’importe quelle autre tâche.
+
+### Ouvertures du projet
+
+Pour chaque projet, on peut définir :
+
+* un fichier à ouvrir
+* un dossier à ouvrir
+* un code (bash) à jouer
+
+Ce code bash à jouer permet de remédier à toutes les situations, même lorsque l’ouverture est complexe.
+
+#### Suppression de l'ouverture
+
+Pour supprimer un fichier ou un dossier à ouvrir, il suffit de faire comme si on en choisissait un (jusqu’à la fenêtre « Ouvrir un fichier/dossier ») et d’annuler.
+
+Pour le code, il suffit de vider le champ.

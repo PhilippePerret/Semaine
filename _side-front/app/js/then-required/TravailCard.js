@@ -87,12 +87,28 @@ class TravailCard {
     const my = this
     this.obj.addEventListener('dblclick', my.onDblClick.bind(my))
     this.obj.addEventListener('click', my.onClick.bind(my))
+
+    // Si le propriétaire de la carte (Travail ou TravailRecurrent) possède un
+    // projet, on peut peut-être trouver les boutons outils pour ouvrir le
+    // dossier, le fichier ou jouer le code.
+    if ( this.owner.projet ) {
+      // Observation des trois outils (3 ou moins) qui permettent d'ouvrir le
+      // fichier, le dossier ou le code d'ouverture
+      let openFichierTools = DGet('.tools-open-fichier',this.obj)
+      openFichierTools && openFichierTools.addEventListener('click', my.openFichier.bind(my))
+      let openDossierTools = DGet('.tools-open-dossier',this.obj)
+      openDossierTools && openDossierTools.addEventListener('click', my.openDossier.bind(my))
+      let openCodeTools = DGet('.tools-open-code',this.obj)
+      openCodeTools && openCodeTools.addEventListener('click', my.openCode.bind(my))
+    }
+
+
     /**
       SI
         - le travail appartient au jour courant
         - et son heure est inférieure au temps courant
       ALORS
-        - il faut ajouter un trigger
+        - il faut ajouter un trigger pour avertir
     **/
     if ( this.njour == TODAY.wDay && this.owner.heure > Horloge.currentHour) {
       Cursor.current.addTrigger(this)
@@ -128,13 +144,28 @@ class TravailCard {
       styles.push(`color:${this.owner.f_color.ftcolor}`)
     }
 
+    // Le div contenant les outils (ouverture, mise en route du temps, arrêt)
+    let toolsContent = []
+    if ( this.owner.projet ) {
+      toolsContent.push(...this.owner.projet.opener.cardMenus)
+      toolsContent.push(DCreate('DIV', {class: 'separator'}))
+    }
+    toolsContent.push(...[
+      DCreate('A', {inner: "Démarrer le temps", class:'tools-toggle-time'})
+    ])
+    let innerTools = [
+        DCreate('SPAN', {class:'tools-collapse-button', inner:'⚙️'})
+      , DCreate('DIV', {class:'content', inner:toolsContent})
+    ]
+
     // L'objet de la carte
     // -------------------
     // Rappel = un travail, s'il est récurrent, en a plusieurs.
     const objAttrs = {
         class:classCss.join(' ')
       , inner:[
-          DCreate('SPAN', {class:'tache', inner:this.owner.formated_tache })
+          DCreate('DIV',  {class:'tools', inner:innerTools})
+        , DCreate('SPAN', {class:'tache', inner:this.owner.formated_tache })
         , DCreate('SPAN', {class:'infos', inner:this.owner.formated_infos })
         ]
       , style:styles.join(';')
@@ -158,6 +189,7 @@ class TravailCard {
   select(){this.obj.classList.add('selected')}
   deselect(){this.obj.classList.remove('selected')}
 
+
   /*
     Méthodes d'évènement
   */
@@ -179,6 +211,27 @@ class TravailCard {
   onClick(ev){
     this.owner.constructor.select(this.owner)
     return stopEvent(ev)
+  }
+
+  /**
+    3 méthodes répondant aux menus outils pour ouvrir le fichier, le dossier
+    ou le code dans le cas où le propriétaire (Travail ou TravailRecurrent) de
+    cette carte appartient à (définit) un projet.
+  **/
+  openFichier(ev){
+    stopEvent(ev)
+    this.owner.projet.opener.openFichier()
+    return false
+  }
+  openDossier(ev){
+    stopEvent(ev)
+    this.owner.projet.opener.openDossier()
+    return false
+  }
+  openCode(ev){
+    stopEvent(ev)
+    this.owner.projet.opener.openCode()
+    return false
   }
 
   /**

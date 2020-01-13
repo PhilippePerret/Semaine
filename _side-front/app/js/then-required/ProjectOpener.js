@@ -48,6 +48,78 @@ class ProjectOpener {
   }
 
   /**
+   * Méthodes publiques utiles
+  **/
+
+  /**
+    La marque à mettre dans le formulaire de l'ÉDITEUR du PROJET pour indiquer
+    quelles valeurs sont définies. Par exemple 'dossier + code'
+  **/
+  get markData(){
+    let str = []
+    this.data.fichier && str.push('fichier')
+    this.data.dossier && str.push('dossier')
+    this.data.code    && str.push('code')
+    return str.join(' + ')
+  }
+
+  /**
+    Retourne les menus à placer dans la boite d'outils (tools) de la carte du
+    travail lorsqu'on peut ouvrir certaines choses.
+  **/
+  get cardMenus(){
+    var menus = []
+    this.data.fichier && menus.push(DCreate('A', {class:'tools-open-fichier', inner:'Ouvrir le fichier'}))
+    this.data.dossier && menus.push(DCreate('A', {class:'tools-open-dossier', inner:'Ouvrir le dossier'}))
+    this.data.code    && menus.push(DCreate('A', {class:'tools-open-code',    inner:'Jouer le code d’ouverture'}))
+    return menus
+  }
+
+  /**
+    3 méthodes pour ouvrir le fichier, le dossier ou jouer le code
+  **/
+  openFichier(){
+    if ( this.data.fichier ) {
+      exec(`open "${this.data.fichier}"`)
+    } else {
+      error(loc('projet.open.fichier-undefined'))
+    }
+  }
+  openDossier(){
+    if ( this.data.dossier ) {
+      exec(`open "${this.data.dossier}"`)
+    } else {
+      error(loc('projet.open.dossier-undefined'))
+    }
+  }
+  openCode(){
+    if ( this.data.code ) {
+      try {
+        exec(this.data.code)
+      } catch (e) {
+        console.error(e)
+        error(loc('projet.open.code-error'))
+      } finally {
+
+      }
+    } else {
+      error(loc('projet.open.code-undefined'))
+    }
+  }
+
+  /**
+   * Méthodes de données
+  **/
+
+  /**
+    Quand on ne vient pas de l'éditeur, on passe les données à l'instance
+    grâce à cette méthode
+  **/
+  setData(data){ this.data = data }
+
+
+
+  /**
    * Pour éditer l'opener
   **/
   edit(){

@@ -32,11 +32,14 @@ class Projet extends CommonElement {
   get projectopener(){ return this._projectopener }
 
   get f_projectopener(){
-    let openingData = JSON.parse(this.projectopener || "{}")
-    let str = []
-    openingData.fichier && str.push('fichier')
-    openingData.dossier && str.push('dossier')
-    openingData.code    && str.push('code')
-    return str.join(' + ')
+    return this.opener.markData
+  }
+
+  get opener(){
+    if ( undefined === this._opener ) {
+      this._opener = new ProjectOpener(this, null)
+      this._opener.setData(JSON.parse(this.projectopener || "{}"))
+    }
+    return this._opener
   }
 }

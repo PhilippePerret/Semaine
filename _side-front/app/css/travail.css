@@ -1,5 +1,5 @@
 /*
-Pour l'apparence des travaux
+Pour l'apparence des travaux (des cartes)
  */
 div.travail {
   position:absolute;
@@ -10,6 +10,9 @@ div.travail {
   width:calc(100% - 5px);
   border-left: 2px solid transparent;
   padding-left:4px;
+}
+div.travail:hover {
+  z-index:400 !important;
 }
 div.travail, div.travail * {
   -webkit-user-select:none;
@@ -27,12 +30,58 @@ div.travail:not(.selected) {
   z-index: 20;
 }
 
+/*
+  Les outils (tools)
+ */
+ div.travail div.tools {
+   float:right;
+   text-align:right;
+   margin:0 4px 1em 1em;
+   color: white!important;
+   width:auto;
+   z-index:400;
+ }
+ div.travail div.tools:hover {
+   background-color:green;
+ }
+ div.travail div.tools .content {
+   display:none;
+   text-align:left;
+   padding:0 0.5em 0.5em;
+   z-index:400;
+ }
+ div.travail div.tools:hover div.content,
+ div.travail div.tools div.content:hover
+ {
+   display:block;
+ }
+ div.travail div.tools div.content a {
+   display:block;
+   cursor:pointer;
+   padding: 3px 0.5em;
+ }
+ div.travail div.tools div.content a:hover {
+   background-color: #2979dc !important;
+ }
+ div.travail div.tools div.content div.separator {
+   height:1px;
+   background-color: white;
+   width:100%;
+   margin:8px 0 6px 0;
+ }
+
+
+
+/*
+  Les infos
+ */
 div.travail span.infos {
   position:absolute;
   bottom:0px;
   right:0px;
-  text-align:right
+  text-align:right;
   font-size: 9pt;
+  z-index:-1 !important;
 }
 /*
 Travaux récurrents

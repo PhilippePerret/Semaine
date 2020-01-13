@@ -11,7 +11,9 @@ function loc(message_id, params) {
   var dmessage = message_id.split('.')
   var message = TEXT
   var dom ;
-  while ( dom = dmessage.shift() ){ message = message[dom] }
+  while ( dom = dmessage.shift() ){
+    message = message[dom]
+  }
   if ( params ) {
     for(var k in params){
       var reg = new RegExp(`\\\$\\\{${k}\\\}`, 'g')
