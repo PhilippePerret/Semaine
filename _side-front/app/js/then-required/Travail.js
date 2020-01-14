@@ -292,7 +292,7 @@ class Travail extends CommonElement {
   **/
   get formated_infos(){
     let fstr = ''
-    if ( !this.tache.match('${projet}') && this.projet ) {
+    if ( !this.tache.match(/\$\{projet\}/) && this.projet ) {
       fstr += `Projet “${this.projet.name}”`
     }
     return fstr
