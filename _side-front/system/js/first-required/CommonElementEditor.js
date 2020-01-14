@@ -231,7 +231,7 @@ class CommonElementEditor {
       if (undefined != field) {
         value = field[domProp/*p.e. 'value' ou 'checked'*/]
       } else {
-        console.warn("Le champ '%s' n'existe pas…", fieldId)
+        // Un champ non éditable, comme par exemple le temps de travail
         continue;
       }
 

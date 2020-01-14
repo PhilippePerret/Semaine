@@ -241,7 +241,9 @@ class CommonElement {
           // console.log("Valeur de clé '%s' n'a pas changé (dans this.data:'%s', dans newData:'%s')", k, this.data[k], newData[k])
         }
       } else {
-        console.log("La propriété définie '%s' n'est pas connu des nouvelles données à transmettre", k)
+        // Cas normal où une propriété n'est pas connue. C'est une propriété
+        // non éditable, comme le temps de travail par exemple.
+        // console.log("La propriété définie '%s' n'est pas connu des nouvelles données à transmettre", k)
       }
     }
 

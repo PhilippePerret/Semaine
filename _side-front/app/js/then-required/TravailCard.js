@@ -42,9 +42,8 @@ class TravailCard {
    */
   rebuild(){
     X(4,'-> TravailCard#rebuild', {travail:this.owner, njour:this.njour})
-    this.reset()
-    this.unobserve()
     this.remove()
+    this.reset()
     this.build()
   }
 
@@ -53,7 +52,7 @@ class TravailCard {
     les ré-initialiser.
   **/
   reset(){
-    for(var prop of ['top','height']){ delete this[`_${prop}`]}
+    for(var prop of ['obj','top','height']){ delete this[`_${prop}`]}
   }
 
   /**
@@ -62,6 +61,8 @@ class TravailCard {
   **/
   remove(){
     if (this.obj) {
+      this.deselect()
+      this.unobserve()
       this.obj.remove()
       this.removeFromPlage()
     }
@@ -135,7 +136,6 @@ class TravailCard {
    * Méthodes de construction
    */
   buildInJour(overlap){
-    const container = this.jour.objTravaux;
     var classCss = ['travail'] ;
     var dataNjour = this.njour
     this.isRecurrent  && classCss.push('recurrent')
@@ -165,26 +165,34 @@ class TravailCard {
     // -------------------
     // Rappel = un travail, s'il est récurrent, en a plusieurs.
     const objAttrs = {
-        class:classCss.join(' ')
+        id: this.domId
+      , class:classCss.join(' ')
       , inner:[
           DCreate('DIV',  {class:'tools', inner:innerTools})
         , DCreate('SPAN', {class:'tache', inner:this.owner.formated_tache })
         , DCreate('SPAN', {class:'infos', inner:this.owner.formated_infos })
         ]
       , style:styles.join(';')
-      , 'data-travail-id': this.owner.id
-      , 'data-travail-type': this.isRecurrent?'recurrent':'ponctuel'
-      , 'data-njour':this.njour
+      , 'data-travail-id':    this.owner.id
+      , 'data-travail-type':  this.isRecurrent?'recurrent':'ponctuel'
+      , 'data-njour':         this.njour
       }
-    this.obj = DCreate('DIV', objAttrs)
+    const div = DCreate('DIV', objAttrs)
 
-    container.append(this.obj)
+    this.container.append(div)
+
     // On place correctement l'objet (noter que top et height ont pu être
     // rectifiés par l'étude des chevauchements)
     this.obj.style.top    = `${this.top}px`
     this.obj.style.height = `${this.height}px`
 
   }
+
+  get obj(){
+    return this._obj || (this._obj = DGet(`#${this.domId}`, this.container))
+  }
+
+  get container(){ return this.jour.objTravaux }
 
   /**
     Pour sélectionner ou désélectionner la carte
