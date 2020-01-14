@@ -160,6 +160,10 @@ class Travail extends CommonElement {
   // Reconstruction (après modification)
   rebuild(){
     X(2,'-> Travail#rebuild', this)
+    // Si on met prepareCards ici, la destruction des cartes actuelles opérées
+    // par la méthode rebuild ne fonctionnera pas ou mal. Il faut préparer les
+    // cartes seulement après avoir détruit toutes les cartes actuelles.
+    this.forEachCard('remove')
     this.isRecurrent && this.prepareCards()
     this.forEachCard('rebuild')
   }
