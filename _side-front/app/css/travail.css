@@ -32,18 +32,23 @@ div.travail:not(.selected) {
 
 /*
   Les outils (tools)
- */
- div.travail div.tools {
-   float:right;
-   text-align:right;
-   margin:0 4px 1em 1em;
-   color: white!important;
-   width:auto;
-   z-index:400;
- }
- div.travail div.tools:hover {
-   background-color:green;
- }
+*/
+div.travail div.tools {
+  float:right;
+  text-align:right;
+  margin:0 4px 1em 1em;
+  color: white!important;
+  width:auto;
+  z-index:400;
+}
+div.travail div.tools:hover,
+div.travail div.tools.opened
+{
+  float:unset;
+  position:absolute;
+  background-color:green;
+  width:90%;
+}
  div.travail div.tools .content {
    display:none;
    text-align:left;
@@ -51,7 +56,8 @@ div.travail:not(.selected) {
    z-index:400;
  }
  div.travail div.tools:hover div.content,
- div.travail div.tools div.content:hover
+ div.travail div.tools div.content:hover,
+ div.travail div.tools.opened div.content
  {
    display:block;
  }

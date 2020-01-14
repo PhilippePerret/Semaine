@@ -180,12 +180,16 @@ class Travail extends CommonElement {
   **/
   afterDispatch(){
     X(2,'-> Travail#afterDispatch', this)
-    if ( !this._recurrent ) return
-    // La récurrence doit être prise en compte. Cela consiste à :
-    //  - supprimer le travail de cette semaine
-    //  - l'ajouter à la liste des travaux récurrents
-    TravailRecurrent.createFromTravail(this)
-    Travail.remove(this)
+    if ( this._recurrent ) {
+      // La récurrence doit être prise en compte. Cela consiste à :
+      //  - supprimer le travail de cette semaine
+      //  - l'ajouter à la liste des travaux récurrents
+      TravailRecurrent.createFromTravail(this)
+      Travail.remove(this)
+    } else {
+      this.removeDisplay()
+      this.rebuild()
+    }
   }
 
   /**

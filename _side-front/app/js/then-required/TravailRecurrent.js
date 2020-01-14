@@ -287,13 +287,16 @@ class TravailRecurrent extends Travail {
   **/
   afterDispatch(){
     X(2,'-> TravailRecurrent#afterDispatch', this)
-    if ( this.isRecurrent ) return
-    // La récurrence doit être prise en compte. Cela consiste à :
-    //  - supprimer le travail récurrent de cette semaine
-    //  - l'ajouter à la liste des travaux
-    Travail.createFromTravailRecurrent(this)
-    TravailRecurrent.remove(this)
-
+    if ( this.isRecurrent ) {
+      this.removeDisplay()
+      this.rebuild()
+    } else {
+      // La récurrence doit être prise en compte. Cela consiste à :
+      //  - supprimer le travail récurrent de cette semaine
+      //  - l'ajouter à la liste des travaux
+      Travail.createFromTravailRecurrent(this)
+      TravailRecurrent.remove(this)
+    }
   }
 
   /**

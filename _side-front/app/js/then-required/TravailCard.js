@@ -245,7 +245,7 @@ class TravailCard {
     if ( this.timeRunning ) {
       this.stopHorloge(tool)
     } else {
-      this.startHorloge()
+      this.startHorloge(tool)
     }
     this.timeRunning = !this.timeRunning
     return false
@@ -255,12 +255,14 @@ class TravailCard {
     Appelée pour mettre en route le temps, c'est-à-dire jouer l'horloge
     et l'inscrire dans la carte
   **/
-  startHorloge(){
+  startHorloge(tool){
     const my = this
     this.startTime = new Date().getTime()
     this.objHorloge = DGet('.tools-toggle-time', this.obj)
     my.setHorlogeTime.call(my)
     this.horlogeTimer = setInterval(my.setHorlogeTime.bind(my), 1000)
+    // On laisse la boite outils ouverte pour voir le temps
+    DGet('.tools',this.obj).classList.add('opened')
   }
   setHorlogeTime(){
     var now = new Date().getTime()
@@ -272,6 +274,8 @@ class TravailCard {
     tool.innerHTML = "Démarrer le temps" // TODO Localisé
     clearInterval(this.horlogeTimer)
     delete this.horlogeTimer
+    // On laisse la boite outils ouverte pour voir le temps
+    DGet('.tools',this.obj).classList.remove('opened')
     if ( this.workingTime > 30) {
       const saveTime = await confirmer(loc('travail.ask-save-time'))
       if (saveTime) {
