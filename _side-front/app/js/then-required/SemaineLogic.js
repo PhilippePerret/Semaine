@@ -108,6 +108,9 @@ class SemaineLogic {
         annee   [Number]  Année de la semaine
   **/
   static showWeek(data){
+    // Dans tous les cas on s'assure qu'il n'y ait aucune semaine-screenshot
+    DGetAll('.semaine-screenshot').forEach(img => img.remove())
+
     // On définit la nouvelle semaine
     this.current = new SemaineLogic(data)
 
@@ -116,6 +119,16 @@ class SemaineLogic {
     // semaine logique (pour connaitre le bon offset et pouvoir régler
     // correctement les valeurs de jours)
     Jour.update()
+
+    // Si c'est une semaine précédente, on affiche le screenshot de la semaine
+    if ( this.current.isASouvenir ) {
+      if ( this.current.hasScreenshot) {
+        this.current.showScreenshot()
+      } else {
+        error("Cette semaine n'est pas définie. Elle doit être antérieur à l’initialisation de l’application.")
+      }
+      return
+    }
 
     // On construit les travaux de la semaine
     this.current.build()
@@ -238,6 +251,13 @@ class SemaineLogic {
     DGet('#index-semaine').innerHTML = this.index
   }
 
+
+  showScreenshot(){
+    this.screenshotObj = DCreate('IMG',{class:'semaine-screenshot', src:this.screenshotPath})
+    document.body.append(this.screenshotObj)
+    this.screenshotObj.addEventListener('click', (ev) => {this.screenshotObj.remove();return stopEvent(ev)})
+  }
+
   /**
     Décalage de cette instance semaine logique avec la semaine
     du jour courant. Utile pour connaitre les jours à afficher
@@ -276,6 +296,21 @@ class SemaineLogic {
                             this.index == todaySem.semaine
     }
     return this._iscurrentweek
+  }
+
+  // Retourne true si cette semaine logique est dans le passé
+  get isASouvenir(){
+    if ( undefined === this._isasouvenir ) {
+      const dToday      = SemaineLogic.todaySemaine
+      const curSemaine = Number(String(this.annee) + String(this.index).padStart(2,'0'))
+      const todSemaine = Number(String(dToday.annee)+String(dToday.semaine).padStart(2,'0'))
+      this._isasouvenir = curSemaine < todSemaine
+    } return this._isasouvenir ;
+  }
+
+  // Retourne true si la semaine possède un screenshot
+  get hasScreenshot(){
+    return fs.existsSync(this.screenshotPath)
   }
 
   /**

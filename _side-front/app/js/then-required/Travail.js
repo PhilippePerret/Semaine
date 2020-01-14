@@ -121,14 +121,11 @@ class Travail extends CommonElement {
     On empêche de sauvegarder les changements avant la semaine courante
   **/
   static beforeSave(){
-    const dataToday   = SemaineLogic.todaySemaine
-    let curSemaine = String(SemaineLogic.current.annee) + String(SemaineLogic.current.index).padStart(2,'0')
-    curSemaine = Number(curSemaine)
-    let todSemaine = Number(String(dataToday.annee)+String(dataToday.semaine).padStart(2,'0'))
-    if ( curSemaine < todSemaine ) {
-      return error("On ne peut pas modifier une semaine précédente.\bPour la voir telle qu'elle était, voir son screenshot.")
+    if ( SemaineLogic.current.isASouvenir ) {
+      error("On ne peut pas modifier une semaine précédente.\bPour la voir telle qu'elle était, voir son screenshot.")
+      return false
     } else {
-      retrun true
+      return true
     }
   }
   /**
