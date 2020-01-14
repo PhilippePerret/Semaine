@@ -14,7 +14,9 @@ class SemaineLogic {
     du jour courant.
   **/
   static forEachJour(method){
-    this.jours.forEach( jour => method(jour) )
+    for (var jour of this.jours) {
+      if ( false === method(jour) ) break ; // pour pouvoir interrompre
+    }
   }
 
   /**
@@ -161,6 +163,41 @@ class SemaineLogic {
     }
     return this._foldersemaines
   }
+
+
+  static findFreePlage({njour,heure,duree}){
+    const heure_init = Number(heure)
+    var fin = heure + duree
+    // On doit trouver une plage libre
+    this.forEachJour(jour => {
+      const sortedPlages = jour.plages.sort((a,b)=>{return a.start > b.start ? 1 : -1})
+      // console.log("njour, plages = ", jour.njour, sortedPlages)
+      njour = jour.njour
+      for(var dplage of sortedPlages) {
+        const w     = dplage.travail
+        const debW  = w.heure
+        const finW  = w.heure + w.duree
+
+        if (debW > heure && finW < fin) {
+          // Il suffit de modifier la durée du nouveau travail
+          duree = parseFloat(debW - heure)
+          return false // pour arrêter
+        } else if ( debW == heure || (debW < heure && finW > heure)){
+          heure = finW
+          fin   = heure + duree
+          // Si on dépasse l'heure du soir, il faut passer à l'autre jour
+          if ( fin > HEURE_END ) {
+            heure = heure_init
+            fin   = heure + duree
+            break
+          }
+        } else { // C'est bon
+          return false // pour arrêter
+        }
+      }
+    })
+    return {njour:njour, heure:heure, duree:duree}
+  }// /findFreePlage
 
   /** ---------------------------------------------------------------------
     *   INSTANCE

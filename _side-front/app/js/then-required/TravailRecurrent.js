@@ -165,7 +165,6 @@ class TravailRecurrent extends Travail {
       case 'none'   : return false ;
       case 'jour'   : return true  ; // tous les jours
       case 'jours'  : // seulement les jours voulus
-        console.log("recval, jourDay.wDay = ", recval, jourDay.wDay+1)
         return recval.indexOf(String(jourDay.wDay+1)) > -1
       case 'xjour'  : // tous les x jours
         // Le principe à appliquer ici est que le jour courant soit à un

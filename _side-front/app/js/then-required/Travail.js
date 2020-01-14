@@ -59,6 +59,14 @@ class Travail extends CommonElement {
   }
 
   /**
+    Pour créer un nouveau travail depuis le bouton "+" de l'UI
+  **/
+  static createNew(ev){
+    var {njour, heure, duree} = SemaineLogic.findFreePlage({njour:0,heure:HEURE_START,duree:1})
+    this.createNewInJour({njour:njour, heure:heure, duree:duree})
+  }
+
+  /**
     Retransforme le travail récurrent +rtravail+ [TravailRecurrent] en
     travail normal.
   **/

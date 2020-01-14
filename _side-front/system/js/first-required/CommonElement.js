@@ -129,9 +129,13 @@ class CommonElement {
   /**
     Méthode appelée quand on clique un bouton '+' qui permet
     d'ajouter un élément de ce type.
+    Mais attention, ce n'est pas le bouton des listings, qui est géré
+    par la classe CommonElementListing. Ici, par exemple dans Semaine, c'est
+    le bouton qui permet de créer un nouveau travail, depuis l'interface, le
+    + qui se trouve en bas à gauche.
   **/
   static onClickPlusButton(ev){
-    // TODO Créer un nouveau travail sur le premier emplacement libre
+    if (this.createNew instanceof Function) this.createNew.call(this)
     return stopEvent(ev)
   }
 
