@@ -56,8 +56,7 @@ class Debug {
 
   **/
   static debug(level, message, owner){
-    if (this.off || (!level && !message)) return this ;
-    if ( level > this.maxLevel ) return this ;
+    if (this.isOff || (!level && !message) || level > this.maxLevel ) return this ;
     if ( owner && owner.refDebug ){
       message += `\n\t[${owner.refDebug}]`
     }
@@ -95,7 +94,7 @@ class Debug {
   static stop() {this._off = true}
   static off(){this._off = true}
 
-  static get off(){
+  static get isOff(){
     if (undefined === this._off) { this._off = false}
     return this._off
   }

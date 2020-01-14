@@ -4,7 +4,8 @@ const App = {
     /**
       NIveau de débuggage
     **/
-    Debug.maxLevel = 5;
+    Debug.maxLevel = 3;
+    X().off()
 
     UI.init()
     // Appeler la méthode 'onInit' si elle existe
