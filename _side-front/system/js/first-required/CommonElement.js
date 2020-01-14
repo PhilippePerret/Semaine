@@ -93,7 +93,7 @@ class CommonElement {
    */
   static save(){
     if ( this.beforeSave instanceof Function ) {
-      if ( false === this.beforeSave.call() ) return false;
+      if ( false === this.beforeSave.call(this) ) return false;
     }
     this.path || raise(`Il faut définir le fichier ${this.name}.path, chemin d'accès au fichier de données.`)
     fs.existsSync(this.path) && fs.unlinkSync(this.path)

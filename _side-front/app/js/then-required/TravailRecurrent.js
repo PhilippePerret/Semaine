@@ -42,6 +42,32 @@ class TravailRecurrent extends Travail {
   // Nom minuscule obligatoire, sinon il est calculé d'après Travail
   static get minName(){return 'travailrecurrent'}
 
+  /**
+    Appelé avant d'enregistrer
+  **/
+  static beforeSave(){
+    if ( SemaineLogic.current.isASouvenir ) {
+      error("On ne peut pas modifier une semaine précédente.\bPour la voir telle qu'elle était, voir son screenshot.")
+      return false
+    } else {
+      // Il faut vérifier les travaux pour voir si des travaux périmés sont
+      // à supprimer (#33)
+      var newItems = {}
+      this.forEach(item => {
+        // console.log("item, endAtDay = ", item, item.endAtDay)
+        if ( item.endAtDay && (item.endAtDay.time < TODAY.time) ) {
+          console.log("Travail récurrent périmé. Je le supprime.", item)
+        } else {
+          // Sinon, c'est un travail récurrent toujours en activité,
+          // je l'enregistre.
+          Object.assign(newItems, {[item.id]: item})
+        }
+      })
+      this.items = newItems
+      newItems = null
+      return true
+    }
+  }
 
   /**
     Créer un nouveau travail récurrent à partir du travail +travail+ (instance
@@ -144,7 +170,7 @@ class TravailRecurrent extends Travail {
     const jourDay   = jour.smartDay
     const recval    = this.recurrenceValue
     const startDay  = SmartDay.parseDDMMYY(this.startAt)
-    const endDay    = this.endAt && SmartDay.parseDDMMYY(this.endAt)
+    const endDay    = this.endAtDay
 
     // Dans tous les cas, si on se trouve avant la date de départ,
     // on ne doit pas afficher le travail
@@ -330,6 +356,10 @@ class TravailRecurrent extends Travail {
     if (undefined === this._hend){
       this._hend = Horloge.heure2horloge(this.heure + (this.duree || 1))
     } return this._hend
+  }
+
+  get endAtDay(){
+    return this.endAt && SmartDay.parseDDMMYY(this.endAt)
   }
   /**
    * Propriétés fixes

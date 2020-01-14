@@ -119,6 +119,8 @@ class Travail extends CommonElement {
   /**
     Avant l'enregistrement de la semaine
     On empêche de sauvegarder les changements avant la semaine courante
+    ATTENTION : TravailRecurrent a sa propre méthode, pour filtrer les
+    travaux récurrents dépassés
   **/
   static beforeSave(){
     if ( SemaineLogic.current.isASouvenir ) {
