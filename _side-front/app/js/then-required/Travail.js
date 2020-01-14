@@ -141,7 +141,7 @@ class Travail extends CommonElement {
     for(var card of this.cards) {
       // console.log("method: %s sur card = ", method, card)
       if ( !card ) continue ;
-      const res = isFunction ? method(car) : card[method].call(card) ;
+      const res = isFunction ? method(card) : card[method].call(card) ;
       if ( false === res ) break ;
     }
   }

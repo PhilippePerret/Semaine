@@ -188,9 +188,13 @@ class TravailCard {
 
   /**
     Pour sélectionner ou désélectionner la carte
+
+    Noter que l'objet n'existe pas forcément, lorsqu'il y a par exemple
+    ajout ou suppression de cartes, quand on augmente le nombre de jours ou
+    qu'on le diminue par le choix de la récurrence.
   **/
-  select(){this.obj.classList.add('selected')}
-  deselect(){this.obj.classList.remove('selected')}
+  select(){this.obj && this.obj.classList.add('selected')}
+  deselect(){this.obj && this.obj.classList.remove('selected')}
 
 
   /*
