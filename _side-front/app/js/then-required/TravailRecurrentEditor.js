@@ -45,12 +45,20 @@ class TravailRecurrentEditor extends CommonElementEditor {
       OptionsRecurrence.push(DCreate('OPTION', {inner:dataRec.hname||loc(`recur.${rec}.hname`), value:rec}))
     }
 
+    // Si la récurrence courante est définie et que c'est une récurrence
+    // qui a besoin de valeur, on affiche le champ d'édition de cette valeur
+    // Sinon, il sera caché et n'apparaitra que lorsqu'on choisira un item
+    // 'definable'
+    var recValueCss = ['short']
+    if ( !DATA_RECURRENCES[this.owner['recurrence']||'none'].definable) recValueCss.push('noDisplay')
+    recValueCss = recValueCss.join(' ')
+
     return [
         DCreate('INPUT',{type:'text',   id:this.idFor('tache'), placeholder:"Tâche à exécuter"})
       , DCreate('DIV', {class:'row select', inner:[
           DCreate('LABEL',{inner: "Récurrence : "})
         , DCreate('SELECT', {id:this.idFor('recurrence'), inner:OptionsRecurrence, class:'auto'})
-        , DCreate('INPUT',{type:'text', class:'noDisplay short', id:this.idFor('recurrenceValue')})
+        , DCreate('INPUT',{type:'text', class:recValueCss, id:this.idFor('recurrenceValue')})
         , DCreate('DIV', {class:'rec-expli', id:this.idFor('recurrence_explication')})
         ]})
       , DCreate('DIV', {class:'row', inner:[
@@ -90,11 +98,11 @@ class TravailRecurrentEditor extends CommonElementEditor {
     // console.log("Changement de la récurrence")
     const recMenu = DGet(`#${this.idFor('recurrence')}`)
     const recExpli = DGet(`#${this.idFor('recurrence_explication')}`)
-    const recSupValeu = DGet(`#${this.idFor('recurrenceValue')}`)
+    const recSupValue = DGet(`#${this.idFor('recurrenceValue')}`)
     const recValue = recMenu.value
     // console.log("Valeur de récurrence :", recValue)
     const recData = DATA_RECURRENCES[recValue]
-    recSupValeu.classList[recData.definable?'remove':'add']('noDisplay')
+    recSupValue.classList[recData.definable?'remove':'add']('noDisplay')
     recExpli.innerHTML = loc(recData.explication||`recur.${recValue}.ex`).replace(/\$\{([a-zA-Z]+)\}/g, (tout,prop) => {return this.owner[`f_${prop}`]})
     return stopEvent(ev)
   }
