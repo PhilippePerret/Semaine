@@ -144,7 +144,7 @@ class Travail extends CommonElement {
       +method+:: [String|Function] Méthode à jouer sur chaque carte définie.
   **/
   forEachCard(method){
-    X(2,'-> Travail#forEachCard', this)
+    X(2,'-> Travail#forEachCard', {this:this, method:method})
     const isFunction = method instanceof Function
     for(var card of this.cards) {
       // console.log("method: %s sur card = ", method, card)
@@ -172,8 +172,16 @@ class Travail extends CommonElement {
     // par la méthode rebuild ne fonctionnera pas ou mal. Il faut préparer les
     // cartes seulement après avoir détruit toutes les cartes actuelles.
     this.forEachCard('remove')
-    this.isRecurrent && this.prepareCards()
+    this.resetCards()
     this.forEachCard('rebuild')
+  }
+
+  resetCards(){
+    if (this.isRecurrent) {
+      this.prepareCards()
+    } else {
+      delete this._cards
+    }
   }
 
   /**
@@ -224,7 +232,7 @@ class Travail extends CommonElement {
   /**
     Toutes les cartes du travail ou du travail récurrent sur l'agenda
     Noter que Travail et TravailRecurrent ont tous les deux cette liste, même
-    si le travail n'en a qu'une, au jour this.njour.
+    si le travail n'a qu'une seule carte, au jour this.njour.
     Noter que this.cards contient toujours 7 éléments, le premier sera toujours
     null et les autres correspondent au 6 `njour` possible (lundi = cards[1],
     mardi = cards[2], etc.).
