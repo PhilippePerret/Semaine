@@ -144,6 +144,7 @@ class CommonElementEditor {
           domProp = 'checked'
           break;
         default:
+
           // Les valeurs qui seront utiles
           // -----------------------------
 
@@ -179,12 +180,14 @@ class CommonElementEditor {
 
       // On n'opère que s'il y a un champ pour le nom
       // DGet(`#${fieldNameId}`) && f_value && ( nameField.innerHTML = f_value )
-      if (DGet(`#${fieldNameId}`)) {
+      if (DGet(`#${fieldNameId}`) && f_value) {
         if ( 'string' == typeof f_value ) {
           nameField.innerHTML = f_value;
         } else {
           nameField.innerHTML = '';
           nameField.append(f_value)
+          // Il faut faire apparaitre la croix pour supprimer l'association,
+          // mais SEULEMENT si c'est une valeur explicite (pas héritée)
         }
       }
 
@@ -490,13 +493,17 @@ class CommonElementEditor {
       realClass = classe
       classe    = realClass.name
     }
+    // Si une valeur explicite existe, il faut faire apparaitre la croix de
+    // dissociation. Sinon, on la cache
+    var croixCss = ['button-unlink', `unlink-${classe}`]
+    this.owner[`_${realClass.minName}Id`] || croixCss.push('hidden')
     return DCreate('DIV',{
       class:'external-type row'
     , inner:[
         DCreate('BUTTON', {class:'button-choose small', 'data-type':classe, inner:'Choisir…'})
       , DCreate('LABEL', {inner: `${realClass.humanData.name} : `})
       , DCreate('SPAN', {id:`${this.idFor(realClass.minName)}-name`, inner: '...'})
-      , DCreate('SPAN', {inner:'×', class:`button-unlink unlink-${classe} hidden`, 'data-type':classe})
+      , DCreate('SPAN', {inner:'×', class:croixCss.join(' '), 'data-type':classe})
       , DCreate('INPUT',{type:'hidden', id:`${this.idFor(`${realClass.minName}Id`)}`})
       ]
     })
