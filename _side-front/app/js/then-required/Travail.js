@@ -113,8 +113,30 @@ class Travail extends CommonElement {
   // Le path des travaux, doit maintenant être défini par la semaine
   // courante
   static get path(){
-    // console.log("Path = ", Semaine.current.path)
     return SemaineLogic.current.path
+  }
+
+  /**
+    Avant l'enregistrement de la semaine
+    On empêche de sauvegarder les changements avant la semaine courante
+  **/
+  static beforeSave(){
+    const dataToday   = SemaineLogic.todaySemaine
+    let curSemaine = String(SemaineLogic.current.annee) + String(SemaineLogic.current.index).padStart(2,'0')
+    curSemaine = Number(curSemaine)
+    let todSemaine = Number(String(dataToday.annee)+String(dataToday.semaine).padStart(2,'0'))
+    if ( curSemaine < todSemaine ) {
+      return error("On ne peut pas modifier une semaine précédente.\bPour la voir telle qu'elle était, voir son screenshot.")
+    } else {
+      retrun true
+    }
+  }
+  /**
+    Après l'enregistrement de la semaine
+    On fait un screenshot.
+  **/
+  static afterSave(){
+    SemaineLogic.makeScreenshot()
   }
 
   /** ---------------------------------------------------------------------

@@ -199,6 +199,24 @@ class SemaineLogic {
     return {njour:njour, heure:heure, duree:duree}
   }// /findFreePlage
 
+
+  /**
+    Produit un screenshot de la semaine, permet de la garder sous forme
+    d'image, sans avoir à la reconstruire.
+  **/
+  static makeScreenshot(){
+    if (undefined === this.screenshotMachine){
+      this.screenshotMachine = require('screenshot-desktop')
+    }
+    var dataScreenshot = {filename:this.current.screenshotPath, format:'jpg'}
+    this.screenshotMachine(dataScreenshot)
+      .then(this.confirmScreenshot.bind(this))
+      .catch(error)
+  }
+  static confirmScreenshot(path){
+    console.log("Capture de la semaine enregistrée dans ", path)
+  }
+
   /** ---------------------------------------------------------------------
     *   INSTANCE
     *
@@ -278,10 +296,16 @@ class SemaineLogic {
   }
 
   /**
+    Path du screenshot
+  **/
+  get screenshotPath(){
+    return this._screenshotpath||(this._screenshotpath = path.join(this.folderSemaines,`${this.affixeName}.jpg`))
+  }
+  /**
     Path de la semaine courante
   **/
   get path(){
-    return this._path||(this._path = path.join(this.constructor.folderSemaines,this.pathName))
+    return this._path||(this._path = path.join(this.folderSemaines,this.pathName))
   }
 
   /**
@@ -295,4 +319,5 @@ class SemaineLogic {
     return this._affixename || (this._affixename = `semaine-${this.annee}-${this.index}`)
   }
 
+  get folderSemaines(){return this.constructor.folderSemaines}
 }

@@ -86,8 +86,15 @@ class CommonElement {
   /**
    * Sauve les données items
    * Requis : la définition de +path+
+
+   Si une méthode `beforeSave` existe, on l'appelle avant la sauvegarde. Si
+   elle retourne false (et exacteement false) on ne sauvegarde pas.
+   Si une méthode `afterSave` est définie, on l'appelle après la sauvegarde
    */
   static save(){
+    if ( this.beforeSave instanceof Function ) {
+      if ( false === this.beforeSave.call() ) return false;
+    }
     this.path || raise(`Il faut définir le fichier ${this.name}.path, chemin d'accès au fichier de données.`)
     fs.existsSync(this.path) && fs.unlinkSync(this.path)
     var datas = Object.values(this.items).map(item => {
@@ -100,6 +107,8 @@ class CommonElement {
     fs.writeFileSync(this.path, JSON.stringify(datas))
     // Il faut actualiser les listings de cet élément
     this.listingClass.updateListings()
+    // Si une méthode après la sauvegarde existe, on l'appelle
+    if ( this.afterSave instanceof Function) this.afterSave.call(this)
   }
 
   /**

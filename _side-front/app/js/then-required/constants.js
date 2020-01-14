@@ -26,7 +26,7 @@ const TOP_START     = 30 ; // hauteur du nom du jour
 
 const DATA_RECURRENCES = {
     'none':   {hname: loc('verbe.choose')}
-  , 'cron':   {definable:true, explication: 'long-texts.recur.cron.ex'}
+  // , 'cron':   {definable:true, explication: 'long-texts.recur.cron.ex'}
   , 'jour':   {}
   , 'xjour':  {definable:true}
   , 'jours':  {definable:true}
