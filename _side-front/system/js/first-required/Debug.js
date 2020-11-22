@@ -5,6 +5,9 @@
   Pour un système de débuggage de l'application
 
   # Version 0.1.0
+  ----------------
+  # 0.1.0
+      Première mise en place.
 
   Utiliser l'alias X
 
